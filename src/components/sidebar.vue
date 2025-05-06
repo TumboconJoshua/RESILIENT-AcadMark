@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sm:w-[1/5] md:w-1/5 lg:w-1/6 max-w-[210px] w-auto bg-blue md:pt-15 sm:pt-5 rounded-tr-[30px] sticky top-0 h-screen flex flex-col"
+    class="sm:w-[1/5] md:w-1/5 lg:w-1/6 max-w-[220px] w-auto bg-blue md:pt-15 sm:pt-5 rounded-tr-[30px] sticky top-0 h-screen flex flex-col"
     style="box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px; flex-shrink: 0;">
 
     <div class="flex flex-col items-center m-4 gap-8">
@@ -59,12 +59,27 @@ const showLogoutModal = ref(false);
 const imageSrc = ref("/assets/img/profile/avatar.png");
 const currentTeacher = ref(null);
 
-const links = ref([
-  { name: "Dashboard", path: "/dashboard", icon: "assets/img/sidebar/dashboard.png" },
-  { name: "Classes", path: "/classes", icon: "assets/img/sidebar/classes.png" },
-  { name: "Forms", path: "/forms", icon: "assets/img/sidebar/form.png" },
-  { name: "Profile", path: "/profile", icon: "assets/img/sidebar/form.png" }
+const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+const teacherLinks = ref([
+  { name: "Dashboard", path: "/dashboard", icon: "/assets/img/sidebar/dashboard.png" },
+  { name: "Classes", path: "/classes", icon: "/assets/img/sidebar/classes.png" },
+  { name: "Forms", path: "/forms", icon: "/assets/img/sidebar/form.png" },
+  { name: "Profile", path: "/profile", icon: "/assets/img/sidebar/form.png" }
 ]);
+
+const adminLinks = ref([
+  { name: "Dashboard", path: "/admin/dashboard", icon: "/assets/img/sidebar/dashboard.png" },
+  { name: "Add Student", path: "/admin/add-student", icon: "/assets/img/sidebar/add.png" },
+  { name: "Record", path: "/admin/record", icon: "/assets/img/sidebar/classes.png" },
+  { name: "Manage Class", path: "/admin/add-class", icon: "/assets/img/sidebar/manageClass.png" },
+  { name: "Masterlist", path: "/admin/master-list", icon: "/assets/img/sidebar/masterlist.png" },
+]);
+
+
+const links = computed(() => {
+  return isAdmin ? adminLinks.value : teacherLinks.value;
+});
 
 const fullName = computed(() => {
   if (!currentTeacher.value) return '';

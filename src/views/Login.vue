@@ -47,8 +47,10 @@
 
 <script setup>
 import { ref, defineEmits } from 'vue';
+import { useRouter } from 'vue-router';
 import teachersData from '../data/teachers.json';
 
+const router = useRouter();
 const emit = defineEmits(['logged-in']);
 const email = ref('');
 const password = ref('');
@@ -64,19 +66,38 @@ const togglePassword = () => {
 const login = () => {
   errorMessage.value = '';
 
+  // Check for admin login first
+  const admin = teachersData.admin.find(a => a.username === email.value && a.password === password.value);
 
+  if (admin) {
+    // Admin login successful
+    localStorage.setItem('user', JSON.stringify({ username: admin.username }));
+    localStorage.setItem('isAdmin', 'true');
+    emit('logged-in', { username: admin.username, isAdmin: true });
+    router.push('/admin/master-list');
+    return;
+  }
+
+  // Check for teacher login
   const teacher = teachers.value.find(t => t.email === email.value && t.password === password.value);
 
   if (teacher) {
-
-    localStorage.setItem('teacherID', teacher.teacher_ID);
-
-    emit('logged-in', {
+    // Teacher login successful
+    localStorage.setItem('user', JSON.stringify({
       teacher_ID: teacher.teacher_ID,
       email: teacher.email,
       firstName: teacher.firstName,
       lastName: teacher.lastName
+    }));
+    localStorage.setItem('isAdmin', 'false');
+    emit('logged-in', {
+      teacher_ID: teacher.teacher_ID,
+      email: teacher.email,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      isAdmin: false
     });
+    router.push('/dashboard');
   } else {
     errorMessage.value = 'Invalid email or password. Please try again.';
   }

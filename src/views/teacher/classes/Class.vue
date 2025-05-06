@@ -137,12 +137,12 @@
 <script>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import subjects from '../../data/subjects.json';
-import students from '../../data/students.json';
+import subjects from '@/data/subjects.json';
+import students from '@/data/students.json';
 import Classlist from './Classlist.vue';
-import Grading from './Grading.vue';
-import Submitted from './Submitted.vue';
-import SummaryOfGrades from './Summary.vue';
+import Grading from '../Grading.vue';
+import Submitted from '../Submitted.vue';
+import SummaryOfGrades from '../Summary.vue';
 
 export default {
     props: {

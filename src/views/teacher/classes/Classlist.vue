@@ -45,8 +45,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import subjects from '../../data/subjects.json';
-import students from '../../data/students.json';
+import subjects from '@/data/subjects.json';
+import students from '@/data/students.json';
 import modal from '@/components/modal.vue';
 
 const props = defineProps({

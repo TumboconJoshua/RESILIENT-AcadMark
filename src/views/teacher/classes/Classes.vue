@@ -12,9 +12,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import Card from "../../components/card.vue";
-import classesData from "../../data/class.json";
-import subjectsData from "../../data/subjects.json";
+import Card from "@/components/card.vue";
+import classesData from "@/data/class.json";
+import subjectsData from "@/data/subjects.json";
 
 const classes = ref([]);
 const subjects = ref({});

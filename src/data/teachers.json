@@ -29,5 +29,12 @@
       ],
       "position": "Teacher IV"
     }
+  ],
+
+  "admin": [
+    {
+      "username": "admin@gmail.com",
+      "password": "password"
+    }
   ]
 }

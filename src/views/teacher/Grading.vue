@@ -156,11 +156,11 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import subjects from '../../data/subjects.json';
-import students from '../../data/students.json';
-import Dropdown from '../../components/dropdown.vue';
+import subjects from '@/data/subjects.json';
+import students from '@/data/students.json';
+import Dropdown from '@/components/dropdown.vue';
 import { computed } from 'vue';
-import Modal from '../../components/modal.vue';
+import Modal from '@/components/modal.vue';
 
 const props = defineProps({
     trackStand: String,
