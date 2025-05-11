@@ -7,7 +7,7 @@
     </div>
 
     <div class="rounded-sm" style="box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 1px 1px;">
-      <div class="p-5">
+      <div class="p-5 w-[50%]">
         <searchbar v-model="searchQuery" />
       </div>
       <div class="flex border-t-[1px] border-gray-300">
@@ -286,17 +286,14 @@ const calculateGWA = (subjectId) => {
       student.grades['fourth']
     ];
 
-    // Check if all grades are empty or invalid
     if (grades.every(grade => grade === undefined || !grade || grade === null || grade === '' || grade === '-' || grade === 'No grade')) {
       return 'No grade';
     }
 
-    // Filter out invalid grades and convert to numbers
     const validGrades = grades
       .filter(grade => grade !== undefined && grade && grade !== null && grade !== '' && grade !== '-' && grade !== 'No grade')
       .map(grade => parseFloat(grade));
 
-    // If there's at least one valid grade, calculate the average
     if (validGrades.length > 0) {
       const average = validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length;
       return isNaN(average) ? 'No grade' : average.toFixed(2);

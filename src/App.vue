@@ -24,7 +24,6 @@ const route = useRoute();
 const isLoginPage = computed(() => route.path === '/login');
 
 const handleLogin = () => {
-  localStorage.setItem('user', 'true');
   router.push('/dashboard');
 };
 </script>

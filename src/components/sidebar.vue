@@ -57,7 +57,6 @@ const activeIndex = ref(0);
 const showLogoutModal = ref(false);
 
 const imageSrc = ref("/assets/img/profile/avatar.png");
-const currentTeacher = ref(null);
 
 const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
@@ -82,36 +81,26 @@ const links = computed(() => {
 });
 
 const fullName = computed(() => {
-  if (!currentTeacher.value) return '';
-  const middleInitial = currentTeacher.value.middleName ? currentTeacher.value.middleName[0] + '.' : '';
-  return `${currentTeacher.value.firstName} ${middleInitial} ${currentTeacher.value.lastName}`;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const middleInitial = user.middleName ? user.middleName[0] + '.' : '';
+  const fullName = `${user.firstName} ${middleInitial} ${user.lastName}`;
+  return fullName;
 });
 
 const updateImageFromStorage = () => {
-  const teacherID = localStorage.getItem('teacherID');
-  if (!teacherID) return;
-
-  const teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-  const teacher = teachers.find(t => t.teacher_ID === teacherID);
-  if (teacher?.avatar) imageSrc.value = teacher.avatar;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.avatar) {
+    imageSrc.value = user.avatar;
+  }
 };
 
 watch(() => localStorage.getItem('teachers'), updateImageFromStorage, { deep: true });
 
 onMounted(() => {
-  const teacherID = localStorage.getItem('teacherID');
-  if (!teacherID) return;
-
-  let teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-  if (teachers.length === 0) teachers = teacherData.teachers;
-
-  const teacher = teachers.find(t => t.teacher_ID === teacherID);
-  if (teacher) {
-    currentTeacher.value = teacher;
-    imageSrc.value = teacher.avatar || "/assets/img/profile/avatar.png";
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.avatar) {
+    imageSrc.value = user.avatar;
   }
-
-  setInterval(updateImageFromStorage, 1000);
 });
 
 const confirmLogout = () => {

@@ -21,9 +21,9 @@ const teacherFirstName = ref('');
 const isDashboard = computed(() => route.path === '/dashboard');
 
 onMounted(() => {
-  const teacherID = localStorage.getItem('teacherID');
-  if (teacherID) {
-    const teacher = teacherData.teachers.find(t => t.teacher_ID === teacherID);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user) {
+    const teacher = teacherData.teachers.find(t => t.teacher_ID === user.teacher_ID);
     if (teacher) {
       teacherFirstName.value = teacher.firstName;
     }

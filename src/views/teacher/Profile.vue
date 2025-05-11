@@ -221,6 +221,8 @@
 import { ref, onMounted, watch } from 'vue';
 import teachersData from '@/data/teachers.json';
 
+defineEmits(['loggedIn']);
+
 const fileInput = ref(null);
 const teacherData = ref({
     research: [],
@@ -364,19 +366,25 @@ watch(showEditModal, (newValue) => {
 });
 
 onMounted(() => {
-    const teacherID = localStorage.getItem('teacherID');
-    let teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+    try {
+        const storedUserData = localStorage.getItem('user');
+        const userData = JSON.parse(storedUserData || '{}');
 
-    if (teachers.length === 0) {
-        teachers = teachersData.teachers;
-        localStorage.setItem('teachers', JSON.stringify(teachers));
-    }
+        if (!userData || !userData.teacher_ID) {
+            console.error('No valid user data found in localStorage');
+            return;
+        }
 
-    const currentTeacher = teachers.find(teacher => teacher.teacher_ID === teacherID);
+        teacherData.value = {
+            ...userData,
+            research: userData.research || [],
+            avatar: userData.avatar || null
+        };
 
-    if (currentTeacher) {
-        teacherData.value = currentTeacher;
         currentSlide.value = 0;
+    } catch (error) {
+        console.error('Error loading teacher data:', error);
+        console.error('Error details:', error.message);
     }
 });
 </script>
