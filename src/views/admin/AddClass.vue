@@ -56,110 +56,141 @@
             <div v-else class="grid grid-cols-3 gap-8 my-8 min-h-[200px]"></div>
         </template>
         <template v-else-if="showGrade7Detail">
-            <div class="grade7-detail-container">
+            <div class="min-h-[400px]">
                 <button @click="backFromDetail" class="flex items-center mt-2 ml-2">
                     <span class="ml-1 text-lg text-[30px] text-[#242424] cursor-pointer">
                         < </span>
                             <span class="ml-1 text-lg font-semibold text-[#242424] underline cursor-pointer">Back</span>
                 </button>
-                <div class="detail-content">
-                    <div class="dropdown-row">
-                        <div class="dropdown-item curriculum-box">
-                            <label class="curriculum-label">Grade Level</label>
-                            <div class="curriculum-value">{{ enteredGrade }}</div>
+                <div class="mt-6">
+                    <div
+                        class="flex gap-6 mb-6 bg-white p-[30px] border border-[#EEEEEE] rounded-[5px] shadow-[0_2px_8px_0_rgba(0,0,0,0.07)]">
+                        <div class="min-w-[200px] relative flex flex-col justify-end">
+                            <label
+                                class="absolute -top-2 left-4 bg-white text-[#292929] text-sm px-2 pointer-events-none font-medium">Grade
+                                Level</label>
+                            <div
+                                class="font-bold text-base text-[#242424] border border-[#E3E9EC] rounded-[6px] p-2 bg-white">
+                                {{ enteredGrade }}
+                            </div>
                         </div>
-                        <div class="dropdown-item curriculum-box">
-                            <label class="curriculum-label">Curriculum</label>
-                            <div class="curriculum-value">{{ enteredCurriculum }}</div>
+                        <div class="min-w-[200px] relative flex flex-col justify-end">
+                            <label
+                                class="absolute -top-2 left-4 bg-white text-[#292929] text-sm px-2 pointer-events-none font-medium">Curriculum</label>
+                            <div
+                                class="font-bold text-base text-[#242424] border border-[#E3E9EC] rounded-[6px] p-2 bg-white">
+                                {{ enteredCurriculum }}
+                            </div>
                         </div>
-                        <div class="dropdown-item curriculum-box">
-                            <label class="curriculum-label">Track</label>
-                            <select v-model="selectedTrack" class="custom-select">
+                        <div class="min-w-[200px] relative flex flex-col justify-end">
+                            <label
+                                class="absolute -top-2 left-4 bg-white text-[#292929] text-sm px-2 pointer-events-none font-medium">Track</label>
+                            <select v-model="selectedTrack"
+                                class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
                                 <option value="SPA">SPA</option>
                                 <option value="SPJ">SPJ</option>
                                 <option value="BEC">BEC</option>
                             </select>
                         </div>
-                        <div class="dropdown-item curriculum-box">
-                            <label class="curriculum-label">Class Section</label>
-                            <select v-model="selectedClassSection" class="custom-select">
+                        <div class="min-w-[200px] relative flex flex-col justify-end">
+                            <label
+                                class="absolute -top-2 left-4 bg-white text-[#292929] text-sm px-2 pointer-events-none font-medium">Class
+                                Section</label>
+                            <select v-model="selectedClassSection"
+                                class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
                                 <option value="Einstein">Einstein</option>
                                 <option value="Einstein2">Einstein</option>
                                 <option value="Einstein3">Einstein</option>
                                 <option value="Einstein4">Einstein</option>
                             </select>
                         </div>
-                        <div class="add-teacher-btn-container">
-                            <button class="add-teacher-btn">Add Teacher</button>
+                        <div class="flex items-end ml-auto">
+                            <button
+                                class="bg-[#295F98] text-white text-base font-normal border-none rounded-[6px] px-[25px] py-[10px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]"
+                                @click="openAddTeacherModal">Add Teacher</button>
                         </div>
                     </div>
-                    <div class="detail-placeholder">
-                        <div class="detail-flex">
+                    <div class="min-h-[200px] bg-[#f9f9f9] rounded-[8px] mt-8">
+                        <div class="flex gap-6 mb-5">
                             <!-- Left Column -->
-                            <div class="left-panel">
-                                <div class="left-dropdown-row">
-                                    <select v-model="leftSex" class="left-select">
+                            <div
+                                class="bg-white rounded-[8px] border border-[#e0e0e0] w-[410px] min-w-[280px] flex flex-col p-3">
+                                <div class="mb-2">
+                                    <select v-model="leftSex"
+                                        class="w-[35%] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
                                         <option value="" disabled selected>Sex</option>
                                         <option value="F">Female</option>
                                         <option value="M">Male</option>
                                     </select>
                                 </div>
-                                <div class="left-list">
-                                    <div v-for="row in dummyLeftListData[enteredIdx]" :key="row.lrn" class="left-list-row">
-                                        <span class="left-lrn">{{ row.lrn }}</span>
-                                        <span class="left-name">{{ row.name }}</span>
-                                        <span class="left-arrow">&#x21ba;</span>
+                                <div
+                                    class="flex-1 overflow-y-auto max-h-[600px] mb-3 rounded-[4px] border border-[#e0e0e0] bg-[#fafbfc] p-1 cursor-pointer">
+                                    <div v-for="row in dummyLeftListData[enteredIdx]" :key="row.lrn"
+                                        class="flex items-center p-[6px_8px] border-b border-[#f0f0f0] text-sm text-[#222] gap-10 hover:bg-[#e0e0e0]">
+                                        <span class="ml-[5px] w-[90px] font-medium">{{ row.lrn }}</span>
+                                        <span class="flex-1 -ml-[5px] font-medium">{{ row.name }}</span>
+                                        <span class="mr-2 text-lg text-[#222]">&#x21ba;</span>
                                     </div>
                                 </div>
-                                <button class="left-submit">Submit</button>
+                                <button
+                                    class="mt-2 w-[30%] bg-[#295F98] text-white border-none rounded-[6px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066] block ml-auto">Submit</button>
                             </div>
                             <!-- Right Column -->
-                            <div class="right-panel">
-                                <div class="right-controls">
-                                    <select v-model="rightGender" class="right-select">
+                            <div
+                                class="flex-1 bg-white rounded-[8px] border border-[#e0e0e0] p-4 flex flex-col min-w-0">
+                                <div class="flex items-center gap-3">
+                                    <select v-model="rightGender"
+                                        class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
                                         <option value="" disabled selected>Sex</option>
-                                        <option value="">All</option>
+                                        <option value="All">All</option>
                                         <option value="F">Female</option>
                                         <option value="M">Male</option>
                                     </select>
-                                    <select v-model="rightSort" class="right-select">
+                                    <select v-model="rightSort"
+                                        class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
                                         <option value="" disabled selected>Sort By</option>
                                         <option value="latest">Latest</option>
                                         <option value="oldest">Oldest</option>
                                     </select>
-                                    <div class="right-search">
-                                        <img src="/assets/img/search-icon.svg" alt="search" class="search-icon" />
-                                        <input type="text" v-model="rightSearch" placeholder="Search..." />
+                                    <div
+                                        class="w-[220px] ml-auto flex items-center bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-9">
+                                        <img src="/assets/img/search-icon.svg" alt="search"
+                                            class="w-[18px] h-[18px] mx-[5px] opacity-70" />
+                                        <input type="text" v-model="rightSearch" placeholder="Search..."
+                                            class="border-none outline-none bg-transparent w-full text-[15px] text-[#222]" />
                                     </div>
                                 </div>
-                                <div class="right-table-container">
-                                    <table class="dummy-table">
+                                <div class="flex-1 overflow-y-auto mb-[10px] max-h-[600px] relative">
+                                    <table class="w-full border-collapse mt-4 bg-white">
                                         <thead>
                                             <tr>
                                                 <th v-if="showCheckboxes"></th>
-                                                <th>LRN</th>
-                                                <th>FULL NAME</th>
-                                                <th>GENDER</th>
-                                                <th>Age</th>
-                                                <th>Track</th>
+                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-left">LRN</th>
+                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-left">FULL NAME</th>
+                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-left">GENDER</th>
+                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-left">Age</th>
+                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-left">Track</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <template v-if="filteredTableData.length > 0">
-                                                <tr v-for="row in filteredTableData" :key="row.lrn">
+                                                <tr v-for="row in filteredTableData" :key="row.lrn"
+                                                    class="hover:bg-[#e0e0e0] cursor-pointer">
                                                     <td v-if="showCheckboxes"><input type="checkbox" /></td>
-                                                    <td>{{ row.lrn }}</td>
-                                                    <td>{{ row.name }}</td>
-                                                    <td>{{ row.gender }}</td>
-                                                    <td>{{ row.age }}</td>
-                                                    <td>{{ row.track }}</td>
+                                                    <td class="p-2 text-left">{{ row.lrn }}</td>
+                                                    <td class="p-2 text-left">{{ row.name }}</td>
+                                                    <td class="p-2 text-left">{{ row.gender }}</td>
+                                                    <td class="p-2 text-left">{{ row.age }}</td>
+                                                    <td class="p-2 text-left">{{ row.track }}</td>
                                                 </tr>
                                             </template>
                                             <template v-else>
                                                 <tr>
-                                                    <td :colspan="showCheckboxes ? 7 : 6" class="no-results">
-                                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                                            <img src="/assets/img/search-icon.svg" alt="search" class="search-icon" style="opacity: 0.5;" />
+                                                    <td :colspan="showCheckboxes ? 7 : 6"
+                                                        class="text-center text-[#666] text-[15px] py-5 bg-white border-b border-[#e0e0e0]">
+                                                        <div class="flex items-center justify-center gap-2">
+                                                            <img src="/assets/img/search-icon.svg" alt="search"
+                                                                class="w-[18px] h-[18px] opacity-50" />
                                                             No results found for "{{ rightSearch }}"
                                                         </div>
                                                     </td>
@@ -168,8 +199,9 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <button class="right-select-btn" @click="showCheckboxes = !showCheckboxes">Select
-                                    Students</button>
+                                <button
+                                    class="mt-2 self-end bg-[#295F98] text-white border-none rounded-[6px] px-[22px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]"
+                                    @click="showCheckboxes = !showCheckboxes">Select Students</button>
                             </div>
                         </div>
                     </div>
@@ -185,6 +217,48 @@
                 </button>
             </div>
         </template>
+    </div>
+    <div v-if="showAddTeacherModal" class="fixed inset-0 bg-black/20 z-[9999] flex items-center justify-center" @click.self="closeAddTeacherModal">
+        <div class="bg-white shadow-[0_4px_32px_0_rgba(0,0,0,0.18)] w-[850px] h-[620px] p-[38px_38px_24px_38px] relative flex flex-col">
+            <h2 class="text-[1.5rem] font-bold text-[#295F98] mb-7">Add Class Teacher</h2>
+            <div class="mb-[22px]">
+                <div class="text-[#295F98] text-[1rem] font-semibold mb-2">Advisory Teacher</div>
+                <div class="flex gap-[22px] mb-2 justify-between">
+                    <Dropdown :options="subjectOptions" placeholder="Subjects" customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
+                    <select class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" v-model="selectedAdviser">
+                        <option value="" disabled selected>Adviser Name</option>
+                        <option v-for="adviser in advisers" :key="adviser.id" :value="adviser.name">
+                            {{ adviser.name }}
+                        </option>
+                    </select>
+                    <div class="flex flex-col relative">
+                        <label class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee ID</label>
+                        <input class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" placeholder="Auto Fill" :value="adviserIdByName(selectedAdviser)" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="mb-[22px]">
+                <div class="text-[#295F98] text-[1rem] font-semibold mb-2">Subject Teacher</div>
+                <div class="flex gap-[22px] mb-2 justify-between">
+                    <Dropdown :options="subjectOptions" placeholder="Subjects" customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
+                    <select class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" v-model="selectedSubjectAdviser">
+                        <option value="" disabled selected>Adviser Name</option>
+                        <option v-for="adviser in advisers" :key="adviser.id + '-subject'" :value="adviser.name">
+                            {{ adviser.name }}
+                        </option>
+                    </select>
+                    <div class="flex flex-col relative">
+                        <label class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee ID</label>
+                        <input class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" placeholder="Auto Fill" :value="adviserIdByName(selectedSubjectAdviser)" readonly />
+                    </div>
+                </div>
+            </div>
+            <button class="w-full bg-[#295F98] text-white text-[2rem] border-none rounded px-0 py-1 mt-[18px] mb-[18px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]">+</button>
+            <div class="flex justify-end gap-[18px] mt-[120px]">
+                <button class="bg-[#BFC3C8] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 hover:bg-[#a0a4a8]" @click="closeAddTeacherModal">Cancel</button>
+                <button class="bg-[#295F98] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 shadow-[0_2px_4px_0_rgba(41,95,152,0.08)] hover:bg-[#1d4066]">Add Faculty(s)</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -486,6 +560,25 @@ export default {
                     { lrn: '60693001020', name: 'Logan Thompson' },
                 ],
             ],
+            showAddTeacherModal: false,
+            subjectOptions: [
+                { value: 'Math', label: 'Math' },
+                { value: 'Science', label: 'Science' },
+                { value: 'English', label: 'English' },
+                { value: 'Filipino', label: 'Filipino' },
+                { value: 'Araling Panlipunan', label: 'Araling Panlipunan' },
+                { value: 'MAPEH', label: 'MAPEH' },
+                { value: 'TLE', label: 'TLE' },
+                { value: 'EPP', label: 'EPP' },
+                { value: 'ESP', label: 'ESP' },
+            ],
+            advisers: [
+                { name: 'Polaris Jumel Dasmarinas', id: 'EMP-001' },
+                { name: 'Joshua Ralph Solomon', id: 'EMP-002' },
+                { name: 'Harvey Samson', id: 'EMP-003' }
+            ],
+            selectedAdviser: '',
+            selectedSubjectAdviser: '',
         };
     },
     methods: {
@@ -513,339 +606,39 @@ export default {
             this.showGrade7Detail = false;
             this.showBlank = false;
         },
+        openAddTeacherModal() {
+            this.showAddTeacherModal = true;
+        },
+        closeAddTeacherModal() {
+            this.showAddTeacherModal = false;
+            this.selectedAdviser = '';
+            this.selectedSubjectAdviser = '';
+        },
+        adviserIdByName(name) {
+            const adviser = this.advisers.find(a => a.name === name);
+            return adviser ? adviser.id : '';
+        },
     },
     computed: {
         filteredTableData() {
             let filteredData = this.dummyTableData[this.enteredIdx];
-            
+
             // Apply gender filter
             if (this.rightGender && this.rightGender !== "") {
                 filteredData = filteredData.filter(row => row.gender === this.rightGender);
             }
-            
+
             // Apply search filter
             if (this.rightSearch) {
                 const searchTerm = this.rightSearch.toLowerCase();
-                filteredData = filteredData.filter(row => 
-                    row.name.toLowerCase().includes(searchTerm) || 
+                filteredData = filteredData.filter(row =>
+                    row.name.toLowerCase().includes(searchTerm) ||
                     row.lrn.toLowerCase().includes(searchTerm)
                 );
             }
-            
+
             return filteredData;
         }
     },
 };
 </script>
-
-<style scoped>
-.grade7-detail-container {
-    min-height: 400px;
-}
-
-.detail-content {
-    margin-top: 24px;
-}
-
-.dropdown-row {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 24px;
-    background-color: #FFFFFF;
-    padding: 30px;
-    border: 0.5px solid #EEEEEE;
-    border-radius: 5px;
-    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-}
-
-.dropdown-item {
-    min-width: 200px;
-}
-
-.curriculum-box {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-.curriculum-label {
-    position: absolute;
-    top: -8px;
-    left: 16px;
-    background-color: #fff;
-    color: #292929;
-    font-size: 13px;
-    padding: 0 8px;
-    pointer-events: none;
-    font-weight: 500;
-}
-
-.curriculum-value {
-    font-weight: bold;
-    font-size: 16px;
-    color: #242424;
-    border: 1px solid #E3E9EC;
-    border-radius: 6px;
-    padding: 8px 16px;
-    background: #fff;
-}
-
-.detail-placeholder {
-    min-height: 200px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    margin-top: 32px;
-
-}
-
-.custom-select {
-    width: 180px;
-    padding: 8px 12px;
-    border: 1px solid #E3E9EC;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 16px;
-    color: #242424;
-    font-weight: 500;
-
-}
-
-.add-teacher-btn-container {
-    display: flex;
-    align-items: flex-end;
-    margin-left: auto;
-}
-
-.add-teacher-btn {
-    background: #295F98;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 400;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 25px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.add-teacher-btn:hover {
-    background: #1d4066;
-}
-
-.dummy-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    background: #fff;
-}
-
-.dummy-table th,
-.dummy-table td {
-    /* border: 1px solid #e0e0e0; */
-    padding: 8px 12px;
-    text-align: left;
-}
-
-.dummy-table th {
-    background: #F6F6F6;
-    font-weight: 600;
-}
-
-.dummy-table td {
-    cursor: pointer;
-}
-
-.dummy-table tbody tr:hover {
-    background: #e0e0e0;
-}
-
-.detail-flex {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 20px;
-}
-
-.left-panel {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    width: 410px;
-    min-width: 280px;
-    display: flex;
-    flex-direction: column;
-    padding: 16px 12px 12px 12px;
-}
-
-.left-dropdown-row {
-    margin-bottom: 8px;
-}
-
-.left-select {
-    width: 35%;
-    padding: 6px 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #242424;
-    background: #fff;
-}
-
-.left-list {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 600px;
-    margin-bottom: 12px;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
-    background: #fafbfc;
-    padding: 4px 0;
-    cursor: pointer;
-}
-
-.left-list-row:hover {
-    background: #e0e0e0;
-}
-
-.left-list-row {
-    display: flex;
-    align-items: center;
-    padding: 6px 8px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
-    color: #222;
-    gap: 40px;
-}
-
-.left-list-row:last-child {
-    border-bottom: none;
-}
-
-.left-lrn {
-    margin-left: 5px;
-    width: 90px;
-    font-weight: 500;
-}
-
-.left-name {
-    flex: 1;
-    margin-left: -5px;
-    font-weight: 500;
-}
-
-.left-arrow {
-    margin-right: 8px;
-    font-size: 18px;
-    color: #222;
-}
-
-.left-submit {
-    margin-top: 8px;
-    width: 30%;
-    background: #295F98;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 0;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: block;
-    margin-left: auto;
-}
-
-.left-submit:hover {
-    background: #1d4066;
-}
-
-.right-panel {
-    flex: 1;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    padding: 16px 18px 18px 18px;
-    display: flex;
-    flex-direction: column;
-    /* height: 100%; */
-    min-width: 0;
-}
-
-.right-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.right-select {
-    width: 130px;
-    padding: 6px 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 15px;
-    color: #242424;
-    background: #fff;
-}
-
-.right-search {
-    width: 220px;
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    background: #fafbfc;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 0 8px;
-    height: 36px;
-}
-
-.right-search input {
-    border: none;
-    outline: none;
-    background: transparent;
-    width: 100%;
-    font-size: 15px;
-    color: #222;
-}
-
-.right-table-container {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    max-height: 600px;
-    position: relative;
-}
-
-.no-results {
-    text-align: center;
-    color: #666;
-    font-size: 15px;
-    padding: 20px 0;
-    background: #fff;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.right-select-btn {
-    margin-top: 8px;
-    align-self: flex-end;
-    background: #295F98;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 22px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.right-select-btn:hover {
-    background: #1d4066;
-}
-
-.search-icon {
-    width: 18px;
-    height: 18px;
-    margin-left: 5px;
-    margin-right: 5px;
-    opacity: 0.7;
-}
-</style>

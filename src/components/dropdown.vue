@@ -77,6 +77,18 @@
         </select>
       </div>
     </div>
+
+    <div v-if="options && options.length > 0">
+      <div class="flex justify-between items-center">
+        <select v-model="selectedOption" 
+          :class="customClass ? customClass : 'text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none'">
+          <option value="" disabled selected>{{ placeholder }}</option>
+          <option v-for="option in options" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -118,6 +130,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: Array,
+    default: () => []
+  },
+  placeholder: {
+    type: String,
+    default: 'Select an option'
+  },
+  customClass: {
+    type: String,
+    default: ''
+  }
 });
 
 const curriculumOptions = ['SHS', 'JHS'];
@@ -140,11 +164,11 @@ const selectedSubject = ref('');
 const selectedQuarter = ref('1st');
 const selectedSort = ref('');
 const selectedMarkStatus = ref('Show All');
+const selectedOption = ref('');
 
 const updateQuarter = () => {
   emit("update:modelValue", selectedQuarter.value);
 };
-
 
 const updateMarkStatus = () => {
   emit("update:modelValue", selectedMarkStatus.value);
