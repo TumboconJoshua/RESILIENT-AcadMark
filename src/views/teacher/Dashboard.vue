@@ -78,23 +78,23 @@
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#0C5A48]"></div>
-          <p class="text-[#0C5A48] text-base">85-89 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-green"></div>
+          <p class="text-green text-base">85-89 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#D0D000]"></div>
-          <p class="text-[#D0D000] text-base">80-84 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-yellow"></div>
+          <p class="text-yellow text-base">80-84 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#FF9204]"></div>
-          <p class="text-[#FF9204] text-base">75-79 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-orange"></div>
+          <p class="text-orange text-base">75-79 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#D30000]"></div>
-          <p class="text-[#D30000] text-base">75 Below Grade</p>
+          <div class="rounded-full w-5 h-5 bg-red"></div>
+          <p class="text-red text-base">75 Below Grade</p>
         </div>
       </div>
 
@@ -408,7 +408,6 @@ const recentSubmittedGrades = ref([]);
 const recentGraded = ref([]);
 
 onMounted(() => {
-  // Store the initial data in localStorage if not already present
   if (!localStorage.getItem('subjects')) {
     localStorage.setItem('subjects', JSON.stringify(subjectData));
   }
@@ -417,16 +416,12 @@ onMounted(() => {
     localStorage.setItem('students', JSON.stringify(studentData));
   }
 
-  // Load data from localStorage
   loadDashboardData();
 
-  // Set up event listener for storage changes
   window.addEventListener('storage', handleStorageChange);
 });
 
-// Add a function to load dashboard data
 function loadDashboardData() {
-  // Load submitted grades
   const submittedGrades = JSON.parse(localStorage.getItem('recentSubmit') || '[]');
   recentSubmittedGrades.value = submittedGrades.slice(0, 12).map(grade => ({
     lrn: grade.lrn,
@@ -435,7 +430,6 @@ function loadDashboardData() {
     status: grade.status
   }));
 
-  // Load graded entries
   const graded = JSON.parse(localStorage.getItem('recentGrades') || '[]');
   recentGraded.value = graded.slice(0, 10).map(grade => ({
     lrn: grade.lrn,
@@ -451,7 +445,6 @@ function loadDashboardData() {
   }));
 }
 
-// Handle storage events to update data when it changes
 function handleStorageChange(e) {
   if (e.key === 'recentSubmit' || e.key === 'recentGrades') {
     loadDashboardData();

@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
 
 const emit = defineEmits();
 
@@ -144,9 +144,13 @@ const props = defineProps({
   }
 });
 
-const curriculumOptions = ['SHS', 'JHS'];
+const curriculumOptions = ['JHS', 'SHS'];
+const curriculumMapping = {
+  'JHS': 'Junior High School',
+  'SHS': 'Senior High School'
+};
 const yearOptions = ['2023', '2024', '2025'];
-const academicTrackOptions = ['TVL', 'Arts and Design', 'Sports', 'ABM', 'STEM', 'HUMMS'];
+const academicTrackOptions = ['TVL', 'Academic', 'Arts and Design', 'Sports', 'ABM', 'STEM', 'HUMMS'];
 const gradeOptions = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const subjectOptions = [
   'Mathematics', 'English', 'PE and Health', 'Chemistry', 'Physics', 'Physical Education',
@@ -165,6 +169,18 @@ const selectedQuarter = ref('1st');
 const selectedSort = ref('');
 const selectedMarkStatus = ref('Show All');
 const selectedOption = ref('');
+
+watch(selectedCurriculum, (newValue) => {
+  emit("update:modelValue", curriculumMapping[newValue] || newValue);
+});
+
+watch(selectedGrade, (newValue) => {
+  emit("update:modelValue", newValue);
+});
+
+watch(selectedAcademicTrack, (newValue) => {
+  emit("update:modelValue", newValue);
+});
 
 const updateQuarter = () => {
   emit("update:modelValue", selectedQuarter.value);

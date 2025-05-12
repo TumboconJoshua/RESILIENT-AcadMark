@@ -57,11 +57,31 @@
         </div>
 
         <div class="flex flex-col md:flex-row gap-10 mb-5">
-            <div class="sm:full md:w-1/3 py-5 border border-[#cecece] rounded-2xl bg-white shadow-lg">
-                <h3 class="text-xl px-3 font-semibold text-gray-800 mb-4 border-b border-[#E0E0E0] pb-3">Educational
-                    Attainment
-                </h3>
-                <p class="text-gray-700 px-5">{{ teacherData.education }}</p>
+            <div class="sm:full md:w-1/3 border border-[#cecece] rounded-2xl bg-white shadow-lg">
+                <div class="border-b border-[#E0E0E0] p-5 flex justify-between items-center">
+                    <h3 class="text-xl px-3 font-medium text-gray-800">Lesson Plan
+                    </h3>
+
+                    <div class="flex gap-2">
+                        <img class="bg-blue p-1 cursor-pointer" src="/assets/img/profile/add.svg" alt=""
+                            @click="showAddLessonPlanModal = true">
+                        <img class="bg-red p-1 cursor-pointer" src="/assets/img/profile/remove.svg" alt=""
+                            @click="removeSelectedLessonPlan">
+                    </div>
+                </div>
+
+                <div v-for="(plan, index) in lessonPlans" :key="index" @click="openEditModal(plan)"
+                    class="flex justify-between items-center p-5 border-b border-[#E0E0E0] cursor-pointer">
+                    <label class="flex gap-3 items-center">
+                        <input type="radio" :value="index" v-model="selectedLessonPlan" />
+                        <p class="font-semibold cursor-pointer">Lesson Plan {{
+                            plan.lessonPlanNo }}</p>
+                    </label>
+
+                    <p class="font-light">{{ plan.category }}</p>
+
+                    <p class="text-orange">{{ plan.status }}</p>
+                </div>
             </div>
 
             <div class="flex-1 py-3 border border-[#cecece] rounded-2xl bg-white shadow-lg">
@@ -119,7 +139,7 @@
         <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
             <h3 class="text-2xl font-semibold mb-4">Edit Profile</h3>
             <form @submit.prevent="saveProfileChanges">
-                <div class="mb-4">
+                <div class="mb-4 relative">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="firstName">
                         First Name
                     </label>
@@ -215,11 +235,169 @@
         </div>
     </div>
 
+    <!-- Add Lesson Plan Modal -->
+    <div v-if="showAddLessonPlanModal" class="fixed inset-0 flex items-center justify-center z-50"
+        style="background-color: rgba(0, 0, 0, 0.8);">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <h3 class="text-2xl font-semibold mb-4">Add Lesson Plan</h3>
+            <form @submit.prevent="saveNewLessonPlan">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="lessonPlanNo">
+                            Lesson Plan No.
+                        </label>
+                        <input v-model="newLessonPlan.lessonPlanNo" type="text" id="lessonPlanNo" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10" for="category">
+                            Category
+                        </label>
+                        <input v-model="newLessonPlan.category" type="text" id="category" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="gradeLevel">
+                            Grade Level
+                        </label>
+                        <div class="relative">
+                            <select v-model="newLessonPlan.gradeLevel" id="gradeLevel" required
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8">
+                                <option value="">Select Grade Level</option>
+                                <option v-for="grade in gradeLevels" :key="grade" :value="grade">{{ grade }}</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10" for="section">
+                            Section
+                        </label>
+                        <input v-model="newLessonPlan.section" type="text" id="section" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+
+                <div class="relative mb-4">
+                    <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                        for="lessonPlanLink">
+                        Lesson Plan Link
+                    </label>
+                    <input v-model="newLessonPlan.link" type="url" id="lessonPlanLink" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="showAddLessonPlanModal = false"
+                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="bg-blue text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Lesson Plan Modal -->
+    <div v-if="showEditLessonPlanModal" class="fixed inset-0 flex items-center justify-center z-50"
+        style="background-color: rgba(0, 0, 0, 0.8);">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <h3 class="text-2xl font-semibold mb-4">Edit Lesson Plan</h3>
+            <form @submit.prevent="updateLessonPlan">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="editLessonPlanNo">
+                            Lesson Plan No.
+                        </label>
+                        <input v-model="editingLessonPlan.lessonPlanNo" type="text" id="editLessonPlanNo" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="editCategory">
+                            Category
+                        </label>
+                        <input v-model="editingLessonPlan.category" type="text" id="editCategory" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="editGradeLevel">
+                            Grade Level
+                        </label>
+                        <div class="relative">
+                            <select v-model="editingLessonPlan.gradeLevel" id="editGradeLevel" required
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8">
+                                <option value="">Select Grade Level</option>
+                                <option v-for="grade in gradeLevels" :key="grade" :value="grade">{{ grade }}</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                            for="editSection">
+                            Section
+                        </label>
+                        <input v-model="editingLessonPlan.section" type="text" id="editSection" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                </div>
+
+                <div class="relative mb-4">
+                    <label class="absolute top-[-10px] left-[20px] px-2 bg-white text-sm mb-2 z-10"
+                        for="editLessonPlanLink">
+                        Lesson Plan Link
+                    </label>
+                    <input v-model="editingLessonPlan.link" type="url" id="editLessonPlanLink" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="showEditLessonPlanModal = false"
+                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="bg-green text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
+                        Edit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import teachersData from '@/data/teachers.json';
+
+defineEmits(['loggedIn']);
 
 const fileInput = ref(null);
 const teacherData = ref({
@@ -241,6 +419,32 @@ const editedProfile = ref({
     email: '',
     contactNumber: '',
     address: ''
+});
+
+const showAddLessonPlanModal = ref(false);
+const selectedLessonPlan = ref(null);
+const lessonPlans = ref([]);
+
+const gradeLevels = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
+
+const newLessonPlan = ref({
+    lessonPlanNo: '',
+    category: '',
+    gradeLevel: '',
+    section: '',
+    link: '',
+    status: 'Pending'
+});
+
+const showEditLessonPlanModal = ref(false);
+const editingLessonPlan = ref({
+    lessonPlanNo: '',
+    category: '',
+    gradeLevel: '',
+    section: '',
+    link: '',
+    status: 'Pending',
+    id: null
 });
 
 const nextSlide = () => {
@@ -299,31 +503,27 @@ const initializeEditProfile = () => {
 };
 
 const saveProfileChanges = () => {
-    const teacherID = localStorage.getItem('teacherID');
-    let teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-
-    if (teachers.length === 0) {
-        teachers = teachersData.teachers;
+    const storedUserData = localStorage.getItem('user');
+    if (!storedUserData) {
+        console.error('No user data found in localStorage');
+        return;
     }
 
-    const teacherIndex = teachers.findIndex(teacher => teacher.teacher_ID === teacherID);
+    const userData = JSON.parse(storedUserData);
+    const updatedUserData = {
+        ...userData,
+        firstName: editedProfile.value.firstName,
+        middleName: editedProfile.value.middleName,
+        lastName: editedProfile.value.lastName,
+        employeeNo: editedProfile.value.employeeNo,
+        email: editedProfile.value.email,
+        contactNumber: editedProfile.value.contactNumber,
+        address: editedProfile.value.address
+    };
 
-    if (teacherIndex !== -1) {
-        teachers[teacherIndex] = {
-            ...teachers[teacherIndex],
-            firstName: editedProfile.value.firstName,
-            middleName: editedProfile.value.middleName,
-            lastName: editedProfile.value.lastName,
-            employeeNo: editedProfile.value.employeeNo,
-            email: editedProfile.value.email,
-            contactNumber: editedProfile.value.contactNumber,
-            address: editedProfile.value.address
-        };
-
-        localStorage.setItem('teachers', JSON.stringify(teachers));
-        teacherData.value = teachers[teacherIndex];
-        showEditModal.value = false;
-    }
+    localStorage.setItem('user', JSON.stringify(updatedUserData));
+    teacherData.value = updatedUserData;
+    showEditModal.value = false;
 };
 
 const triggerImageUpload = () => {
@@ -335,26 +535,89 @@ const handleImageUpload = (event) => {
     if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const teacherID = localStorage.getItem('teacherID');
-            let teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-
-            if (teachers.length === 0) {
-                teachers = teachersData.teachers;
+            const storedUserData = localStorage.getItem('user');
+            if (!storedUserData) {
+                console.error('No user data found in localStorage');
+                return;
             }
 
-            const teacherIndex = teachers.findIndex(teacher => teacher.teacher_ID === teacherID);
+            const userData = JSON.parse(storedUserData);
+            const updatedUserData = {
+                ...userData,
+                avatar: e.target.result
+            };
 
-            if (teacherIndex !== -1) {
-                teachers[teacherIndex].avatar = e.target.result;
-                localStorage.setItem('teachers', JSON.stringify(teachers));
-                teacherData.value = teachers[teacherIndex];
-                const currentTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-                localStorage.setItem('teachers', JSON.stringify(currentTeachers));
-                window.dispatchEvent(new CustomEvent('avatarUpdated'));
-            }
+            localStorage.setItem('user', JSON.stringify(updatedUserData));
+            teacherData.value = updatedUserData;
+            window.dispatchEvent(new CustomEvent('avatarUpdated'));
         };
         reader.readAsDataURL(file);
     }
+};
+
+const saveNewLessonPlan = () => {
+    const teacherID = localStorage.getItem('teacherID');
+    let storedLessonPlans = JSON.parse(localStorage.getItem('lessonPlan') || '[]');
+
+    const lessonPlan = {
+        ...newLessonPlan.value,
+        teacherID,
+        id: Date.now() // Unique identifier
+    };
+
+    storedLessonPlans.push(lessonPlan);
+    localStorage.setItem('lessonPlan', JSON.stringify(storedLessonPlans));
+
+    // Update local state
+    lessonPlans.value = storedLessonPlans.filter(plan => plan.teacherID === teacherID);
+
+    // Reset form
+    newLessonPlan.value = {
+        lessonPlanNo: '',
+        category: '',
+        gradeLevel: '',
+        section: '',
+        link: '',
+        status: 'Pending'
+    };
+
+    showAddLessonPlanModal.value = false;
+};
+
+const removeSelectedLessonPlan = () => {
+    if (selectedLessonPlan.value === null) return;
+
+    const teacherID = localStorage.getItem('teacherID');
+    let storedLessonPlans = JSON.parse(localStorage.getItem('lessonPlan') || '[]');
+
+    storedLessonPlans = storedLessonPlans.filter((plan, index) => {
+        return !(plan.teacherID === teacherID && index === selectedLessonPlan.value);
+    });
+
+    localStorage.setItem('lessonPlan', JSON.stringify(storedLessonPlans));
+    lessonPlans.value = storedLessonPlans.filter(plan => plan.teacherID === teacherID);
+    selectedLessonPlan.value = null;
+};
+
+const openEditModal = (plan) => {
+    editingLessonPlan.value = { ...plan };
+    showEditLessonPlanModal.value = true;
+};
+
+const updateLessonPlan = () => {
+    const teacherID = localStorage.getItem('teacherID');
+    let storedLessonPlans = JSON.parse(localStorage.getItem('lessonPlan') || '[]');
+
+    const index = storedLessonPlans.findIndex(plan => plan.id === editingLessonPlan.value.id);
+    if (index !== -1) {
+        storedLessonPlans[index] = { ...editingLessonPlan.value };
+        localStorage.setItem('lessonPlan', JSON.stringify(storedLessonPlans));
+
+        // Update local state
+        lessonPlans.value = storedLessonPlans.filter(plan => plan.teacherID === teacherID);
+    }
+
+    showEditLessonPlanModal.value = false;
 };
 
 watch(showEditModal, (newValue) => {
@@ -364,19 +627,29 @@ watch(showEditModal, (newValue) => {
 });
 
 onMounted(() => {
-    const teacherID = localStorage.getItem('teacherID');
-    let teachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+    try {
+        const storedUserData = localStorage.getItem('user');
+        const userData = JSON.parse(storedUserData || '{}');
 
-    if (teachers.length === 0) {
-        teachers = teachersData.teachers;
-        localStorage.setItem('teachers', JSON.stringify(teachers));
-    }
+        if (!userData || !userData.teacher_ID) {
+            console.error('No valid user data found in localStorage');
+            return;
+        }
 
-    const currentTeacher = teachers.find(teacher => teacher.teacher_ID === teacherID);
+        teacherData.value = {
+            ...userData,
+            research: userData.research || [],
+            avatar: userData.avatar || null
+        };
 
-    if (currentTeacher) {
-        teacherData.value = currentTeacher;
+        // Load lesson plans
+        const storedLessonPlans = JSON.parse(localStorage.getItem('lessonPlan') || '[]');
+        lessonPlans.value = storedLessonPlans.filter(plan => plan.teacherID === userData.teacher_ID);
+
         currentSlide.value = 0;
+    } catch (error) {
+        console.error('Error loading teacher data:', error);
+        console.error('Error details:', error.message);
     }
 });
 </script>

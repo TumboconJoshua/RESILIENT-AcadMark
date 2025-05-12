@@ -66,37 +66,50 @@ const togglePassword = () => {
 const login = () => {
   errorMessage.value = '';
 
-  // Check for admin login first
   const admin = teachersData.admin.find(a => a.username === email.value && a.password === password.value);
 
   if (admin) {
-    // Admin login successful
-    localStorage.setItem('user', JSON.stringify({ username: admin.username }));
+    const adminCredentials = {
+      username: admin.username,
+      password: admin.password,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      middleName: admin.middleName || '',
+      isAdmin: true
+    };
+    localStorage.setItem('user', JSON.stringify(adminCredentials));
     localStorage.setItem('isAdmin', 'true');
-    emit('logged-in', { username: admin.username, isAdmin: true });
-    router.push('/admin/master-list');
+    emit('logged-in', adminCredentials);
+    router.push('/admin/dashboard');
     return;
   }
 
-  // Check for teacher login
   const teacher = teachers.value.find(t => t.email === email.value && t.password === password.value);
 
   if (teacher) {
-    // Teacher login successful
-    localStorage.setItem('user', JSON.stringify({
+    const teacherCredentials = {
       teacher_ID: teacher.teacher_ID,
       email: teacher.email,
-      firstName: teacher.firstName,
-      lastName: teacher.lastName
-    }));
-    localStorage.setItem('isAdmin', 'false');
-    emit('logged-in', {
-      teacher_ID: teacher.teacher_ID,
-      email: teacher.email,
+      password: teacher.password,
       firstName: teacher.firstName,
       lastName: teacher.lastName,
+      middleName: teacher.middleName || '',
+      employeeNo: teacher.employeeNo || '',
+      contactNumber: teacher.contactNumber || '',
+      address: teacher.address || '',
+      position: teacher.position || '',
+      education: teacher.education || '',
+      research: teacher.research || [],
+      avatar: teacher.avatar || null,
       isAdmin: false
-    });
+    };
+
+    localStorage.setItem('user', JSON.stringify(teacherCredentials));
+    localStorage.setItem('isAdmin', 'false');
+
+    const storedData = JSON.parse(localStorage.getItem('user'));
+
+    emit('logged-in', teacherCredentials);
     router.push('/dashboard');
   } else {
     errorMessage.value = 'Invalid email or password. Please try again.';

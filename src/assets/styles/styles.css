@@ -3,7 +3,10 @@
 @theme {
   --default-font-family: 'Poppins', sans-serif;
   --color-blue: #295f98;
+  --color-red: #d30000;
   --color-green: #0c5a48;
+  --color-orange: #ff9204;
+  --color-yellow: #d0d000;
   --color-gray: #858585;
   --color-light-gray: #e0e0e0;
   --color-border: #cecece;

@@ -19,7 +19,10 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: (to) => {
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      return isAdmin ? '/admin/dashboard' : '/dashboard';
+    },
   },
   {
     path: '/dashboard',
@@ -52,7 +55,6 @@ const routes = [
     component: Profile,
     meta: { requiresAuth: true },
   },
-  // Admin routes
   {
     path: '/admin/dashboard',
     name: 'admin-dashboard',
