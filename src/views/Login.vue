@@ -80,7 +80,7 @@ const login = () => {
     localStorage.setItem('user', JSON.stringify(adminCredentials));
     localStorage.setItem('isAdmin', 'true');
     emit('logged-in', adminCredentials);
-    router.push('/admin/master-list');
+    router.push('/admin/dashboard');
     return;
   }
 

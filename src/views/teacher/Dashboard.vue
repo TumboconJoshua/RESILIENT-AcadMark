@@ -78,23 +78,23 @@
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#0C5A48]"></div>
-          <p class="text-[#0C5A48] text-base">85-89 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-green"></div>
+          <p class="text-green text-base">85-89 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#D0D000]"></div>
-          <p class="text-[#D0D000] text-base">80-84 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-yellow"></div>
+          <p class="text-yellow text-base">80-84 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#FF9204]"></div>
-          <p class="text-[#FF9204] text-base">75-79 Grade</p>
+          <div class="rounded-full w-5 h-5 bg-orange"></div>
+          <p class="text-orange text-base">75-79 Grade</p>
         </div>
 
         <div class="flex gap-2">
-          <div class="rounded-full w-5 h-5 bg-[#D30000]"></div>
-          <p class="text-[#D30000] text-base">75 Below Grade</p>
+          <div class="rounded-full w-5 h-5 bg-red"></div>
+          <p class="text-red text-base">75 Below Grade</p>
         </div>
       </div>
 

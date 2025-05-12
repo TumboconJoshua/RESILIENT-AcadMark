@@ -94,7 +94,10 @@ const updateImageFromStorage = () => {
   }
 };
 
-watch(() => localStorage.getItem('teachers'), updateImageFromStorage, { deep: true });
+watch(() => localStorage.getItem('user'), updateImageFromStorage, { deep: true });
+
+// Listen for the avatarUpdated event
+window.addEventListener('avatarUpdated', updateImageFromStorage);
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
