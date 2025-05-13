@@ -53,7 +53,64 @@
                 </div>
             </div>
 
-            <div v-else class="grid grid-cols-3 gap-8 my-8 min-h-[200px]"></div>
+            <div v-else class="submitted-section">
+                <!-- Filter Bar -->
+                <div class="flex flex-row gap-4 items-center bg-white p-6 border border-[#EEEEEE] rounded-[5px] shadow mb-6">
+                    <Dropdown v-model="selectedSubmittedGrade" :options="gradeOptions" placeholder="Select Grade" customClass="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium" />
+                    <Dropdown v-model="selectedSubmittedCurriculum" :options="curriculumOptions" placeholder="Select Curriculum" customClass="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium" />
+                    <Dropdown v-model="selectedSubmittedTrack" :options="trackOptions" placeholder="Select Track" customClass="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium" />
+                    <Dropdown v-model="selectedSubmittedStatus" :options="statusOptions" placeholder="Select Status" customClass="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium" />
+                    <div class="flex items-center w-[220px] ml-auto bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-10">
+                        <img src="/assets/img/search-icon.svg" alt="search" class="w-5 h-5 mx-1 opacity-70" />
+                        <input type="text" v-model="rightSearch" placeholder="Search..." class="bg-transparent border-none outline-none w-full text-[15px] text-gray-700" />
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-lg shadow border border-gray-200 overflow-x-auto mb-4">
+                    <table class="min-w-[900px] w-full border-collapse table-fixed">
+                        <thead>
+                            <tr>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Grade Level</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Curriculum</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Track</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Class Section</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Class Adviser</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Student Added</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Date Added</th>
+                                <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">STATUS</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="max-h-[400px] overflow-y-auto w-full">
+                        <table class="min-w-[900px] w-full border-collapse table-fixed">
+                            <tbody>
+                                <tr v-for="(row, idx) in filteredSubmittedRows" :key="idx" class="border-b border-[#e0e0e0]">
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.grade }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.curriculum }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.track }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.section }}</td>
+                                    <td class="adviser-cell cursor-pointer text-[#222] underline text-[14px] text-center px-3 py-2" @click="openClassInfoModal(row)">{{ row.adviser }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.students }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.date }}</td>
+                                    <td class="text-[14px] text-center px-3 py-2">
+                                        <span
+                                            :class="[
+                                                'inline-block min-w-[90px] text-center py-1 rounded-lg text-[12px] text-white',
+                                                row.status === 'Pending' ? 'bg-[#ff9800]' : '',
+                                                row.status === 'Accepted' ? 'bg-[#4caf50]' : '',
+                                                row.status === 'Not Accepted' ? 'bg-[#f44336]' : ''
+                                            ]"
+                                        >
+                                            {{ row.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </template>
         <template v-else-if="showGrade7Detail">
             <div class="min-h-[400px]">
@@ -218,45 +275,94 @@
             </div>
         </template>
     </div>
-    <div v-if="showAddTeacherModal" class="fixed inset-0 bg-black/20 z-[9999] flex items-center justify-center" @click.self="closeAddTeacherModal">
-        <div class="bg-white shadow-[0_4px_32px_0_rgba(0,0,0,0.18)] w-[850px] h-[620px] p-[38px_38px_24px_38px] relative flex flex-col">
+    <div v-if="showAddTeacherModal" class="fixed inset-0 bg-black/20 z-[9999] flex items-center justify-center"
+        @click.self="closeAddTeacherModal">
+        <div
+            class="bg-white shadow-[0_4px_32px_0_rgba(0,0,0,0.18)] w-[850px] h-[620px] p-[38px_38px_24px_38px] relative flex flex-col">
             <h2 class="text-[1.5rem] font-bold text-[#295F98] mb-7">Add Class Teacher</h2>
             <div class="mb-[22px]">
                 <div class="text-[#295F98] text-[1rem] font-semibold mb-2">Advisory Teacher</div>
                 <div class="flex gap-[22px] mb-2 justify-between">
-                    <Dropdown :options="subjectOptions" placeholder="Subjects" customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
-                    <select class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" v-model="selectedAdviser">
+                    <Dropdown :options="subjectOptions" placeholder="Subjects"
+                        customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
+                    <select
+                        class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium"
+                        v-model="selectedAdviser">
                         <option value="" disabled selected>Adviser Name</option>
                         <option v-for="adviser in advisers" :key="adviser.id" :value="adviser.name">
                             {{ adviser.name }}
                         </option>
                     </select>
                     <div class="flex flex-col relative">
-                        <label class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee ID</label>
-                        <input class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" placeholder="Auto Fill" :value="adviserIdByName(selectedAdviser)" readonly />
+                        <label
+                            class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee
+                            ID</label>
+                        <input
+                            class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium"
+                            placeholder="Auto Fill" :value="adviserIdByName(selectedAdviser)" readonly />
                     </div>
                 </div>
             </div>
             <div class="mb-[22px]">
                 <div class="text-[#295F98] text-[1rem] font-semibold mb-2">Subject Teacher</div>
                 <div class="flex gap-[22px] mb-2 justify-between">
-                    <Dropdown :options="subjectOptions" placeholder="Subjects" customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
-                    <select class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" v-model="selectedSubjectAdviser">
+                    <Dropdown :options="subjectOptions" placeholder="Subjects"
+                        customClass="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" />
+                    <select
+                        class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium"
+                        v-model="selectedSubjectAdviser">
                         <option value="" disabled selected>Adviser Name</option>
                         <option v-for="adviser in advisers" :key="adviser.id + '-subject'" :value="adviser.name">
                             {{ adviser.name }}
                         </option>
                     </select>
                     <div class="flex flex-col relative">
-                        <label class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee ID</label>
-                        <input class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium" placeholder="Auto Fill" :value="adviserIdByName(selectedSubjectAdviser)" readonly />
+                        <label
+                            class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">Employee
+                            ID</label>
+                        <input
+                            class="min-w-[240px] h-[48px] px-[12px] border border-[#E3E9EC] rounded-[6px] bg-white text-[1rem] text-[#242424] font-medium"
+                            placeholder="Auto Fill" :value="adviserIdByName(selectedSubjectAdviser)" readonly />
                     </div>
                 </div>
             </div>
-            <button class="w-full bg-[#295F98] text-white text-[2rem] border-none rounded px-0 py-1 mt-[18px] mb-[18px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]">+</button>
+            <button
+                class="w-full bg-[#295F98] text-white text-[2rem] border-none rounded px-0 py-1 mt-[18px] mb-[18px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]">+</button>
             <div class="flex justify-end gap-[18px] mt-[120px]">
-                <button class="bg-[#BFC3C8] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 hover:bg-[#a0a4a8]" @click="closeAddTeacherModal">Cancel</button>
-                <button class="bg-[#295F98] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 shadow-[0_2px_4px_0_rgba(41,95,152,0.08)] hover:bg-[#1d4066]">Add Faculty(s)</button>
+                <button
+                    class="bg-[#BFC3C8] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 hover:bg-[#a0a4a8]"
+                    @click="closeAddTeacherModal">Cancel</button>
+                <button
+                    class="bg-[#295F98] text-white text-[1rem] font-medium border-none rounded-[6px] px-8 py-[10px] cursor-pointer transition-colors duration-200 shadow-[0_2px_4px_0_rgba(41,95,152,0.08)] hover:bg-[#1d4066]">Add
+                    Faculty(s)</button>
+            </div>
+        </div>
+    </div>
+    <div v-if="showClassInfoModal" class="fixed inset-0 bg-black/20 z-[9999] flex items-center justify-center" @click.self="closeClassInfoModal">
+        <div class="bg-white w-[750px] rounded-lg p-8 shadow-lg flex flex-col">
+            <h2 class="text-[22px] text-[#295F98] mb-4 tracking-wide">CLASS INFO</h2>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-2 mb-6">
+                <div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Class Adviser</div>
+                    <div class="text-[16px] mb-3">{{ selectedClassInfo.adviser }}</div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Curriculum</div>
+                    <div class="text-[16px] mb-3">{{ selectedClassInfo.curriculum }}</div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Class Section</div>
+                    <div class="text-[16px]">{{ selectedClassInfo.section }}</div>
+                </div>
+                <div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Grade Level</div>
+                    <div class="text-[16px] mb-3">{{ selectedClassInfo.grade }}</div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Track</div>
+                    <div class="text-[16px] mb-3">{{ selectedClassInfo.track }}</div>
+                    <div class="text-[#295F98] text-[13px] font-semibold mb-1">Recently Added Student</div>
+                    <div class="text-[16px]">{{ selectedClassInfo.students }}</div>
+                </div>
+            </div>
+            <div class="text-[#295F98] text-[17px] mb-2 tracking-wide">COMMENT</div>
+            <textarea class="w-full h-[120px] border border-[#295F98] rounded-lg p-3 text-[15px] mb-6 resize-none"></textarea>
+            <div class="flex justify-end">
+                <button @click="closeClassInfoModal" class="bg-[#888] text-white px-8 py-2 rounded transition hover:bg-[#444] cursor-pointer">Close</button>
             </div>
         </div>
     </div>
@@ -579,6 +685,106 @@ export default {
             ],
             selectedAdviser: '',
             selectedSubjectAdviser: '',
+            gradeOptions: [
+                { value: 'Grade 7', label: 'Grade 7' },
+                { value: 'Grade 8', label: 'Grade 8' },
+                { value: 'Grade 9', label: 'Grade 9' },
+                { value: 'Grade 10', label: 'Grade 10' },
+                { value: 'Grade 11', label: 'Grade 11' },
+                { value: 'Grade 12', label: 'Grade 12' }
+            ],
+            curriculumOptions: [
+                { value: 'Junior High School', label: 'Junior High School' },
+                { value: 'Senior High School', label: 'Senior High School' }
+            ],
+            trackOptions: [
+                { value: 'SPA', label: 'SPA' },
+                { value: 'SPJ', label: 'SPJ' },
+                { value: 'BEC', label: 'BEC' }
+            ],
+            statusOptions: [
+                { value: 'Pending', label: 'Pending' },
+                { value: 'Accepted', label: 'Accepted' },
+                { value: 'Not Accepted', label: 'Not Accepted' }
+            ],
+            submittedRows: [
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 10,
+                    date: '04/01/25',
+                    status: 'Pending'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Accepted'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Not Accepted'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Not Accepted'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Not Accepted'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Not Accepted'
+                },
+                {
+                    grade: '7',
+                    curriculum: 'Junior High School',
+                    track: 'SPA',
+                    section: 'Einstein',
+                    adviser: 'Joshua Ralph Xander Jumel Solomon',
+                    students: 42,
+                    date: '04/01/25',
+                    status: 'Not Accepted'
+                },
+            ],
+            selectedSubmittedGrade: '',
+            selectedSubmittedCurriculum: '',
+            selectedSubmittedTrack: '',
+            selectedSubmittedStatus: '',
+            showClassInfoModal: false,
+            selectedClassInfo: null,
         };
     },
     methods: {
@@ -618,13 +824,21 @@ export default {
             const adviser = this.advisers.find(a => a.name === name);
             return adviser ? adviser.id : '';
         },
+        openClassInfoModal(row) {
+            this.selectedClassInfo = row;
+            this.showClassInfoModal = true;
+        },
+        closeClassInfoModal() {
+            this.showClassInfoModal = false;
+            this.selectedClassInfo = null;
+        },
     },
     computed: {
         filteredTableData() {
             let filteredData = this.dummyTableData[this.enteredIdx];
 
             // Apply gender filter
-            if (this.rightGender && this.rightGender !== "") {
+            if (this.rightGender && this.rightGender !== "" && this.rightGender !== "All") {
                 filteredData = filteredData.filter(row => row.gender === this.rightGender);
             }
 
@@ -638,6 +852,26 @@ export default {
             }
 
             return filteredData;
+        },
+        filteredSubmittedRows() {
+            const selectedGrade = typeof this.selectedSubmittedGrade === 'object' ? this.selectedSubmittedGrade?.value : this.selectedSubmittedGrade;
+            const selectedCurriculum = typeof this.selectedSubmittedCurriculum === 'object' ? this.selectedSubmittedCurriculum?.value : this.selectedSubmittedCurriculum;
+            const selectedTrack = typeof this.selectedSubmittedTrack === 'object' ? this.selectedSubmittedTrack?.value : this.selectedSubmittedTrack;
+            const selectedStatus = typeof this.selectedSubmittedStatus === 'object' ? this.selectedSubmittedStatus?.value : this.selectedSubmittedStatus;
+            const search = this.rightSearch ? this.rightSearch.toLowerCase() : '';
+
+            return this.submittedRows.filter(row => {
+                const gradeMatch = !selectedGrade || row.grade === selectedGrade;
+                const curriculumMatch = !selectedCurriculum || row.curriculum === selectedCurriculum;
+                const trackMatch = !selectedTrack || row.track === selectedTrack;
+                const statusMatch = !selectedStatus || row.status === selectedStatus;
+                const searchMatch = !search ||
+                    row.curriculum.toLowerCase().includes(search) ||
+                    row.track.toLowerCase().includes(search) ||
+                    row.section.toLowerCase().includes(search) ||
+                    row.adviser.toLowerCase().includes(search);
+                return gradeMatch && curriculumMatch && trackMatch && statusMatch && searchMatch;
+            });
         }
     },
 };

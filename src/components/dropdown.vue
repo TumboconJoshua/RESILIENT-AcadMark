@@ -34,7 +34,7 @@
       <div class="flex justify-between items-center">
         <label for="grade" class="mr-2.5 p-1.5 text-[#858585]">Grade</label>
         <select v-model="selectedGrade" id="grade"
-          class="text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none">
+          :class="['text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none', customClass]">
           <option v-for="option in gradeOptions" :key="option" :value="option">{{ option }}</option>
         </select>
       </div>
