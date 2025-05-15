@@ -31,20 +31,22 @@ const props = defineProps({
     type: { type: String, required: true },
     trackStand: { type: String, required: true },
     className: { type: String, required: true },
-    subjectName: { type: String, required: true },
+    subjectName: { type: String, default: "General" },
     gradeLevel: { type: [String, Number], required: true },
-    subject_id: { type: String, required: true },
+    subject_id: { type: String, default: "" },
     classType: { type: String, required: true }
 });
 
 const router = useRouter();
 
 const cardColor = computed(() => ({
-    text: props.type === "Advisory" ? "text-blue" : "text-green",
-    bg: props.type === "Advisory" ? "bg-blue" : "bg-green"
+    text: props.classType === "Advisory" ? "text-blue" : "text-green",
+    bg: props.classType === "Advisory" ? "bg-blue" : "bg-green"
 }));
 
-const cardTitle = computed(() => props.type === "Advisory" ? "Advisory Class" : "Subject Class");
+const cardTitle = computed(() => 
+    props.classType === "Advisory" ? "Advisory Class" : "Subject Class"
+);
 
 const formattedGradeLevel = computed(() => {
     const grade = Number(props.gradeLevel);
