@@ -18,7 +18,7 @@ const classes = ref([]);
 
 const getTrackForGrade = (track, gradeLevel) => {
   const grade = parseInt(gradeLevel);
-  return grade <= 10 ? '' : track;
+  return grade <= 10 ? 'Academic' : track;
 };
 
 onMounted(async () => {
