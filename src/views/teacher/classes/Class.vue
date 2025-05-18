@@ -15,8 +15,6 @@
                         <p class="text-white text-xl leading-none">({{ totalStudents }} students)</p>
                     </div>
 
-                    <p class="text-white text-xl font-normal leading-none">{{ subjectInfo?.subjectName }}</p>
-
                     <div class="mt-7">
                         <p class="text-white text-xl">
                             <span class="font-bold">Male:</span> {{ maleCount }}
@@ -31,7 +29,15 @@
                     'text-[#3E6FA2]': classType === 'Advisory',
                     'text-[#357e58]': classType === 'Subject'
                 }" class="flex items-center justify-center pr-15 h-[150px]">
-                    <p class="font-bold text-[150px]">{{ trackStand + ' ' + gradeLevel }}</p>
+                    <p class="font-bold text-[150px]" :style="{
+                        fontSize: subjectName.length > 10 ? 'clamp(60px, 8vw, 120px)' : '150px'
+                    }">
+                        {{ 
+                            gradeLevel <= 10 
+                                ? subjectName + ' ' + gradeLevel 
+                                : trackStand + ' ' + gradeLevel + (subjectInfo?.subjectName ? ' ' + subjectInfo.subjectName : '')
+                        }}
+                    </p>
                 </div>
 
 
@@ -160,6 +166,7 @@ export default {
         SummaryOfGrades
     },
     setup(props) {
+        (props.trackStand);
         const subjectInfo = ref(null);
         const maleCount = ref(0);
         const femaleCount = ref(0);
