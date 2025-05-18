@@ -31,6 +31,11 @@ onMounted(async () => {
     }
     const teacherId = user.teacher_ID;
     classes.value = await ClassesService.fetchClasses(teacherId);
+    // Convert subject_id to string
+    classes.value = classes.value.map(cls => ({
+      ...cls,
+      subject_id: String(cls.subject_id),  // Explicitly convert to string
+    }));
   } catch (error) {
     console.error('Error loading classes:', error);
   }
