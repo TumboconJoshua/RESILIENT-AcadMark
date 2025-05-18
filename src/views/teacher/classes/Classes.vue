@@ -23,7 +23,14 @@ const getTrackForGrade = (track, gradeLevel) => {
 
 onMounted(async () => {
   try {
-    classes.value = await ClassesService.fetchClasses();
+    // Fetch the user object from localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.teacher_ID) {
+      console.error('TEACHER_ID not found in localStorage. Please log in as a teacher.');
+      return;
+    }
+    const teacherId = user.teacher_ID;
+    classes.value = await ClassesService.fetchClasses(teacherId);
   } catch (error) {
     console.error('Error loading classes:', error);
   }
