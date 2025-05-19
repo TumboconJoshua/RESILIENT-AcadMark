@@ -13,6 +13,7 @@
 import { ref, onMounted } from 'vue';
 import Card from "@/components/card.vue";
 import ClassesService from "@/service/Classes/ClassesService";
+import { getTeacherId } from "@/service/authService";
 
 const classes = ref([]);
 
@@ -23,12 +24,12 @@ const getTrackForGrade = (track, gradeLevel) => {
 
 onMounted(async () => {
   try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.teacher_ID) {
-      console.error('TEACHER_ID not found in localStorage. Please log in as a teacher.');
+    const teacherId = await getTeacherId();
+    if (!teacherId) {
+      console.error('TEACHER_ID not found. Please log in as a teacher.');
       return;
     }
-    const teacherId = user.teacher_ID;
+
     const fetchedClasses = await ClassesService.fetchClasses(teacherId);
 
     // Flatten: one card per subject per class

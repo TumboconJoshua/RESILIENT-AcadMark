@@ -32,3 +32,20 @@ export const loginTeacher = async (email, password) => {
     throw error.response?.data?.error || 'Login failed';
   }
 };
+
+export const getTeacherId = async () => {
+  // Check localStorage (fallback)
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user?.teacher_ID) {
+    return user.teacher_ID;
+  }
+
+  // Optional: Fallback to API if needed
+  try {
+    const response = await API.get('/auth/teacher-id');
+    if (!response.data.teacherId) throw new Error('Teacher ID not found');
+    return response.data.teacherId;
+  } catch (error) {
+    throw new Error('Failed to fetch teacher ID from API or localStorage');
+  }
+};
