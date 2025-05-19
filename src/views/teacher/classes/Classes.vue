@@ -34,17 +34,9 @@ onMounted(async () => {
 
     // Flatten: one card per subject per class
     classes.value = fetchedClasses.flatMap(cls =>
-      cls.subjects.length > 0
-        ? cls.subjects.map(subj => ({
-            ...cls,
-            subject_id: String(subj.subject_id),
-            subject_name: subj.subject_name,
-          }))
-        : [{
-            ...cls,
-            subject_id: "",
-            subject_name: "General"
-          }]
+      [...new Map(
+        cls.subjects.map(subj => [subj.subject_id, { ...cls, subject_id: String(subj.subject_id), subject_name: subj.subject_name }])
+      ).values()]
     );
   } catch (error) {
     console.error('Error loading classes:', error);
