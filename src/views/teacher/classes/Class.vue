@@ -62,7 +62,7 @@
 
         </div>
 
-        <div v-if="(activeComponent === 'SummaryOfGrades' || activeComponent === 'Submitted') && totalPages > 0"
+        <div v-if="(activeComponent === 'Submitted') && totalPages > 0"
             class="flex justify-center items-center gap-5 py-5">
             <img src="/assets/img/classes/arrow.png" alt="arrow" class="w-4 h-4 rotate-180 cursor-pointer"
                 @click="prevPage" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">

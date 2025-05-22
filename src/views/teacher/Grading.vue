@@ -99,7 +99,8 @@
                 <div class="flex gap-5">
                     <div>
                         <p class="text-blue text-xs font-bold">Quarter Grade</p>
-                        <input type="text" class="border-[1px] w-35 h-9 text-center" v-model="Grade" />
+                        <input type="text" class="border-[1px] w-35 h-9 text-center" v-model="Grade"
+                            @input="validateGrade" maxlength="3" pattern="[0-9]*" inputmode="numeric" />
                     </div>
                     <div>
                         <p class="text-blue text-xs font-bold">Remarks</p>
@@ -152,6 +153,21 @@
             </button>
         </div>
     </div>
+
+    <!-- Alert Modal -->
+    <div v-if="showAlert" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+        <div class="bg-white rounded-xl p-8 text-center shadow-xl max-w-sm w-full">
+            <h2 class="text-xl font-semibold mb-4" :class="alertType === 'error' ? 'text-red-600' : 'text-green-600'">
+                {{ alertTitle }}
+            </h2>
+            <p class="text-gray-700">{{ alertMessage }}</p>
+            <button @click="showAlert = false" class="mt-6 px-4 py-2 rounded cursor-pointer"
+                :class="alertType === 'error' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
+                :style="{ color: 'white' }">
+                OK
+            </button>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -161,6 +177,7 @@ import students from '@/data/students.json';
 import Dropdown from '@/components/dropdown.vue';
 import { computed } from 'vue';
 import Modal from '@/components/modal.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     trackStand: String,
@@ -178,8 +195,12 @@ const selectedStudent = ref(null);
 const currentIndex = ref(0);
 const Grade = ref("");
 const selectedQuarter = ref("1st");
-const selectedMarkStatus = ref("");
+const selectedMarkStatus = ref("Show All");
 const showSubmitSuccess = ref(false);
+const showAlert = ref(false);
+const alertTitle = ref('');
+const alertMessage = ref('');
+const alertType = ref('error');
 
 const quarterMapping = {
     "1st": "first",
@@ -314,12 +335,25 @@ const filteredStudents = computed(() => {
     return studentsInSubject.value.filter(student => {
         const studentGrade = student.grades[quarterMapping[selectedQuarter.value]];
 
+        // For debugging
+        console.log('Student:', student.firstName, 'Grade:', studentGrade, 'Status:', selectedMarkStatus.value);
+
         if (selectedMarkStatus.value === 'Marked') {
-            return studentGrade !== null && studentGrade !== '';
+            // A student is marked if they have a valid grade (not null, empty, 'No grade', or '-')
+            const isValidGrade = studentGrade &&
+                studentGrade !== '' &&
+                studentGrade !== 'No grade' &&
+                studentGrade !== '-';
+            return isValidGrade;
         } else if (selectedMarkStatus.value === 'Unmarked') {
-            return studentGrade === null || studentGrade === '';
+            // A student is unmarked if they have no grade or an invalid grade
+            const isInvalidGrade = !studentGrade ||
+                studentGrade === '' ||
+                studentGrade === 'No grade' ||
+                studentGrade === '-';
+            return isInvalidGrade;
         }
-        return true;
+        return true; // Show all students when no filter is selected
     });
 });
 
@@ -327,14 +361,16 @@ const remarks = computed(() => {
     if (!Grade.value) {
         return "";
     }
-    return Grade.value <= 75 ? "Failed" : "Passed";
+    const gradeValue = parseFloat(Grade.value);
+    return gradeValue < 75 ? "Failed" : "Passed";
 });
 
 const remarksClass = computed(() => {
     if (!Grade.value) {
         return "";
     }
-    return Grade.value <= 75 ? "text-red-500" : "text-green-500";
+    const gradeValue = parseFloat(Grade.value);
+    return gradeValue < 75 ? "text-red-500" : "text-green-500";
 });
 
 const isSelectedStudent = (student) => {
@@ -345,7 +381,7 @@ function submitGrades() {
     const selectedStudents = studentsInSubject.value.filter(student => student.selected);
 
     if (selectedStudents.length === 0) {
-        alert("Please select students to submit grades.");
+        showAlertModal("Please select students to submit grades.", 'error', 'No Selection');
         return;
     }
 
@@ -392,15 +428,27 @@ function submitGrades() {
     localStorage.setItem(`subject_${props.subject_id}`, JSON.stringify(studentsInSubject.value));
     localStorage.setItem(`submittedGrade_${props.subject_id}`, JSON.stringify(selectedStudents));
 
-    // Set showSubmitSuccess to true after successful submission
     showSubmitSuccess.value = true;
 }
 
-const showAllLocalStorage = () => {
-    // Removed console.log functionality
-};
+function showAlertModal(message, type = 'error', title = 'Error') {
+    Swal.fire({
+        title: title,
+        text: message,
+        icon: type,
+        confirmButtonColor: type === 'error' ? '#dc2626' : '#16a34a',
+        confirmButtonText: 'OK'
+    });
+}
 
-onMounted(() => {
-    showAllLocalStorage();
-});
+function validateGrade(event) {
+    // Remove any non-numeric characters
+    Grade.value = Grade.value.replace(/[^0-9]/g, '');
+
+    // Ensure the value is between 0 and 100
+    const numValue = parseInt(Grade.value);
+    if (numValue > 100) {
+        Grade.value = '100';
+    }
+}
 </script>

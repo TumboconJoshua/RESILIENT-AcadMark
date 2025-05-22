@@ -4,53 +4,63 @@
             <Dropdown :showSort="true" v-model="selectedSort" />
         </div>
 
-        <div class="flex w-1/2 justify-between">
-            <Searchbar v-model="searchQuery" />
+        <div class="flex justify-between gap-5">
+            <div>
+                <Searchbar v-model="searchQuery" />
+            </div>
             <button @click="generateCSV"
                 class="bg-[#30612E] text-white px-5 py-1 rounded-md hover:bg-[#cecece] transition-colors cursor-pointer duration-200">
-                Generate Report
+                <p class="w-full">Generate Report</p>
             </button>
         </div>
     </div>
 
-    <div class="overflow-x-auto p-5 rounded-[5px]">
-        <table class="w-full border-collapse border-none rounded-[5px]">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th v-for="header in headers" :key="header"
-                        class="px-4 py-2 text-[#464F60] text-[16px] font-semibold text-center">
-                        {{ header }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="text-center font-medium">
-                <tr v-if="paginatedStudents.length === 0">
-                    <td colspan="8" class="px-4 py-2">No students available.</td>
-                </tr>
-                <tr v-for="student in paginatedStudents" :key="student.lrn">
-                    <td class="px-4 py-2">{{ student.lrn }}</td>
-                    <td class="px-4 py-2">{{ student.lastName + ", " + student.firstName + " " + student.middleName }}
-                    </td>
-                    <td class="px-4 py-2">{{ student.sex }}</td>
-                    <td class="px-4 py-2">{{ getGradeForQuarter(student, "first") }}</td>
-                    <td class="px-4 py-2">{{ getGradeForQuarter(student, "second") }}</td>
-                    <td class="px-4 py-2">{{ getGradeForQuarter(student, "third") }}</td>
-                    <td class="px-4 py-2">{{ getGradeForQuarter(student, "fourth") }}</td>
-                    <td class="px-4 py-2">{{ getFinalGrade(student) }}</td>
-                    <td :class="getRemarks(student) === 'Passed' ? 'text-[#23AD00]' : 'text-[#FF0000]'"
-                        class="px-4 py-2 font-bold">
-                        {{ getRemarks(student) }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="p-5 rounded-[5px]">
+        <div class="relative">
+            <table class="w-full border-collapse border-none rounded-[5px]">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th v-for="header in headers" :key="header"
+                            class="px-4 py-2 text-[#464F60] text-[16px] font-semibold text-center">
+                            {{ header }}
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="max-h-[600px] overflow-y-auto">
+                <table class="w-full border-collapse border-none rounded-[5px]">
+                    <tbody class="text-center font-medium">
+                        <tr v-if="filteredStudents.length === 0">
+                            <td colspan="9" class="px-4 py-2">No students available.</td>
+                        </tr>
+                        <tr v-for="student in filteredStudents" :key="student.lrn">
+                            <td class="px-4 py-2">{{ student.lrn }}</td>
+                            <td class="px-4 py-2">{{ student.lastName + ", " + student.firstName + " " +
+                                student.middleName }}
+                            </td>
+                            <td class="px-4 py-2">{{ student.sex }}</td>
+                            <td class="px-4 py-2">{{ getGradeForQuarter(student, "first") }}</td>
+                            <td class="px-4 py-2">{{ getGradeForQuarter(student, "second") }}</td>
+                            <td class="px-4 py-2">{{ getGradeForQuarter(student, "third") }}</td>
+                            <td class="px-4 py-2">{{ getGradeForQuarter(student, "fourth") }}</td>
+                            <td class="px-4 py-2">{{ getFinalGrade(student) }}</td>
+                            <td :class="getRemarks(student) === 'Passed' ? 'text-[#23AD00]' : 'text-[#FF0000]'"
+                                class="px-4 py-2 font-bold">
+                                {{ getRemarks(student) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Dropdown from '@/components/dropdown.vue';
 import Searchbar from '@/components/searchbar.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     subject_id: {
@@ -60,18 +70,8 @@ const props = defineProps({
     subjectName: {
         type: String,
         required: true,
-    },
-    currentPage: {
-        type: Number,
-        required: true,
-    },
-    itemsPerPage: {
-        type: Number,
-        required: true,
-    },
+    }
 });
-
-const emit = defineEmits(['update:currentPage', 'update:totalItems']);
 
 const headers = ref([
     'LRN', 'Name', 'Gender', '1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter', 'Final Grade', 'Remarks'
@@ -86,19 +86,15 @@ const fetchStudents = () => {
         const key = `submittedGrade_${props.subject_id}`;
         const storedData = JSON.parse(localStorage.getItem(key)) || [];
         students.value = storedData;
-        emit('update:currentPage', 1);
-        emit('update:totalItems', students.value.length);
     } catch (error) {
         students.value = [];
-        emit('update:currentPage', 1);
-        emit('update:totalItems', 0);
     }
 };
 
 const getGradeForQuarter = (student, quarter) => {
     const grade = student.grades?.[quarter];
     if (!grade || grade === null || grade === undefined || grade === '' || grade === '-' || grade === 'No grade') {
-        return 'No grade';
+        return '-';
     }
     return grade;
 };
@@ -111,29 +107,29 @@ const getFinalGrade = (student) => {
 
     for (let quarter of grades) {
         const grade = getGradeForQuarter(student, quarter);
-        if (grade !== 'No grade') {
+        if (grade !== '-') {
             hasAnyValidGrade = true;
             total += parseFloat(grade);
             gradeCount++;
         }
     }
 
-    if (!hasAnyValidGrade) return 'No grade';
-    if (gradeCount < 4) return 'INC';
+    if (!hasAnyValidGrade) return '-';
+    if (gradeCount < 4) return '-';
 
     return (total / gradeCount).toFixed(2);
 };
 
 const getRemarks = (student) => {
     const finalGrade = getFinalGrade(student);
-    if (finalGrade === 'No grade' || finalGrade === 'INC' || parseFloat(finalGrade) <= 75) {
+    if (finalGrade === '-' || finalGrade === 'INC' || parseFloat(finalGrade) <= 75) {
         return 'Failed';
     }
     return 'Passed';
 };
 
 const gradeToNumeric = (grade) => {
-    if (grade === 'No grade') return -1;
+    if (grade === '-') return -1;
     if (grade === 'INC') return 0;
     return parseFloat(grade);
 };
@@ -172,32 +168,6 @@ const filteredStudents = computed(() => {
     return sortedStudents;
 });
 
-const totalPages = computed(() => {
-    if (filteredStudents.value.length === 0) {
-        return 0;
-    }
-    return Math.ceil(filteredStudents.value.length / props.itemsPerPage);
-});
-
-const paginatedStudents = computed(() => {
-    if (filteredStudents.value.length === 0) {
-        return [];
-    }
-
-    const startIndex = (props.currentPage - 1) * props.itemsPerPage;
-    const endIndex = startIndex + props.itemsPerPage;
-    return filteredStudents.value.slice(startIndex, endIndex);
-});
-
-watch(filteredStudents, (newFilteredStudents) => {
-    const newTotalPages = Math.ceil(newFilteredStudents.length / props.itemsPerPage);
-    if (props.currentPage > newTotalPages && newTotalPages > 0) {
-        emit('update:currentPage', newTotalPages);
-    } else if (newTotalPages === 0) {
-        emit('update:currentPage', 1);
-    }
-}, { deep: true });
-
 const generateCSV = () => {
     const date = new Date().toLocaleDateString().replace(/\//g, '-');
 
@@ -229,13 +199,17 @@ const generateCSV = () => {
     document.body.removeChild(link);
 };
 
+const showAlertModal = (message, type = 'error', title = 'Error') => {
+    Swal.fire({
+        title: title,
+        text: message,
+        icon: type,
+        confirmButtonColor: type === 'error' ? '#dc2626' : '#16a34a',
+        confirmButtonText: 'OK'
+    });
+};
+
 onMounted(() => {
     fetchStudents();
-    if (students.value.length === 0) {
-        emit('update:currentPage', 1);
-        emit('update:totalItems', 0);
-    } else {
-        emit('update:totalItems', students.value.length);
-    }
 });
 </script>

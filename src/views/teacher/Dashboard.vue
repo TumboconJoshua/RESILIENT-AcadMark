@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col gap-10 py-5 px-5 overflow-x-hidden ssm:w-[75vw] sm:w-[80vw] md:w-[84vw] max-w-[84vw]">
-    <h1 class="title">Dashboard</h1>
+    <div class="flex justify-between items-center">
+      <h1 class="title">Dashboard</h1>
+      <p class="title">Total Students: {{ totalStudents }}</p>
+    </div>
 
     <div class="flex ssm:flex-col sm:w-full md:flex-row justify-between ssm:gap-3 md:gap-10">
       <div class="p-5 border-blue border-2 ssm:w-full md:w-1/2 rounded-2xl overflow-hidden">
@@ -207,6 +210,12 @@ import BarChart from '@/components/barchart.vue';
 import classData from '@/data/class.json';
 import subjectData from '@/data/subjects.json';
 import studentData from '@/data/students.json';
+
+const totalStudents = computed(() => {
+  const advisoryCount = advisoryStats.value.total;
+  const subjectCount = subjectClasses.value.reduce((sum, cls) => sum + cls.count, 0);
+  return advisoryCount + subjectCount;
+});
 
 const advisoryStats = computed(() => {
   const advisoryClass = classData.find(cls => cls.classType === 'Advisory');

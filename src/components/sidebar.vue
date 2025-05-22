@@ -3,20 +3,25 @@
     class="sm:w-[1/5] md:w-1/5 lg:w-1/6 max-w-[220px] w-auto bg-blue md:pt-15 sm:pt-5 rounded-tr-[30px] sticky top-0 h-screen flex flex-col"
     style="box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px; flex-shrink: 0;">
 
-    <div class="flex flex-col items-center m-4 gap-8">
-      <img :src="imageSrc" alt="Teacher" class="w-[130px] h-[130px] rounded-full object-contain" />
-      <p class="text-white text-center font-normal text-[16px]">{{ fullName }}</p>
-      <div class="w-full border-b border-[#A6ACAF]"></div>
+    <div class="flex flex-col items-center m-4 gap-6">
+      <div class="w-[130px] h-[130px] rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+        <img :src="imageSrc" alt="Teacher" class="w-full h-full object-cover" />
+      </div>
+      <div class="flex flex-col items-center gap-1.5">
+        <p class="text-white text-center font-medium text-[20px]">{{ fullName }}</p>
+        <p class="text-white text-center font-normal text-[16px]">{{ position }}</p>
+      </div>
+      <div class="w-full border-b-[0.5px] border-[#A6ACAF]"></div>
     </div>
 
     <nav class="flex flex-col w-full mt-5 relative flex-1">
       <div class="absolute left-0 w-full bg-[#3E6FA2] transitions-all duration-300 rounded-r-lg"
-        :style="{ top: `${activeIndex * 57}px`, height: '50px' }"></div>
+        :style="{ top: `${getActiveBarPosition()}px`, height: '42px' }"></div>
 
-      <router-link v-for="(link, index) in links" :key="index" :to="link.path" class="nav-link relative"
-        :class="{ 'active': activeIndex === index }" @click="activeIndex = index">
-        <img :src="link.icon" :alt="link.name" class="w-6 h-6 mr-2 sm:hidden md:block" />
-        <span class="font-semibold text-[16px]">{{ link.name }}</span>
+      <router-link v-for="(link, index) in links" :key="index" :to="link.path" class="nav-link relative py-2"
+        :class="{ 'active': isLinkActive(link) }" @click="activeIndex = index">
+        <i :class="[link.icon, 'w-6', 'h-6', 'mr-2', 'sm:hidden', 'md:block']"></i>
+        <span class="font-semibold text-[17px]">{{ link.name }}</span>
       </router-link>
     </nav>
 
@@ -68,13 +73,23 @@ const teacherLinks = ref([
 ]);
 
 const adminLinks = ref([
-  { name: "Dashboard", path: "/admin/dashboard", icon: "/assets/img/sidebar/dashboard.png" },
-  { name: "Add Student", path: "/admin/add-student", icon: "/assets/img/sidebar/add.png" },
-  { name: "Record", path: "/admin/record", icon: "/assets/img/sidebar/classes.png" },
-  { name: "Manage Class", path: "/admin/add-class", icon: "/assets/img/sidebar/manageClass.png" },
-  { name: "Masterlist", path: "/admin/master-list", icon: "/assets/img/sidebar/masterlist.png" },
+  { name: "Dashboard", path: "/admin/dashboard", icon: "fa-solid fa-chart-pie" },
+  { name: "Add Student", path: "/admin/add-student", icon: "fa-solid fa-user-plus" },
+  { name: "Record", path: "/admin/record", icon: "fa-solid fa-book" },
+  { name: "Manage Class", path: "/admin/add-class", icon: "fa-solid fa-chalkboard" },
+  { name: "Masterlist", path: "/admin/master-list", icon: "fa-solid fa-list" },
 ]);
 
+const superadminLinks = ref([
+  { name: "Dashboard", path: "/superadmin/dashboard", icon: "fa-solid fa-chart-pie" },
+  { name: "Personnel", path: "/superadmin/personnel", icon: "fa-solid fa-users" },
+  { name: "Grades", path: "/superadmin/grades", icon: "fa-solid fa-chart-line" },
+  { name: "Students", path: "/superadmin/students", icon: "fa-solid fa-user-graduate" },
+  { name: "Classes", path: "/superadmin/classes", icon: "fa-solid fa-chalkboard" },
+  { name: "Lesson Plan", path: "/superadmin/lessonplan", icon: "fa-solid fa-clipboard-list" },
+  { name: "Settings", path: "/superadmin/settings", icon: "fa-solid fa-book" },
+
+]);
 
 const links = computed(() => {
   return isAdmin ? adminLinks.value : teacherLinks.value;
@@ -110,4 +125,43 @@ const confirmLogout = () => {
   localStorage.clear();
   router.push('/login');
 };
+
+// --------------- New code to keep activeIndex synced with route ---------------
+const updateActiveIndex = () => {
+  // Find the index of the link that matches the current route or its parent
+  activeIndex.value = links.value.findIndex(link => {
+    if (link.path === '/classes') {
+      return route.path === '/classes' ||
+        (route.path.includes('/class') && !route.path.includes('/superadmin')) ||
+        (route.path.includes('/classlist') && !route.path.includes('/superadmin'));
+    }
+    return route.path === link.path;
+  });
+};
+
+// Watch for route changes and update activeIndex immediately on mount
+watch(route, updateActiveIndex, { immediate: true });
+
+const isLinkActive = (link) => {
+  // Special handling for Classes section
+  if (link.path === '/classes') {
+    // Check if we're in any of the classes-related views, but not superadmin
+    return route.path === '/classes' ||
+      (route.path.includes('/class') && !route.path.includes('/superadmin')) ||
+      (route.path.includes('/classlist') && !route.path.includes('/superadmin'));
+  }
+  return route.path === link.path;
+};
+
+const getActiveBarPosition = () => {
+  const classesIndex = links.value.findIndex(link => link.path === '/classes');
+  // Check if we're in any of the classes-related views, but not superadmin
+  if (route.path === '/classes' ||
+    (route.path.includes('/class') && !route.path.includes('/superadmin')) ||
+    (route.path.includes('/classlist') && !route.path.includes('/superadmin'))) {
+    return classesIndex * 50;
+  }
+  return activeIndex.value * 50;
+};
+
 </script>

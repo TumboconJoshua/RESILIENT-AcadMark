@@ -1,13 +1,19 @@
 <template>
     <div>
-        <button class="btn-primary px-8 py-2 mx-12 mt-5 rounded-md" @click="showLis = true">
-            <p class="text-white font-semibold text-xs">LIS</p>
-        </button>
+        <div class="flex justify-between px-5 py-3 items-center">
+            <button class="btn-primary px-8 py-2 mx-12 mt-5 rounded-md" @click="showLis = true">
+                <p class="text-white font-semibold text-xs">LIS</p>
+            </button>
+
+            <div class="w-1/3">
+                <searchbar v-model="searchQuery" />
+            </div>
+        </div>
 
         <p v-if="!subject_id">Subject ID is not available</p>
 
         <div v-else>
-            <p v-if="studentsInSubject.length === 0">No students available for this subject.</p>
+            <p v-if="filteredStudents.length === 0">No students available for this subject.</p>
             <div v-else>
                 <div class="table-container">
                     <table class="table">
@@ -23,7 +29,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="student in studentsInSubject" :key="student.student_id">
+                            <tr v-for="student in filteredStudents" :key="student.student_id">
                                 <td class="table-cell">{{ student.lrn }}</td>
                                 <td class="table-cell">{{ student.firstName }} {{ student.lastName }}</td>
                                 <td class="table-cell">{{ student.sex }}</td>
@@ -38,16 +44,21 @@
             </div>
         </div>
 
-        <modal v-if="showLis" :subject_id="subject_id" :showLis="showLis" :showMessage="false" :selectedStudent="null"
-            :selectedQuarter="'1st'" :trackStand="'STEM'" :subjectName="subjectName" @close="showLis = false" />
+        <div>
+            <modal v-if="showLis" :subject_id="subject_id" :showLis="showLis" :showMessage="false"
+                :selectedStudent="null" :selectedQuarter="'1st'" :trackStand="'STEM'" :subjectName="subjectName"
+                @close="showLis = false" />
+
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import subjects from '@/data/subjects.json';
 import students from '@/data/students.json';
 import modal from '@/components/modal.vue';
+import searchbar from '@/components/searchbar.vue';
 
 const props = defineProps({
     subject_id: String,
@@ -56,6 +67,17 @@ const props = defineProps({
 
 const studentsInSubject = ref([]);
 const showLis = ref(false);
+const searchQuery = ref("");
+
+const filteredStudents = computed(() => {
+    if (!searchQuery.value) {
+        return studentsInSubject.value;
+    }
+    return studentsInSubject.value.filter(student => {
+        const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+        return fullName.includes(searchQuery.value.toLowerCase());
+    });
+});
 
 const calculateAge = (birthdate) => {
     const today = new Date();

@@ -2,7 +2,9 @@
     <div class="max-h-[412px]">
         <div class="flex justify-between px-5 py-3">
             <Dropdown :showQuarter="true" v-model="selectedQuarter" />
-            <Searchbar v-model="searchQuery" />
+            <div class="w-1/3">
+                <Searchbar v-model="searchQuery" />
+            </div>
         </div>
 
         <div class="overflow-auto px-5">
@@ -10,11 +12,11 @@
                 <thead class="bg-gray-100 text-[#464F60] text-[15px] font-semibold">
                     <tr>
                         <th class="p-2 w-1/6">LRN</th>
-                        <th class="p-2 w-1/6">Name</th>
-                        <th class="p-2 w-1/6">Gender</th>
-                        <th class="p-2 w-1/6">Age</th>
-                        <th class="p-2 w-1/6">Grade</th>
-                        <th class="p-2 w-1/6">Status</th>
+                        <th class="p-2 w-1/6">NAME</th>
+                        <th class="p-2 w-1/6">GENDER</th>
+                        <th class="p-2 w-1/6">AGE</th>
+                        <th class="p-2 w-1/6">GRADE</th>
+                        <th class="p-2 w-1/6">STATUS</th>
                     </tr>
                 </thead>
                 <tbody class="font-medium text-[15px]">
@@ -50,6 +52,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import Dropdown from '@/components/dropdown.vue';
 import Searchbar from '@/components/searchbar.vue';
 import modal from '@/components/modal.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     subject_id: {
@@ -154,6 +157,16 @@ const openModal = (student) => {
 
 const closeModal = () => {
     showMessage.value = false;
+};
+
+const showAlertModal = (message, type = 'error', title = 'Error') => {
+    Swal.fire({
+        title: title,
+        text: message,
+        icon: type,
+        confirmButtonColor: type === 'error' ? '#dc2626' : '#16a34a',
+        confirmButtonText: 'OK'
+    });
 };
 
 onMounted(() => {

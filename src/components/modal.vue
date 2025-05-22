@@ -1,44 +1,74 @@
     <template>
-        <div class="fixed inset-0 z-50 bg-black/50 p-[10%]">
+        <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+            <div class="w-full max-w-6xl max-h-[90vh] mx-4">
+                <div v-if="showLis" class="bg-white rounded-xl shadow-2xl relative">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-2xl font-semibold text-gray-800">Student Grades</h2>
+                    </div>
+                    <button @click="$emit('close')"
+                        class="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex cursor-pointer items-center justify-center shadow-lg transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="overflow-x-auto">
+                        <div class="max-h-[60vh] overflow-y-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 sticky top-0">
+                                    <tr class="text-semibold text-gray-700 text-[15px]">
+                                        <th class="px-6 py-4 text-left">LRN</th>
+                                        <th class="px-6 py-4 text-left">Full Name</th>
+                                        <th class="px-6 py-4 text-center" colspan="4">Quarter</th>
+                                        <th class="px-6 py-4 text-center">Average</th>
+                                        <th class="px-6 py-4 text-center">Remarks</th>
+                                    </tr>
+                                    <tr class="text-semibold text-gray-700 text-[15px]">
+                                        <th class="px-6 py-4"></th>
+                                        <th class="px-6 py-4"></th>
+                                        <th class="px-6 py-4 text-center">Q1</th>
+                                        <th class="px-6 py-4 text-center">Q2</th>
+                                        <th class="px-6 py-4 text-center">Q3</th>
+                                        <th class="px-6 py-4 text-center">Q4</th>
+                                        <th class="px-6 py-4"></th>
+                                        <th class="px-6 py-4"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr v-for="student in students" :key="student.student_id" class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ student.lrn }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ student.firstName }} {{
+                                            student.lastName
+                                        }}</td>
+                                        <td class="px-6 py-4 text-center">{{ student.grades.first || '-' }}</td>
+                                        <td class="px-6 py-4 text-center">{{ student.grades.second || '-' }}</td>
+                                        <td class="px-6 py-4 text-center">{{ student.grades.third || '-' }}</td>
+                                        <td class="px-6 py-4 text-center">{{ student.grades.fourth || '-' }}</td>
+                                        <td class="px-6 py-4 text-center font-medium">{{
+                                            calculateAverage(student.grades) }}
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span :class="{
+                                                'px-3 py-1 rounded-full text-sm font-medium': true,
+                                                'bg-green-100 text-green-800': getRemarks(student) === 'Passed',
+                                                'bg-red-100 text-red-800': getRemarks(student) === 'Failed'
+                                            }">
+                                                {{ getRemarks(student) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-            <div v-if="showLis">
-                <button @click="$emit('close')"
-                    class="absolute top-2.5 right-2.5 bg-red-500 text-white border-none p-2.5 cursor-pointer">Close</button>
-                <table class="w-full bg-[#F6F6F6]">
-                    <thead class="text-center">
-                        <tr class="text-semibold text-[#464F60] text-[15px]">
-                            <th rowspan="2">LRN</th>
-                            <th rowspan="2">Full Name</th>
-                            <th colspan="4">Quarter</th>
-                            <th rowspan="2">Average</th>
-                            <th rowspan="2">Remarks</th>
-                        </tr>
-                        <tr class="text-semibold text-[#464F60] text-[15px]">
-                            <th>Q1</th>
-                            <th>Q2</th>
-                            <th>Q3</th>
-                            <th>Q4</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                        <tr v-for="student in students" :key="student.student_id">
-                            <td>{{ student.lrn }}</td>
-                            <td>{{ student.firstName }} {{ student.lastName }}</td>
-                            <td>{{ student.grades.first || '-' }}</td>
-                            <td>{{ student.grades.second || '-' }}</td>
-                            <td>{{ student.grades.third || '-' }}</td>
-                            <td>{{ student.grades.fourth || '-' }}</td>
-                            <td>{{ calculateAverage(student.grades) }}</td>
-                            <td>{{ getRemarks(student) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div v-if="selectedStudent">
-                <div class="flex items-center justify-center">
-                    <div class="bg-white p-10 flex flex-col gap-5">
-                        <p class="text-blue font-semibold text-2xl">STUDENT INFO</p>
+                <div v-if="selectedStudent" class="bg-white rounded-xl shadow-2xl relative max-w-4xl mx-auto">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-2xl font-semibold text-gray-800">Student Information</h2>
+                    </div>
+                    <div class="p-10 flex flex-col gap-5">
                         <div class="flex flex-col gap-3">
                             <div class="flex gap-10">
                                 <div class="flex flex-col gap-1">
@@ -119,11 +149,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Success Modal -->
-            <div v-if="showSubmitSuccess" class="fixed inset-0 bg-black/50 flex items-center justify-center">
-                <div class="bg-white rounded-xl p-8 text-center shadow-xl max-w-sm w-full">
+                <!-- Success Modal -->
+                <div v-if="showSubmitSuccess"
+                    class="bg-white rounded-xl p-8 text-center shadow-xl max-w-sm w-full mx-auto">
                     <h2 class="text-xl font-semibold text-green-600 mb-4">Success!</h2>
                     <p class="text-gray-700">Grades have been successfully submitted.</p>
                     <button @click="$emit('close')"
@@ -132,7 +161,6 @@
                     </button>
                 </div>
             </div>
-
         </div>
     </template>
 
@@ -242,7 +270,7 @@ const calculateAverage = (grades) => {
 const getRemarks = (student) => {
     const quarterGrade = calculateAverage(student.grades);
 
-    if (quarterGrade === '-' || quarterGrade === null || quarterGrade === '' || parseFloat(quarterGrade) <= 75) {
+    if (quarterGrade === '-' || quarterGrade === null || quarterGrade === '' || parseFloat(quarterGrade) < 75) {
         return 'Failed';
     }
     return 'Passed';
