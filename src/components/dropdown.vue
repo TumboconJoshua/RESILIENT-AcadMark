@@ -34,7 +34,7 @@
       <div class="flex justify-between items-center">
         <label for="grade" class="mr-2.5 p-1.5 text-[#858585]">Grade</label>
         <select v-model="selectedGrade" id="grade"
-          class="text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none">
+          :class="['text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none', customClass]">
           <option v-for="option in gradeOptions" :key="option" :value="option">{{ option }}</option>
         </select>
       </div>
@@ -74,6 +74,18 @@
         <select v-model="selectedMarkStatus" id="mark-status" @change="updateMarkStatus"
           class="text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none">
           <option v-for="option in markStatusOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div v-if="options && options.length > 0">
+      <div class="flex justify-between items-center">
+        <select v-model="selectedOption" 
+          :class="customClass ? customClass : 'text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none'">
+          <option value="" disabled selected>{{ placeholder }}</option>
+          <option v-for="option in options" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
         </select>
       </div>
     </div>
@@ -118,6 +130,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: Array,
+    default: () => []
+  },
+  placeholder: {
+    type: String,
+    default: 'Select an option'
+  },
+  customClass: {
+    type: String,
+    default: ''
+  }
 });
 
 const curriculumOptions = ['JHS', 'SHS'];
@@ -144,6 +168,7 @@ const selectedSubject = ref('');
 const selectedQuarter = ref('1st');
 const selectedSort = ref('');
 const selectedMarkStatus = ref('Show All');
+const selectedOption = ref('');
 
 watch(selectedCurriculum, (newValue) => {
   emit("update:modelValue", curriculumMapping[newValue] || newValue);
@@ -160,7 +185,6 @@ watch(selectedAcademicTrack, (newValue) => {
 const updateQuarter = () => {
   emit("update:modelValue", selectedQuarter.value);
 };
-
 
 const updateMarkStatus = () => {
   emit("update:modelValue", selectedMarkStatus.value);
