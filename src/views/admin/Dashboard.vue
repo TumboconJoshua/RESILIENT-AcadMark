@@ -55,7 +55,9 @@
               </div>
             </div>
           </div>
-          <canvas id="genderChart" class="w-full h-64"></canvas>
+          <div class="h-[500px] relative">
+            <canvas id="genderChart"></canvas>
+          </div>
         </div>
 
         <div class="bg-white rounded-lg border border-gray-300 shadow-md p-6">
@@ -300,6 +302,21 @@ export default {
       });
     },
   },
+  beforeDestroy() {
+    // Clean up chart instances when component is destroyed
+    if (this._gradeChartInstance) {
+      this._gradeChartInstance.destroy();
+      this._gradeChartInstance = null;
+    }
+    if (this._genderChartInstance) {
+      this._genderChartInstance.destroy();
+      this._genderChartInstance = null;
+    }
+    if (this._submissionStatusChartInstance) {
+      this._submissionStatusChartInstance.destroy();
+      this._submissionStatusChartInstance = null;
+    }
+  },
   async mounted() {
     try {
       this.loading = true;
@@ -424,94 +441,137 @@ export default {
     },
 
     renderGenderChart() {
-      const ctx = document.getElementById('genderChart')?.getContext('2d');
-      if (!ctx) return;
+      // Wait for next tick to ensure DOM is updated
+      this.$nextTick(() => {
+        const canvas = document.getElementById('genderChart');
+        if (!canvas) {
+          console.warn('Gender chart canvas element not found, retrying in 100ms');
+          setTimeout(() => this.renderGenderChart(), 100);
+          return;
+        }
 
-      if (this._genderChartInstance) {
-        this._genderChartInstance.destroy();
-      }
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.warn('Gender chart canvas context not found');
+          return;
+        }
 
-      const data = [
-        this.genderData.JHS_M || 0,
-        this.genderData.JHS_F || 0,
-        this.genderData.SHS_M || 0,
-        this.genderData.SHS_F || 0,
-      ];
+        // Destroy existing instance if it exists
+        if (this._genderChartInstance) {
+          this._genderChartInstance.destroy();
+          this._genderChartInstance = null;
+        }
 
-      this._genderChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['JHS Male', 'JHS Female', 'SHS Male', 'SHS Female'],
-          datasets: [
-            {
-              label: 'Number of Students',
-              data,
-              backgroundColor: ['#3b82f6', '#10b981', '#3b82f6', '#10b981'],
-              borderRadius: 6,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: { beginAtZero: true },
+        const data = [
+          this.genderData.JHS_M || 0,
+          this.genderData.JHS_F || 0,
+          this.genderData.SHS_M || 0,
+          this.genderData.SHS_F || 0,
+        ];
+
+        console.log('Gender Chart Data:', data);
+
+        // Create new chart instance
+        this._genderChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['JHS Male', 'JHS Female', 'SHS Male', 'SHS Female'],
+            datasets: [
+              {
+                label: 'Number of Students',
+                data,
+                backgroundColor: ['#3b82f6', '#10b981', '#3b82f6', '#10b981'],
+                borderRadius: 6,
+              },
+            ],
           },
-          plugins: { legend: { display: false } },
-        },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                enabled: true,
+                callbacks: {
+                  label: function (context) {
+                    return `Students: ${context.raw}`;
+                  }
+                }
+              }
+            },
+          },
+        });
       });
     },
 
     renderGradeChart() {
-      console.log('Rendering grade chart with data:', this.studentGrades);
-      const ctx = document.getElementById('gradeChart')?.getContext('2d');
-      if (!ctx) {
-        console.warn('Canvas context not found');
-        return;
-      }
+      // Wait for next tick to ensure DOM is updated
+      this.$nextTick(() => {
+        const canvas = document.getElementById('gradeChart');
+        if (!canvas) {
+          console.warn('Canvas element not found, retrying in 100ms');
+          setTimeout(() => this.renderGradeChart(), 100);
+          return;
+        }
 
-      const gradeLabels = [
-        'Grade 7',
-        'Grade 8',
-        'Grade 9',
-        'Grade 10',
-        'Grade 11',
-        'Grade 12',
-      ];
-      const backgroundColors = [
-        '#3b82f6',
-        '#10b981',
-        '#facc15',
-        '#f97316',
-        '#ec4899',
-        '#8b5cf6',
-      ];
-      const data = gradeLabels.map((label) => this.studentGrades[label] || 0);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.warn('Canvas context not found');
+          return;
+        }
 
-      console.log('Chart Data:', data);
+        const gradeLabels = [
+          'Grade 7',
+          'Grade 8',
+          'Grade 9',
+          'Grade 10',
+          'Grade 11',
+          'Grade 12',
+        ];
+        const backgroundColors = [
+          '#3b82f6',
+          '#10b981',
+          '#facc15',
+          '#f97316',
+          '#ec4899',
+          '#8b5cf6',
+        ];
+        const data = gradeLabels.map((label) => this.studentGrades[label] || 0);
 
-      if (this._gradeChartInstance) {
-        this._gradeChartInstance.destroy();
-      }
+        console.log('Chart Data:', data);
 
-      this._gradeChartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: gradeLabels,
-          datasets: [
-            {
-              data,
-              backgroundColor: backgroundColors,
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
+        if (this._gradeChartInstance) {
+          this._gradeChartInstance.destroy();
+        }
+
+        this._gradeChartInstance = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: gradeLabels,
+            datasets: [
+              {
+                data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1,
+              },
+            ],
           },
-        },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+          },
+        });
       });
     },
 
