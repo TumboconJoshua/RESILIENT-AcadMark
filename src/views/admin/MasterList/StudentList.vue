@@ -299,6 +299,7 @@ import { getAllAcceptedStudents } from '@/service/studentService';
 import { addStudentsToClass, removeStudentToClass, deleteClass } from '@/service/adminClassService';
 import Swal from 'sweetalert2'
 import { useToast } from 'vue-toastification'
+import API from '@/service/API'
 
 const toast = useToast()
 const props = defineProps({
@@ -342,32 +343,41 @@ async function populateStudents(card) {
         loading.value = true;
         error.value = null;
 
-        if (card && Array.isArray(card.student_classes)) {
-            students.value = card.student_classes
-                .filter(sc => sc.student)
-                .map(sc => {
-                    const s = sc.student;
-                    const fullName = `${s.FirstName} ${s.MiddleName || ''} ${s.LastName}`.trim();
-                    return {
-                        Student_ID: s.Student_ID,   // Keep original key for clarity
-                        id: s.Student_ID,           // Add alias 'id' for convenience in Vue
-                        fullName,
-                        lrn: s.LRN,
-                        address: `${s.Barangay}, ${s.Municipality}, ${s.Province}`,
-                        gender: s.Sex,
-                        birthdate: s.BirthDate,
-                        ...s
-                    };
-                });
+        if (!card?.Class_ID) {
+            console.warn("⚠️ No Class_ID found in selectedCard");
+            students.value = [];
+            return;
+        }
+
+        // Fetch students for this class
+        const response = await API.get(`/student-class/class/${card.Class_ID}`);
+        const studentData = response.data;
+
+        if (Array.isArray(studentData)) {
+            students.value = studentData.map(s => {
+                const fullName = `${s.FirstName} ${s.MiddleName || ''} ${s.LastName}`.trim();
+                return {
+                    Student_ID: s.Student_ID,
+                    id: s.Student_ID,
+                    fullName,
+                    lrn: s.LRN,
+                    address: `${s.Barangay}, ${s.Municipality}, ${s.Province}`,
+                    gender: s.Sex,
+                    birthdate: s.BirthDate,
+                    isAdvisory: s.isAdvisory || false,
+                    ...s
+                };
+            });
 
             console.log("✅ Students populated:", students.value);
         } else {
-            console.warn("⚠️ No valid student_classes found in selectedCard");
+            console.warn("⚠️ No valid student data received");
             students.value = [];
         }
     } catch (err) {
         error.value = err.message || 'Failed to populate students';
         console.error('Error populating students:', err);
+        students.value = []; // Clear students array on error
     } finally {
         loading.value = false;
     }

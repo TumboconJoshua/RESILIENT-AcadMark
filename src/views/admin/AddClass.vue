@@ -602,14 +602,10 @@ export default {
                 this.form.class_name = newClass.Section;
                 this.form.sy_id = newClass.SY_ID;
             } else {
-
-
                 this.form.class_id = '';
                 this.form.class_name = '';
                 this.form.sy_id = '';
-                this.hasFacultyBeenAdded = false;
             }
-
         },
         selectedRows(newLRNs) {
             const allRows = this.dummyTableData[this.enteredIdx] || [];
