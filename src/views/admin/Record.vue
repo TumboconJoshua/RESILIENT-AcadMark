@@ -63,14 +63,27 @@ const searchQuery = ref('');
 
 const students = ref([]);
 
+// Add computed property for curriculum based on grade level
+const getCurriculumByGrade = (grade) => {
+    const gradeNum = parseInt(grade);
+    return gradeNum >= 10 ? 'SHS' : 'JHS';
+};
+
 onMounted(async () => {
     try {
         const response = await getAllAcceptedStudents();
+        console.log('API Response:', response);
+        
+        if (!response.students) {
+            console.error('No students property in response:', response);
+            return;
+        }
+
         students.value = response.students.map((student) => ({
             gradeLevel: student.Grade_Level,
             lrn: student.LRN,
             fullName: `${student.FirstName} ${student.MiddleName || ''} ${student.LastName}`.trim(),
-            curriculum: student.Curriculum,
+            curriculum: getCurriculumByGrade(student.Grade_Level), // Use the computed curriculum
             track: student.Track,
             section: student.Section || null,
             sex: student.Sex,

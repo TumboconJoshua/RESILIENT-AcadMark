@@ -326,29 +326,43 @@ const toast = useToast()
 
 onMounted(async () => {
   try {
-      const response = await getStudentsNoClass();  // or axios call
+      const response = await getStudentsNoClass();
 
-    // Access the array inside response.students
-    const data = response.students;
+      // Check if response and response.data exist
+      if (!response || !response.data) {
+          console.warn('No student data received from API');
+          students.value = [];
+          return;
+      }
 
-    console.log("STUDENT DATA:", data)
+      // Access the array inside response.data
+      const data = response.data;
 
-    students.value = data.map(s => ({
-      gradeLevel: s.Grade_Level,
-      lrn: s.LRN,
-      fullName: `${s.LastName}, ${s.FirstName} ${s.MiddleName || ''}`.trim(),
-      curriculum: s.Curriculum === 'JHS' ? 'Junior High School' : (s.Curriculum === 'SHS' ? 'Senior High School' : s.Curriculum),
-      track: s.Track,
-      sex: s.Sex === 'M' ? 'Male' : (s.Sex === 'F' ? 'Female' : s.Sex),
-      birthdate: s.BirthDate,
-      age: s.Age,
-      status: s.Status || 'Pending',
-      original: s,
-      updated_at: s.updated_at,
-    }));
+      console.log("STUDENT DATA:", data);
+
+      if (!Array.isArray(data)) {
+          console.warn('Student data is not an array');
+          students.value = [];
+          return;
+      }
+
+      students.value = data.map(s => ({
+          gradeLevel: s.Grade_Level,
+          lrn: s.LRN,
+          fullName: `${s.LastName}, ${s.FirstName} ${s.MiddleName || ''}`.trim(),
+          curriculum: s.Curriculum === 'JHS' ? 'Junior High School' : (s.Curriculum === 'SHS' ? 'Senior High School' : s.Curriculum),
+          track: s.Track,
+          sex: s.Sex === 'M' ? 'Male' : (s.Sex === 'F' ? 'Female' : s.Sex),
+          birthdate: s.BirthDate,
+          age: s.Age,
+          status: s.Status || 'Pending',
+          original: s,
+          updated_at: s.updated_at,
+      }));
 
   } catch (error) {
-    console.error('Failed to fetch students:', error);
+      console.error('Failed to fetch students:', error);
+      students.value = [];
   }
 });
 
@@ -436,7 +450,7 @@ async function handleAddStudentSubmit() {
     try {
         const result = await Swal.fire({
             title: 'Add New Student?',
-            text: "Are you sure you want to submit this student’s record?",
+            text: "Are you sure you want to submit this student's record?",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -658,7 +672,7 @@ async function handleUpdateStudent() {
     try {
         const confirmResult = await Swal.fire({
             title: 'Update Student Record?',
-            text: "Are you sure you want to save changes to this student’s record?",
+            text: "Are you sure you want to save changes to this student's record?",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
