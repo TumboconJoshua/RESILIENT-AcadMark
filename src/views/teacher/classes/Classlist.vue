@@ -68,6 +68,7 @@ import { classService } from '@/service/classService';
 
 const props = defineProps({
   subject_id: String,
+  class_id: String,
   subjectName: String,
 });
 
@@ -105,7 +106,12 @@ const fetchStudents = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await classService.getClassStudents(props.subject_id);
+    const id = props.class_id || props.subject_id;
+    if (!id) {
+      error.value = 'No class or subject ID provided';
+      return;
+    }
+    const response = await classService.getClassStudents(id);
     if (response.status === 'success') {
       studentsInSubject.value = response.data;
     } else {
@@ -119,7 +125,7 @@ const fetchStudents = async () => {
 };
 
 onMounted(() => {
-  if (props.subject_id) {
+  if (props.subject_id || props.class_id) {
     fetchStudents();
   }
 });

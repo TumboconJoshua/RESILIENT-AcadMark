@@ -49,15 +49,25 @@ export const classService = {
     },
 
     // Get students in a class
-    async getClassStudents(classId) {
+    async getClassStudents(id) {
         try {
-            const response = await axios.get(`${API_URL}/classes/${classId}/students`, {
+            // First try with the ID as a class ID
+            const response = await axios.get(`${API_URL}/classes/${id}/students`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
             return response.data;
         } catch (error) {
+            // If that fails, try with the ID as a subject ID
+            if (error.response && error.response.status === 404) {
+                const response = await axios.get(`${API_URL}/classes/subject/${id}/students`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                return response.data;
+            }
             throw this.handleError(error);
         }
     },
