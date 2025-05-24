@@ -43,7 +43,7 @@
                   <td class="table-cell">{{ student.birthDate }}</td>
                   <td class="table-cell">{{ calculateAge(student.birthDate) }}</td>
                   <td class="table-cell">{{ student.contactNumber }}</td>
-                  <td class="table-cell">{{ student.address }}</td>
+                  <td class="table-cell">{{ formatAddress(student) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -100,6 +100,17 @@ const calculateAge = (birthdate) => {
     age--;
   }
   return age;
+};
+
+const formatAddress = (student) => {
+  const parts = [
+    student.houseNo,
+    student.barangay,
+    student.municipality,
+    student.province
+  ].filter(Boolean);
+  
+  return parts.join(', ');
 };
 
 const fetchStudents = async () => {
