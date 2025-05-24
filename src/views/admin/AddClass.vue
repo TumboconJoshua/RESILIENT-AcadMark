@@ -456,7 +456,7 @@
 
                     <div class="flex flex-col relative">
                         <label
-                            class="absolute bg-white text-[14px] mb-2 text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">
+                            class="absolute bg-white text-[14px] text-[#292929] font-medium mt-[-10px] mb-1 ml-[10px] px-[5px]">
                             Employee ID
                         </label>
                         <input
