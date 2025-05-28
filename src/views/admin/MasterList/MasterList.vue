@@ -19,29 +19,29 @@
             <!-- Content -->
             <div v-else>
                 <!-- Filters -->
-                <div class="flex flex-wrap gap-4 mb-6">
-                    <select v-model="selectedGrade" class="border border-gray-300 rounded-lg p-3">
+                <div class="filters flex flex-wrap gap-4 mb-6">
+                    <select v-model="selectedGrade" class="filter-dropdown border border-gray-300 rounded-lg p-3">
                         <option value="">Grade Level</option>
                         <option v-for="grade in grades" :key="grade" :value="grade">
                             Grade {{ grade }}
                         </option>
                     </select>
 
-                    <select v-model="selectedCurriculum" class="border border-gray-300 rounded-lg p-3">
+                    <select v-model="selectedCurriculum" class="filter-dropdown border border-gray-300 rounded-lg p-3">
                         <option value="">Curriculum</option>
                         <option v-for="curriculum in curriculums" :key="curriculum" :value="curriculum">
                             {{ getSchoolLevel(curriculum) }}
                         </option>
                     </select>
 
-                    <select v-model="selectedTrack" class="border border-gray-300 rounded-lg p-3">
+                    <select v-model="selectedTrack" class="filter-dropdown border border-gray-300 rounded-lg p-3">
                         <option value="">Track</option>
                         <option v-for="track in tracks" :key="track" :value="track">
                             {{ track }}
                         </option>
                     </select>
                 </div>
-
+                
                 <!-- Cards Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                     <div v-for="(card, index) in filteredCards" :key="index"
@@ -196,4 +196,35 @@ export default {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 }
+</style>
+
+<style scoped>
+.filters {
+  display: flex;
+  gap: 10px;
+} 
+
+.filter-dropdown {
+  padding: 10px 15px;
+  width: auto;
+  border: 1px solid #295f98;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #fff;
+  font-weight: bold;
+  color: #295f98;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  transition: all 0.3s ease-in-out;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+}
+
+.filter-dropdown:focus {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
+}
+
 </style>

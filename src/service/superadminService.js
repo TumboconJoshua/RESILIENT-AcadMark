@@ -241,9 +241,12 @@ export const createSchoolYear = async (schoolYearData) => {
   }
 };
 
-
-
-
-
-
-
+export const deleteClassById = async (id) => {
+  try {
+    const response = await API.delete(`/testing/Subjects/${id}`);
+    return response.data; // { message: "Class deleted successfully." }
+  } catch (error) {
+    console.error("Error deleting class:", error);
+    throw error.response ? error.response.data : error;
+  }
+};

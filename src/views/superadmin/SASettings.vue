@@ -187,23 +187,23 @@
     </div>
 
     <!-- Curriculum/Track -->
-    <div class="floating-label">
-      <select class="input" v-model="selectedCurriculumTrack" required :disabled="!selectedHighSchool">
-        <option value=""></option>
-        <option v-for="item in filteredCurriculumTrack" :key="item" :value="item">
-          {{ item }}
-        </option>
-      </select>
-      <label>{{ curriculumOrTrackLabel }}</label>
-    </div>
+   <div class="floating-label">
+  <select class="input" v-model="selectedCurriculumTrack" required :disabled="!selectedHighSchool">
+    <option value=""></option>
+    <option v-for="item in filteredCurriculumTrack" :key="item" :value="item">
+      {{ item }}
+    </option>
+  </select>
+  <label>{{ curriculumOrTrackLabel }}</label>
+</div>
 
     <!-- School Year (SY_ID) -->
     <div class="floating-label">
       <select class="input" v-model="selectedSYId" required>
         <option value=""></option>
-        <option v-for="schoolyear in schoolYears" :key="schoolyear.SY_Year" :value="schoolyear.id || schoolyear.SY_ID || schoolyear.SY_Id">
-          {{ schoolyear.SY_Year }}
-        </option>
+        <option v-for="schoolyear in schoolYears" :key="schoolyear.id" :value="schoolyear.id">
+  {{ schoolyear.SY_Year }}
+</option>
       </select>
       <label>School Year</label>
     </div>
@@ -299,10 +299,13 @@
                         <td class="px-6 py-4 text-lg">{{ sections.curriculumTrack }}</td>
                         <td class="px-6 py-4 text-lg">{{ sections.section }}</td>
                         <td class="px-6 py-4 flex space-x-2 text-lg">
-                          <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 cursor-pointer"
-                            @click="confirmDeleteRecord">
-                            <i class="fas fa-trash-alt"></i>
-                          </button>
+                       <button
+  class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 cursor-pointer"
+  @click="handleDeleteClass(sections.id)"
+>
+  <i class="fas fa-trash-alt"></i>
+</button>
+
                         </td>
                       </tr>
                     </tbody>
@@ -456,7 +459,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import Swal from 'sweetalert2'
-import { getAllSubjects, getAllSchoolYears, getAllSections, createSubject, deleteSubjectById, createSchoolYear, createSection  } from '../../service/superadminService' 
+import { deleteClassById, getAllSubjects, getAllSchoolYears, getAllSections, createSubject, deleteSubjectById, createSchoolYear, createSection  } from '../../service/superadminService' 
 
 
 
@@ -475,6 +478,7 @@ const selectedCode = ref('')
 const selectedGrade = ref('')
 const selectedHighSchool = ref('')
 const selectedCurriculumTrack = ref('')
+const selectedSYId = ref('');
 
 const searchRecordsQuery = ref('')
 const selectedRecordsHighSchool = ref('')
@@ -487,6 +491,7 @@ const pageSize = 10
 const newSubjectName = ref('');
 const newSubjectCode = ref('');
 const newSubjectGradeLevel = ref('');
+const newClassName = ref('');
 
 // Adding S.Y
 const newStartDate = ref('');
@@ -593,6 +598,7 @@ const loadSections = async () => {
     console.log('Sections data:', data)
 
     sections.value = data.map(item => ({
+    id: item.Class_ID,
       highSchool: item.Curriculum === 'JHS'
         ? 'Junior High School'
         : item.Curriculum === 'SHS'
@@ -619,11 +625,12 @@ const loadSchoolYears = async () => {
     const data = await getAllSchoolYears();
     console.log('School years data:', data); // Log the full data
     schoolYears.value = data.map(item => ({
-      SY_Year:  `S.Y. ${item.SY_Year}`,
-      startDate: item.Start_Date,
-      endDate: item.End_Date,
-      syName: `Academic Year ${item.SY_Year}`
-    }));
+  id: item.SY_ID || item.id || item.SY_Id,
+  SY_Year: `S.Y. ${item.SY_Year}`,
+  startDate: item.Start_Date,
+  endDate: item.End_Date,
+  syName: `Academic Year ${item.SY_Year}`
+}));
   } catch (error) {
     console.error('Failed to load school years:', error);
     Swal.fire({
@@ -718,7 +725,16 @@ const filteredRecordsList = computed(() => {
     return matchesSearch && matchesHighSchool && matchesGrade && matchesTrack
   })
 })
-
+const formIsValid = computed(() => {
+  return (
+    newClassName.value &&
+    newSection.value &&
+    selectedHighSchool.value &&
+    selectedGrade.value &&
+    selectedCurriculumTrack.value &&
+    selectedSYId.value
+  );
+});
 const totalRecordsPages = computed(() =>
   Math.ceil(filteredRecordsList.value.length / recordsPerPage)
 )
@@ -756,33 +772,6 @@ const paginatedSchoolYears = computed(() => {
 const totalSchoolYearPages = computed(() =>
   Math.ceil(filteredSchoolYears.value.length / schoolYearItemsPerPage)
 );
-
-  const confirmAddSection = async () => {
-    const result = await Swal.fire({
-      title: 'Add Section',
-      text: 'Are you sure you want to add a new section?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, Add',
-      cancelButtonText: 'Cancel'
-    });
-
-    if (result.isConfirmed) {
-      // Call your actual logic here
-      addSection();
-
-      await Swal.fire({
-        icon: 'success',
-        title: 'Added',
-        text: 'The section has been added successfully.',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    }
-  };
-
 
 const confirmAddSubject = async () => {
   const result = await Swal.fire({
@@ -874,7 +863,6 @@ const confirmAddSubject = async () => {
     }
   }
 };
-
 const confirmAddClassSection = async () => {
   const result = await Swal.fire({
     title: 'Add Section',
@@ -895,9 +883,11 @@ const confirmAddClassSection = async () => {
         SY_ID: selectedSYId.value,
         Grade_Level: selectedGrade.value.replace('Grade ', ''),
         Curriculum: selectedHighSchool.value === 'Junior High School' ? 'JHS' : 'SHS',
-        Track: selectedHighSchool.value === 'Senior High School' ? selectedCurriculumTrack.value : null,
-        Status: 'Approved' // add this if required by backend
+        Track: selectedCurriculumTrack.value,  // ✅ always use this, not conditional
+        Status: 'Incomplete'
       };
+
+      console.log("Sending payload:", payload); // ✅ Add this back for debugging
 
       await createSection(payload);
 
@@ -910,8 +900,8 @@ const confirmAddClassSection = async () => {
       });
 
       await loadSections();
-      
-      // Clear form fields
+
+      // Clear form
       newClassName.value = '';
       newSection.value = '';
       selectedHighSchool.value = '';
@@ -928,6 +918,7 @@ const confirmAddClassSection = async () => {
     }
   }
 };
+
 
 
 const confirmDeleteSubject = async (subjectId) => {
@@ -963,28 +954,40 @@ const confirmDeleteSubject = async (subjectId) => {
   }
 };
 
-  const confirmDeleteRecord = async () => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you really want to delete this record?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#D30000',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel'
-    });
+  const handleDeleteClass = async (id) => {
+  const result = await Swal.fire({
+    title: 'Delete Class',
+    text: 'Are you sure you want to delete this class?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d'
+  });
 
-    if (result.isConfirmed) {
-      Swal.fire({
+  if (result.isConfirmed) {
+    try {
+      await deleteClassById(id);
+      await Swal.fire({
         icon: 'success',
-        title: 'Deleted',
-        text: 'The record has been deleted.',
+        title: 'Deleted!',
+        text: 'The class has been deleted.',
         timer: 1500,
         showConfirmButton: false
       });
+
+      // Optionally reload the class list
+      await loadSections();
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Failed to delete the class.'
+      });
     }
-  };
+  }
+};
 
   watch([searchQuery, selectedId, selectedCode, selectedGrade, 
   searchRecordsQuery, selectedRecordsHighSchool, selectedRecordsGradeLevel, selectedRecordsTrack, searchSchoolYearQuery], () => {

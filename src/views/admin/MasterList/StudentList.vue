@@ -14,75 +14,50 @@
         </div>
         <!-- Content -->
         <div v-else>
-            <div class="student-list-container mb-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex gap-4">
-                        <div class="relative w-30">
-                            <select v-model="genderFilter"
-                                class="appearance-none border border-gray-300 rounded-md px-5 py-2 w-full">
-                                <option value="Female">Female</option>
-                                <option value="Male">Male</option>
-                                <option value="All">All</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="relative w-30">
-                            <select v-model="sortOrder"
-                                class="appearance-none border border-gray-300 rounded-md px-5 py-2 w-full">
-                                <option value="Latest">Latest</option>
-                                <option value="Oldest">Oldest</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+            <div class="student-list-container mt-6 mb-6 shadow-xl border border-gray-300">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+    <!-- Left: Filters (Selects directly side by side) -->
+    <div class="flex gap-2">
+        <select v-model="genderFilter" class="filter-dropdown w-40 h-10 px-3 border border-gray-300 rounded-md">
+            <option value="All">All</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+        </select>
 
-                    <div class="relative flex-1 mx-4 w">
-                        <input v-model="searchTerm" type="text" placeholder="Search..."
-                            class="border border-gray-300 rounded-md py-2 px-3 pl-10 w-62" />
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
+        <select v-model="sortOrder" class="filter-dropdown w-40 h-10 px-3 border border-gray-300 rounded-md">
+            <option value="Latest">Latest</option>
+            <option value="Oldest">Oldest</option>
+        </select>
+    </div>
 
-                <div class="relative flex-1 mx-4 w">
-                    <input v-model="searchTerm" type="text" placeholder="Search..."
-                        class="border border-gray-300 rounded-md py-2 px-3 pl-10 w-62" />
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
+    <!-- Right: Search Bar + Buttons -->
+    <div class="flex items-center gap-4 ml-auto">
+        <!-- Search Bar -->
+        <div class="relative w-80">
+            <input v-model="searchTerm" type="text" placeholder="Search..."
+                class="border border-[#295f98] rounded-md py-2 px-3 pl-10 w-full h-10" />
+            <i class="fas fa-search text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+        </div>
 
-                <div class="flex gap-2">
-                    <button class="bg-[#858585] p-2 rounded cursor-pointer" @click="handleDownload">
-                        <img src="/assets/img/admin/download.svg" class="w-7 h-7 object-contain" alt="Download Icon">
-                    </button>
-                    <button class="bg-red p-2 rounded cursor-pointer" @click="handleDeleteAll(selectedCard)">
-                        <img src="/assets/img/admin/delete.svg" class="w-7 h-7 object-contain" alt="Delete Icon">
-                    </button>
-                    <button class="bg-blue p-2 rounded cursor-pointer" @click="showAddModal = true">
-                        <img src="/assets/img/admin/add.svg" class="w-7 h-7 object-contain" alt="">
-                    </button>
-                    <button class="bg-green p-2 rounded cursor-pointer" @click="openEditModal">
-                        <img src="/assets/img/admin/edit.svg" class="w-7 h-7 object-contain" alt="Edit Icon">
-                    </button>
-                </div>
-            </div>
+        <!-- Buttons -->
+        <div class="flex gap-2">
+            <button class="bg-[#858585] p-2 rounded cursor-pointer text-white w-10 h-10 flex items-center justify-center" @click="handleDownload">
+                <i class="fas fa-download"></i>
+            </button>
+            <button class="bg-red p-2 rounded cursor-pointer text-white w-10 h-10 flex items-center justify-center" @click="handleDeleteAll(selectedCard)">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <button class="bg-blue p-2 rounded cursor-pointer text-white w-10 h-10 flex items-center justify-center" @click="showAddModal = true">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="bg-green p-2 rounded cursor-pointer text-white w-10 h-10 flex items-center justify-center" @click="openEditModal">
+                <i class="fas fa-edit"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+
 
             <div class="student-list-container">
                 <div class="overflow-x-auto bg-white shadow mb-6">
@@ -158,7 +133,7 @@
                     </label>
                 </div>
 
-                <!-- Right: Search -->
+                <!-- Right: Search #295f98 -->
                 <div class="relative flex-1 mx-4 w-full">
                     <input v-model="modalSearchTerm" type="text" placeholder="Search..."
                         class="border border-gray-300 rounded-md py-2 px-3 pl-10 w-full" />
@@ -726,6 +701,34 @@ function openEditModal() {
 </script>
 
 <style scoped>
+.filters {
+  display: flex;
+  gap: 10px;
+} 
+
+.filter-dropdown {
+  padding: 10px 15px;
+  width: auto;
+  border: 1px solid #295f98;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #fff;
+  font-weight: bold;
+  color: #295f98;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  transition: all 0.3s ease-in-out;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+}
+
+.filter-dropdown:focus {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
+}
+
 .student-list-container {
     background-color: white;
     padding: 24px;
