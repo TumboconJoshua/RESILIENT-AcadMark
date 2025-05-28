@@ -38,28 +38,28 @@
       <h2 class="text-blue-800 font-semibold text-xl mb-4" style="color: #295F98;">GRADING</h2>
       <div class="flex items-center gap-4 mb-6">
         <div>
-          <label class="block text-sm font-semibold mb-1">1st Quarter</label>
-          <input type="number" class="border px-2 py-1 w-24" :value="student.subject_grades.Q1" readonly />
+          <label class="block text-sm font-semibold text-center mb-1">1st Quarter</label>
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.Q1" readonly />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1">2nd Quarter</label>
-          <input type="number" class="border px-2 py-1 w-24" :value="student.subject_grades.Q2" readonly />
+          <label class="block text-sm font-semibold text-center mb-1">2nd Quarter</label>
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.Q2" readonly />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1">3rd Quarter</label>
-          <input type="number" class="border px-2 py-1 w-24" :value="student.subject_grades.Q3" readonly />
+          <label class="block text-sm font-semibold text-center mb-1">3rd Quarter</label>
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.Q3" readonly />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1">4th Quarter</label>
-          <input type="number" class="border px-2 py-1 w-24" :value="student.subject_grades.Q4" readonly />
+          <label class="block text-sm font-semibold text-center mb-1">4th Quarter</label>
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.Q4" readonly />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1">Final Grade</label>
-          <input type="number" class="border px-2 py-1 w-24" :value="student.subject_grades.Q4" readonly />
+          <label class="block text-sm font-semibold text-center mb-1">Final Grade</label>
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.Q4" readonly />
         </div>
         <div>
-          <label class="block text-sm font-semibold mb-1">Remarks</label>
-          <div :class="remarkClass" class="px-3 py-1 rounded border text-center w-24">
+          <label class="block text-sm font-semibold text-center mb-1">Remarks</label>
+          <div :class="remarkClass" class="px-3 py-1 rounded border text-center w-28">
             {{ student.subject_grades.Status }}
           </div>
         </div>

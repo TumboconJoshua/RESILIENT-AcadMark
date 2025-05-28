@@ -166,6 +166,10 @@ const confirmLogout = () => {
 // --------------- New code to keep activeIndex synced with route ---------------
 const updateActiveIndex = () => {
   activeIndex.value = links.value.findIndex(link => route.path.startsWith(link.path));
+  activeIndex.value = links.value.findIndex(link => route.path.startsWith(link.path));
+  if (activeIndex.value === -1) {
+    activeIndex.value = 2; // Default to first link if no match found
+  }
 };
 
 // Watch for route changes and update activeIndex immediately on mount
