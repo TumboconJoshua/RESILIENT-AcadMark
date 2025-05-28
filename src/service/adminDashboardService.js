@@ -87,7 +87,6 @@ export const getAcceptedStudentsPerGrade = async () => {
     throw error;
   }
 };
-
 export const fetchPendingCount = async () => {
   try {
     const response = await API.get('/count-pending-classes');
@@ -97,27 +96,31 @@ export const fetchPendingCount = async () => {
   } catch (error) {
     console.error('Error fetching pending count:', error);
   }
-}
+};
+
 export const fetchPendingCountPerGrade = async () => {
   try {
     const response = await API.get('/pending-gradelevel');
-    console.log("Class count per grade: ", response.data);
+    console.log("Class count per grade:", response.data);
     return response.data.pending_classes_per_grade;
   } catch (error) {
-    console.error('Error fetching pending count per grade:', error);
+    console.error('Service error - fetching pending count per grade:', error);
     return [];
   }
 };
 
-export const getpendingStudentCount = async () => {
+export const fetchPendingStudentCount = async () => {
   try {
     const response = await API.get('/pending-students');
+    console.log("Pending student count:", response.data);
     return response.data.total_pending_students;
   } catch (error) {
-    console.error("Failed to fetch student count:", error);
+    console.error("❌ Failed to fetch student count:", error);
     throw error;
   }
 };
+
+
 
 
 

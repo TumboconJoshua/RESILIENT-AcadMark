@@ -223,7 +223,7 @@
 
 <script>
   import { Chart, registerables } from 'chart.js';
-  import { getStudentCount, getAcceptedClassesCount, getAcceptedStudentsPerGrade, getSubmissionStatusCounts, getLatestStudents, fetchPendingCount  } from '@/service/adminDashboardService';
+  import { getStudentCount, getAcceptedClassesCount, getAcceptedStudentsPerGrade, getSubmissionStatusCounts, getLatestStudents, fetchPendingCount, fetchPendingStudentCount, fetchPendingCountPerGrade   } from '@/service/adminDashboardService';
   import { getClassesExcludingIncomplete } from '@/service/teacherSubjectsService';
   import { getSummaryStats, getRecentFaculties, getStudentCountPerGradeLevel, getStudentStatusCounts } from '@/service/superadminService';
 
@@ -312,12 +312,14 @@
             this.fetchLatestStudents();
             this.fetchClasses();
             this.fetchPendingClassesCount();
+                 fetchPendingCountPerGrade();  // logs from inside service will appear in console
+  fetchPendingStudentCount();
           });
         }
       },
     },
     mounted() {
-      if (this.selectedDashboard === 'teacher') {
+  if (this.selectedDashboard === 'teacher') {
         this.fetchSummaryStats();
         this.fetchRecentFaculties();
         this.fetchStudentCountsByGradeLevel();
@@ -328,6 +330,24 @@
         this.renderStatusPieChart();
       }
       if (this.selectedDashboard === 'admin') {
+    this.renderTotalStudentsChart();
+    this.renderSubmissionStatusChart();
+    this.renderStudentsPieChart();
+    this.fetchStudentCount();
+    this.fetchAcceptedClassesCount();
+    this.updateTotalStudentsPerGrade(); 
+    this.fetchAndRenderSubmissionStatus();
+    this.fetchLatestStudents();
+    this.fetchClasses();
+    this.fetchPendingClassesCount();
+    this.fetchPendingClassesPerGrade();  // <== call this method
+    this.fetchPendingStudentsCount();    // <== call this method
+  }
+},
+watch: {
+  selectedDashboard(newVal) {
+    if (newVal === 'admin') {
+      this.$nextTick(() => {
         this.renderTotalStudentsChart();
         this.renderSubmissionStatusChart();
         this.renderStudentsPieChart();
@@ -338,11 +358,47 @@
         this.fetchLatestStudents();
         this.fetchClasses();
         this.fetchPendingClassesCount();
-
-      }
-    },
+        this.fetchPendingClassesPerGrade();  // <== call here
+        this.fetchPendingStudentsCount();    // <== call here
+      });
+    }
+  }
+},
     methods: {
       // Admin
+async fetchPendingClassesPerGrade() {
+  try {
+    const data = await fetchPendingCountPerGrade();
+    console.log("Pending classes per grade data:", data);
+
+    // Transform the API response to your existing pendingClassesData format
+    this.pendingClassesPerGrade = data.map(item => ({
+      grade: `Grade ${item.Grade_Level}`,
+      students: item.count,
+    }));
+  
+    // Update the chart data source and rerender the pie chart
+    this.pendingClassesData = [...this.pendingClassesPerGrade]; // update reactive data used by chart
+    this.renderStudentsPieChart();
+  } catch (error) {
+    console.error("Error fetching pending classes per grade:", error);
+  }
+},
+
+async fetchPendingStudentsCount() {
+  try {
+    const count = await fetchPendingStudentCount();  // your service function that calls API
+    console.log("Pending students count:", count);
+
+const pendingStudentCard  = this.admincards.find(card => card.label === 'Pending Students');
+    if (pendingStudentCard) {
+      pendingStudentCard.value = count;  // <-- update the value here
+    }
+  } catch (error) {
+    console.error("Failed to fetch pending students count:", error);
+  }
+},
+
       renderTotalStudentsChart() {
         const ctx = document.getElementById('totalStudentsChart').getContext('2d');
 
@@ -474,47 +530,53 @@
       },
 
       renderStudentsPieChart() {
-        const ctx = document.getElementById('studentsPieChart').getContext('2d');
-        new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: this.pendingClassesData.map(item => item.grade),
-            datasets: [{
-              data: this.pendingClassesData.map(item => item.students),
-              backgroundColor: [
-                '#3B82F6', // Blue
-                '#10B981', // Green
-                '#F59E0B', // Amber
-                '#EF4444', // Red
-                '#8B5CF6', // Purple
-                '#EC4899', // Pink
-              ],
-              borderColor: '#fff',
-              borderWidth: 2,
-            }],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'right',
-                labels: {
-                  font: {
-                    size: 16,
-                    family: 'Arial, sans-serif',
-                    weight: 'bold',
-                  },
-                  usePointStyle: true,
-                  pointStyle: 'rect',
-                },
+    const ctx = document.getElementById('studentsPieChart').getContext('2d');
+
+    // Destroy previous instance if it exists
+    if (this.studentsPieChartInstance) {
+      this.studentsPieChartInstance.destroy();
+    }
+
+    this.studentsPieChartInstance = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: this.pendingClassesData.map(item => item.grade),
+        datasets: [{
+          data: this.pendingClassesData.map(item => item.students),
+          backgroundColor: [
+            '#3B82F6', // Blue
+            '#10B981', // Green
+            '#F59E0B', // Amber
+            '#EF4444', // Red
+            '#8B5CF6', // Purple
+            '#EC4899', // Pink
+          ],
+          borderColor: '#fff',
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              font: {
+                size: 16,
+                family: 'Arial, sans-serif',
+                weight: 'bold',
               },
-              tooltip: {
-                enabled: true,
-              },
+              usePointStyle: true,
+              pointStyle: 'rect',
             },
           },
-        });
+          tooltip: {
+            enabled: true,
+          },
+        },
       },
+    });
+  },
 
       async fetchStudentCount() {
         try {
@@ -795,12 +857,11 @@ async fetchStatusCounts() {
         this.statusCounts[key] = parseInt(item.total, 10);
       }
     });
-
     this.renderStatusPieChart(); // <- make sure to call it here!
   } catch (error) {
     console.error("Error loading status counts:", error);
   }
-}
+},
 
 
 
