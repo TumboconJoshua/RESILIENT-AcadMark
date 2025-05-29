@@ -661,7 +661,10 @@ export default {
             console.log('Form Data:', this.form);
 
             try {
-                const response = await createClass(this.form);
+                const response = await createClass({
+                    ...this.form,
+                    is_advisory: true
+                });
                 console.log('Class created successfully:', response);
 
                 // Show success alert
@@ -752,11 +755,7 @@ export default {
                 const adviserTeacherSubjectId = this.getTeacherSubjectId(adviserId, adviserSubjectId);
                 if (adviserTeacherSubjectId) {
                     teacherSubjectIds.push(adviserTeacherSubjectId);
-                } else {
-                    console.error(`No teacher-subject match found for adviserId ${adviserId} and subjectId ${adviserSubjectId}`);
                 }
-            } else {
-                console.error('Adviser ID or Subject ID is missing');
             }
 
             // STEP 2: Other subject teachers
@@ -764,17 +763,11 @@ export default {
                 const teacherId = this.adviserIdByName(entry.teacher);
                 const subjectId = this.subjectIdByName(entry.subject);
 
-                if (!teacherId || !subjectId) {
-                    console.error(`Missing teacher or subject ID for "${entry.teacher}" / "${entry.subject}"`);
-                    continue;
-                }
-
-                const teacherSubjectId = this.getTeacherSubjectId(teacherId, subjectId);
-
-                if (teacherSubjectId) {
-                    teacherSubjectIds.push(teacherSubjectId);
-                } else {
-                    console.error(`No match found for teacherId ${teacherId} and subjectId ${subjectId}`);
+                if (teacherId && subjectId) {
+                    const teacherSubjectId = this.getTeacherSubjectId(teacherId, subjectId);
+                    if (teacherSubjectId) {
+                        teacherSubjectIds.push(teacherSubjectId);
+                    }
                 }
             }
 
@@ -793,6 +786,7 @@ export default {
                     // Save locally in parent form state
                     this.form.teacher_subject_ids = teacherSubjectIds;
                     this.form.adviser_id = adviserId;
+                    this.form.is_advisory = true;
 
                     console.log('Saved locally in form:', this.form);
 
