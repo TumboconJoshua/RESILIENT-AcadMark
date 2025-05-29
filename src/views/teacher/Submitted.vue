@@ -63,10 +63,15 @@
     <Modal 
       v-if="showMessage" 
       :showMessage="showMessage" 
+      :showLis="false"
       @close="closeModal"
       :trackStand="trackStand"
       :selectedStudent="selectedStudent"
       :selectedQuarter="selectedQuarter"
+      :students="students"
+      :subjectName="subjectName"
+      :subject_id="subject_id"
+      :class_id="class_id"
     />
   </div>
 </template>
@@ -97,6 +102,10 @@ const props = defineProps({
     required: true,
   },
   class_id: {
+    type: String,
+    required: true,
+  },
+  subjectName: {
     type: String,
     required: true,
   },
@@ -245,6 +254,29 @@ const openModal = (student) => {
 
 const closeModal = () => {
   showMessage.value = false;
+};
+
+const fetchStudents = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    
+    if (!props.subject_id) {
+      console.warn('No subject_id provided to modal');
+      students.value = [];
+      return;
+    }
+    
+    const response = await getSubjectGrades(props.subject_id, props.class_id);
+    if (response.status === 'success' && response.data) {
+      students.value = response.data;
+    }
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    error.value = error.message || 'Failed to fetch students';
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(() => {

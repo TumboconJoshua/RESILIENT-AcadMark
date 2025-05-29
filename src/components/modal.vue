@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                <div v-else-if="selectedStudent" class="bg-white rounded-xl shadow-2xl relative max-w-4xl mx-auto">
+                <div v-else-if="currentStudent" class="bg-white rounded-xl shadow-2xl relative max-w-4xl mx-auto">
                     <div class="p-6 border-b border-gray-200">
                         <h2 class="text-2xl font-semibold text-gray-800">Student Information</h2>
                     </div>
@@ -87,27 +87,27 @@
                                 <div class="flex flex-col gap-1">
                                     <div>
                                         <p class="text-blue text-xs font-bold">Student Name</p>
-                                        <p class="text-2xl font-medium">{{ selectedStudent.firstName }} {{ selectedStudent.middleName }} {{ selectedStudent.lastName }}</p>
+                                        <p class="text-2xl font-medium">{{ currentStudent.firstName }} {{ currentStudent.middleName }} {{ currentStudent.lastName }}</p>
                                     </div>
                                     <div>
                                         <p class="text-blue text-xs font-bold">LRN</p>
-                                        <p class="text-2xl font-medium">{{ selectedStudent.lrn }}</p>
+                                        <p class="text-2xl font-medium">{{ currentStudent.lrn }}</p>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div>
                                         <p class="text-blue text-xs font-bold">Sex</p>
-                                        <p class="text-2xl font-medium">{{ selectedStudent.sex }}</p>
+                                        <p class="text-2xl font-medium">{{ currentStudent.sex }}</p>
                                     </div>
                                     <div>
                                         <p class="text-blue text-xs font-bold">Curriculum</p>
-                                        <p class="text-2xl font-medium">{{ selectedStudent.curriculum }}</p>
+                                        <p class="text-2xl font-medium">{{ currentStudent.curriculum }}</p>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div>
                                         <p class="text-blue text-xs font-bold">Birthdate</p>
-                                        <p class="text-2xl font-medium">{{ selectedStudent.birthDate }}</p>
+                                        <p class="text-2xl font-medium">{{ currentStudent.birthDate }}</p>
                                     </div>
                                     <div>
                                         <p class="text-blue text-xs font-bold">Academic Track</p>
@@ -129,8 +129,8 @@
                                     <p class="text-blue text-xs font-bold">Remarks</p>
                                     <div class="w-35 h-9 border rounded-[5px] items-center justify-center flex">
                                         <p class="font-bold"
-                                            :class="{ 'text-[#23AD00]': getRemarks(selectedStudent) === 'Passed', 'text-red-500': getRemarks(selectedStudent) === 'Failed' }">
-                                            {{ getRemarks(selectedStudent) }}
+                                            :class="{ 'text-[#23AD00]': getRemarks(currentStudent) === 'Passed', 'text-red-500': getRemarks(currentStudent) === 'Failed' }">
+                                            {{ getRemarks(currentStudent) }}
                                         </p>
                                     </div>
                                 </div>
@@ -243,7 +243,7 @@ const fetchStudents = async () => {
     
     console.log('Fetching students for subject_id:', props.subject_id, 'class_id:', props.class_id);
     
-    const response = await getSubjectGrades(props.subject_id, props.class_id || null);
+    const response = await getSubjectGrades(props.subject_id, props.class_id);
     console.log('API Response:', response);
     
     if (response.status === 'success' && response.data) {
@@ -253,6 +253,9 @@ const fetchStudents = async () => {
         firstName: student.student?.FirstName || '',
         middleName: student.student?.MiddleName || '',
         lastName: student.student?.LastName || '',
+        sex: student.student?.sex || '',
+        birthDate: student.student?.birthDate || '',
+        curriculum: student.student?.curriculum || '',
         grades: {
           first: student.Q1 || null,
           second: student.Q2 || null,
@@ -347,16 +350,22 @@ onMounted(() => {
 });
 
 const quarterGrade = computed(() => {
-    if (props.selectedStudent) {
+    if (currentStudent.value) {
         const quarterKey = quarterMapping[props.selectedQuarter];
-        return props.selectedStudent.grades[quarterKey] || '-';
+        return currentStudent.value.grades[quarterKey] || '-';
     }
     return '-';
 });
 
 watchEffect(() => {
-  if (props.subject_id) {
+  if (props.subject_id && props.selectedStudent) {
     fetchStudents();
   }
+});
+
+// Add this computed property to get the current student data
+const currentStudent = computed(() => {
+  if (!props.selectedStudent || !students.value) return null;
+  return students.value.find(student => student.student_id === props.selectedStudent.Student_ID);
 });
 </script>
