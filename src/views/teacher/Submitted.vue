@@ -44,7 +44,7 @@
             <td class="p-2 w-1/12">{{ grade.student?.sex || 'N/A' }}</td>
             <td class="p-2 w-1/12">{{ getAge(grade.student?.birthDate) }}</td>
             <td class="p-2 w-1/12">
-              {{ grade.Status === 'Approved' ? getGradeForQuarter(grade, quarterMapping[selectedQuarter]) : '-' }}
+              {{ (grade.Status === 'Approved' || grade.Status === 'Declined') ? getGradeForQuarter(grade, quarterMapping[selectedQuarter]) : '-' }}
             </td>
             <td class="p-2 w-1/12">
               <span :class="{
