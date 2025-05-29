@@ -122,32 +122,112 @@
                             <div class="flex gap-5">
                                 <div>
                                     <p class="text-blue text-xs font-bold">Quarter Grade</p>
-                                    <input type="text" class="border w-35 h-9 text-center" v-model="quarterGrade"
-                                        readonly />
+                                    <input 
+                                        type="number" 
+                                        class="border w-35 h-9 text-center" 
+                                        :value="isEditing ? editedGrades[quarterMapping[props.selectedQuarter]] : quarterGrade"
+                                        @input="e => isEditing && (editedGrades[quarterMapping[props.selectedQuarter]] = e.target.value)"
+                                        :readonly="!isEditing"
+                                        min="0"
+                                        max="100"
+                                    />
                                 </div>
                                 <div>
                                     <p class="text-blue text-xs font-bold">Remarks</p>
                                     <div class="w-35 h-9 border rounded-[5px] items-center justify-center flex">
                                         <p class="font-bold"
-                                            :class="{ 'text-[#23AD00]': getRemarks(currentStudent) === 'Passed', 'text-red-500': getRemarks(currentStudent) === 'Failed' }">
-                                            {{ getRemarks(currentStudent) }}
+                                            :class="{ 
+                                                'text-[#23AD00]': currentStudent?.remarks === 'Passed', 
+                                                'text-red-500': currentStudent?.remarks === 'Failed',
+                                                'text-gray-500': !currentStudent?.remarks
+                                            }">
+                                            {{ currentStudent?.remarks || '-' }}
                                         </p>
                                     </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Add all quarters when editing -->
+                            <div v-if="isEditing" class="grid grid-cols-4 gap-4 mt-4">
+                                <div>
+                                    <p class="text-blue text-xs font-bold">1st Quarter</p>
+                                    <input 
+                                        type="number" 
+                                        class="border w-full h-9 text-center" 
+                                        v-model="editedGrades.first"
+                                        min="0"
+                                        max="100"
+                                    />
+                                </div>
+                                <div>
+                                    <p class="text-blue text-xs font-bold">2nd Quarter</p>
+                                    <input 
+                                        type="number" 
+                                        class="border w-full h-9 text-center" 
+                                        v-model="editedGrades.second"
+                                        min="0"
+                                        max="100"
+                                    />
+                                </div>
+                                <div>
+                                    <p class="text-blue text-xs font-bold">3rd Quarter</p>
+                                    <input 
+                                        type="number" 
+                                        class="border w-full h-9 text-center" 
+                                        v-model="editedGrades.third"
+                                        min="0"
+                                        max="100"
+                                    />
+                                </div>
+                                <div>
+                                    <p class="text-blue text-xs font-bold">4th Quarter</p>
+                                    <input 
+                                        type="number" 
+                                        class="border w-full h-9 text-center" 
+                                        v-model="editedGrades.fourth"
+                                        min="0"
+                                        max="100"
+                                    />
                                 </div>
                             </div>
                         </div>
 
                         <div>
                             <p class="text-blue font-semibold text-2xl">Comment</p>
-                            <textarea class="w-full h-32 text-left p-2 rounded-[12px] border border-black resize-none"
-                                readonly>ADMIN COMMENT...</textarea>
+                            <textarea 
+                                class="w-full h-32 text-left p-2 rounded-[12px] border border-black resize-none"
+                                readonly
+                                v-model="currentStudent.comments"
+                                placeholder="No comments available">
+                            </textarea>
                         </div>
 
                         <div class="flex justify-end gap-2">
                             <button
                                 class="font-light text-lg bg-[#656464] px-6 py-2 text-white rounded-md cursor-pointer hover:bg-[#cecece]"
                                 @click="emit('close')">Close</button>
-                            <div class="relative group">
+                            
+                            <template v-if="currentStudent?.status === 'Declined'">
+                                <template v-if="isEditing">
+                                    <button
+                                        class="font-light text-lg bg-red-600 px-6 py-2 text-white rounded-md hover:bg-red-700"
+                                        @click="isEditing = false">
+                                        Cancel
+                                    </button>
+                                    <button
+                                        class="font-light text-lg bg-green-600 px-6 py-2 text-white rounded-md hover:bg-green-700"
+                                        @click="saveGrades">
+                                        Save
+                                    </button>
+                                </template>
+                                <button
+                                    v-else
+                                    class="font-light text-lg bg-[#0C5A48] px-6 py-2 text-white rounded-md hover:bg-[#cecece]"
+                                    @click="handleEdit">
+                                    Edit
+                                </button>
+                            </template>
+                            <div v-else class="relative group">
                                 <button
                                     class="font-light text-lg bg-[#0C5A48] px-6 py-2 text-white rounded-md hover:bg-[#cecece]">
                                     Edit
@@ -157,7 +237,6 @@
                                     You can only edit once it's not accepted
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -177,7 +256,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted } from 'vue';
+import { ref, computed, watchEffect, onMounted, watch } from 'vue';
 import { getSubjectGrades } from '@/service/gradeService';
 import Swal from 'sweetalert2';
 
@@ -229,6 +308,13 @@ const props = defineProps({
 const students = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const isEditing = ref(false);
+const editedGrades = ref({
+  first: null,
+  second: null,
+  third: null,
+  fourth: null
+});
 
 const fetchStudents = async () => {
   try {
@@ -262,7 +348,9 @@ const fetchStudents = async () => {
           third: student.Q3 || null,
           fourth: student.Q4 || null
         },
-        status: student.Status || 'pending'
+        status: student.Status || 'pending',
+        remarks: student.Remarks || null,
+        comments: student.comments || null
       }));
       console.log('Processed students:', students.value);
     } else {
@@ -317,7 +405,7 @@ const calculateAverage = (grades) => {
 };
 
 const getRemarks = (student) => {
-    if (!student.grades) return '-';
+    if (!student?.grades) return '-';
     
     // Check if all quarters have valid grades
     const allQuartersComplete = ['first', 'second', 'third', 'fourth'].every(quarter => {
@@ -330,14 +418,7 @@ const getRemarks = (student) => {
         return '-';
     }
 
-    const quarterGrade = calculateAverage(student.grades);
-
-    // Only show Passed/Failed if we have a valid numeric grade
-    if (quarterGrade === '-' || quarterGrade === null || quarterGrade === '' || quarterGrade === 'INC') {
-        return '-';
-    }
-
-    return parseFloat(quarterGrade) >= 75 ? 'Passed' : 'Failed';
+    return student.remarks || '-';
 };
 
 onMounted(() => {
@@ -368,4 +449,70 @@ const currentStudent = computed(() => {
   if (!props.selectedStudent || !students.value) return null;
   return students.value.find(student => student.student_id === props.selectedStudent.Student_ID);
 });
+
+// Add this watcher after your existing computed properties
+watch(() => currentStudent.value?.grades, (newGrades) => {
+  if (!newGrades) return;
+  
+  // Calculate average of all quarters
+  const grades = [
+    newGrades.first,
+    newGrades.second,
+    newGrades.third,
+    newGrades.fourth
+  ].filter(grade => grade !== null && grade !== undefined && grade !== '-');
+
+  if (grades.length === 0) return;
+
+  const average = grades.reduce((sum, grade) => sum + Number(grade), 0) / grades.length;
+  
+  // Update remarks based on average
+  if (currentStudent.value) {
+    currentStudent.value.remarks = average >= 75 ? 'Passed' : 'Failed';
+  }
+}, { deep: true });
+
+// Add this method to handle grade editing
+const handleEdit = () => {
+  if (currentStudent.value?.status === 'Declined') {
+    isEditing.value = true;
+    // Initialize edited grades with current values
+    editedGrades.value = {
+      first: currentStudent.value.grades.first,
+      second: currentStudent.value.grades.second,
+      third: currentStudent.value.grades.third,
+      fourth: currentStudent.value.grades.fourth
+    };
+  }
+};
+
+// Add this method to save edited grades
+const saveGrades = async () => {
+  try {
+    // Here you would call your API to update the grades
+    // Example API call:
+    // await updateGrades(currentStudent.value.student_id, editedGrades.value);
+    
+    // Update local state
+    if (currentStudent.value) {
+      currentStudent.value.grades = { ...editedGrades.value };
+    }
+    
+    isEditing.value = false;
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Grades updated successfully',
+      timer: 1500,
+      showConfirmButton: false
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to update grades'
+    });
+  }
+};
 </script>
