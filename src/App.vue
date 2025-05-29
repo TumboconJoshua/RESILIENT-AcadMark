@@ -20,7 +20,6 @@ import HeaderBar from '@/components/header.vue';
 
 const router = useRouter();
 const route = useRoute();
-
 const isLoginPage = computed(() => route.path === '/login');
 
 const handleLogin = () => {
