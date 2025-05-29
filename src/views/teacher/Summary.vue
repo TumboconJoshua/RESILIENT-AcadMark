@@ -148,6 +148,10 @@ const loadSubjectData = async () => {
 };
 
 const getGradeForQuarter = (student, quarter) => {
+  if (!student.status || student.status.toLowerCase() !== 'approved') {
+    return '-';
+  }
+  
   const grade = student.grades?.[quarter];
   if (!grade || grade === null || grade === undefined || grade === '' || grade === '-' || grade === 'No grade') {
     return '-';

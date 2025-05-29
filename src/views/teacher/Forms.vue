@@ -170,22 +170,22 @@
                       {{ subject.subjectName }}
                     </td>
                     <td class="p-2 text-center font-semibold text-gray-800">
-                      {{ subject.grades.Q1 || 'No grade' }}
+                      {{ subject.status?.toLowerCase() === 'approved' ? (subject.grades.Q1 || 'No grade') : '-' }}
                     </td>
                     <td class="p-2 text-center font-semibold text-gray-800">
-                      {{ subject.grades.Q2 || 'No grade' }}
+                      {{ subject.status?.toLowerCase() === 'approved' ? (subject.grades.Q2 || 'No grade') : '-' }}
                     </td>
                     <td class="p-2 text-center font-semibold text-gray-800">
-                      {{ subject.grades.Q3 || 'No grade' }}
+                      {{ subject.status?.toLowerCase() === 'approved' ? (subject.grades.Q3 || 'No grade') : '-' }}
                     </td>
                     <td class="p-2 text-center font-semibold text-gray-800">
-                      {{ subject.grades.Q4 || 'No grade' }}
+                      {{ subject.status?.toLowerCase() === 'approved' ? (subject.grades.Q4 || 'No grade') : '-' }}
                     </td>
                     <td class="p-2 text-center font-semibold text-gray-800">
                       {{ getFinalGradeDisplay(subject) }}
                     </td>
-                    <td class="p-2 text-center font-semibold text-gray-800" :class="remarksClass">
-                      {{ remarks }}
+                    <td class="p-2 text-center font-semibold text-gray-800" :class="getRemarksClass(subject)">
+                      {{ getRemarksDisplay(subject) }}
                     </td>
                   </tr>
                 </tbody>
@@ -334,7 +334,7 @@
 
   const getGrade = (subjectId, quarter) => {
     const subject = studentSubjects.value.find(s => s.subject_id === subjectId);
-    if (!subject || !subject.grades) return 'No grade';
+    if (!subject || !subject.grades) return '-';
     
     const quarterMap = {
       'first': 'Q1',
