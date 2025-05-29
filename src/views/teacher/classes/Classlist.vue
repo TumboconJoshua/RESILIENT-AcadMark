@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="flex justify-between px-5 py-3 items-center">
-      <button class="btn-primary px-8 py-2 mx-12 mt-5 rounded-md" @click="showLis = true">
+      <!-- <button class="btn-primary px-8 py-2 mx-12 mt-5 rounded-md" @click="goToSummary">
         <p class="text-white font-semibold text-xs">LIS</p>
-      </button>
+      </button> -->
 
       <div class="w-1/3">
         <searchbar v-model="searchQuery" />
@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, inject } from 'vue';
 import modal from '@/components/modal.vue';
 import searchbar from '@/components/searchbar.vue';
 import { classService } from '@/service/classService';
@@ -91,6 +91,12 @@ const showLis = ref(false);
 const searchQuery = ref("");
 const loading = ref(true);
 const error = ref(null);
+
+const switchTab = inject('switchTab');
+
+const goToSummary = () => {
+  switchTab('SummaryOfGrades');
+};
 
 const filteredStudents = computed(() => {
   if (!searchQuery.value) {
