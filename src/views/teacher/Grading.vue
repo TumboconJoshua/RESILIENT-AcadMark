@@ -274,7 +274,31 @@ async function submitGrades() {
     return;
   }
 
-  const gradesData = selectedStudents.value.map((student) => ({
+  // Get selected students
+  const selectedStudents = studentsInSubject.value.filter(student => student.selected);
+  
+  // Check if any selected students have null grades
+  const studentsWithNullGrades = selectedStudents.filter(student => {
+    const gradeKey = quarterMapping[selectedQuarter.value];
+    const localStorageKey = `grade_${student.student_id}_${props.subject_id}_${gradeKey}`;
+    const storedGrade = localStorage.getItem(localStorageKey);
+    const grade = storedGrade || student.grades[gradeKey];
+    return !grade || grade === '';
+  });
+
+  if (studentsWithNullGrades.length > 0) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Cannot Submit',
+      text: `The following students have no grades: ${studentsWithNullGrades.map(student => 
+        `${student.firstName} ${student.lastName}`
+      ).join(', ')}`,
+      confirmButtonColor: '#dc2626'
+    });
+    return;
+  }
+
+  const gradesData = selectedStudents.map((student) => ({
     Student_ID: student.student_id,
     Subject_ID: props.subject_id,
     Teacher_ID: JSON.parse(localStorage.getItem('user')).teacher_ID,
