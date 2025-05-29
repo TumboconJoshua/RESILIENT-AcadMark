@@ -26,6 +26,7 @@
             <table class="table">
               <thead>
                 <tr>
+                  <th class="table-header">No.</th>
                   <th class="table-header">LRN</th>
                   <th class="table-header">Full Name</th>
                   <th class="table-header">Gender</th>
@@ -37,6 +38,7 @@
               </thead>
               <tbody>
                 <tr v-for="(student, index) in filteredStudents" :key="`${student.student_id}-${student.class_id}-${index}`">
+                  <td class="table-cell">{{ index + 1 }}</td>
                   <td class="table-cell">{{ student.lrn }}</td>
                   <td class="table-cell">{{ student.firstName }} {{ student.middleName }} {{ student.lastName }}</td>
                   <td class="table-cell">{{ student.sex }}</td>
