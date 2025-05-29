@@ -51,8 +51,11 @@
       </p>
 
       <div class="flex justify-end mt-2 mr-5">
-        <button class="bg-blue px-3 py-2 text-xs font-semibold text-white rounded-sm hover:bg-[#cecece] cursor-pointer"
-          @click="submitGrades">
+        <button 
+          class="bg-blue px-3 py-2 text-xs font-semibold text-white rounded-sm cursor-pointer"
+          :class="{ 'opacity-50 cursor-not-allowed': !canSubmitGrades, 'hover:bg-[#cecece]': canSubmitGrades }"
+          @click="submitGrades"
+          :disabled="!canSubmitGrades">
           Submit Grades
         </button>
       </div>
@@ -102,8 +105,15 @@
         <div class="flex gap-5">
           <div>
             <p class="text-blue text-xs font-bold">Quarter Grade</p>
-            <input type="text" class="border-[1px] w-35 h-9 text-center" v-model="Grade" @input="validateGrade"
-              maxlength="3" pattern="[0-9]*" inputmode="numeric" :disabled="isEditMode" />
+            <input 
+              type="text" 
+              class="border-[1px] w-35 h-9 text-center" 
+              v-model="Grade" 
+              @input="validateGrade"
+              maxlength="3" 
+              pattern="[0-9]*" 
+              inputmode="numeric" 
+              :disabled="!canInputGrade" />
           </div>
           <div>
             <p class="text-blue text-xs font-bold">Remarks</p>
@@ -159,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import Dropdown from '@/components/dropdown.vue';
 import { computed } from 'vue';
 import { classService } from '@/service/classService';
@@ -204,12 +214,20 @@ const quarterMapping = {
 const loadGrade = () => {
   if (selectedStudent.value) {
     const gradeKey = quarterMapping[selectedQuarter.value];
-    // Always check localStorage first
     const localStorageKey = `grade_${selectedStudent.value.student_id}_${props.subject_id}_${gradeKey}`;
     const storedGrade = localStorage.getItem(localStorageKey);
     
-    // Use stored grade if available, otherwise use the grade from the student object
-    Grade.value = storedGrade || selectedStudent.value.grades[gradeKey] || '';
+    // Check previous quarters
+    const checkResult = checkPreviousQuarters(selectedStudent.value, selectedQuarter.value);
+    if (!checkResult.canGrade) {
+      // Disable the input if previous quarters are not graded
+      isEditMode.value = true; // This will disable the input
+      Grade.value = ''; // Clear the grade value
+    } else {
+      // Enable the input if all previous quarters are graded
+      isEditMode.value = false;
+      Grade.value = storedGrade || selectedStudent.value.grades[gradeKey] || '';
+    }
   }
 };
 
@@ -250,6 +268,18 @@ function toggleEditMode() {
 function saveGradesToLocalStorage() {
   if (!selectedStudent.value) return;
 
+  // Check previous quarters before saving
+  const checkResult = checkPreviousQuarters(selectedStudent.value, selectedQuarter.value);
+  if (!checkResult.canGrade) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Cannot Grade',
+      text: `Please grade Quarter ${checkResult.missingQuarter} first before grading Quarter ${selectedQuarter.value}.`,
+      confirmButtonColor: '#3085d6'
+    });
+    return;
+  }
+
   const gradeKey = quarterMapping[selectedQuarter.value];
   const localStorageKey = `grade_${selectedStudent.value.student_id}_${props.subject_id}_${gradeKey}`;
   
@@ -266,16 +296,12 @@ function saveGradesToLocalStorage() {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Save the grade to localStorage
         localStorage.setItem(localStorageKey, Grade.value);
-        // Update the student's grade in the local state
         selectedStudent.value.grades[gradeKey] = Grade.value;
-        // Show success message
         Swal.fire('Success', 'Grade saved to local storage!', 'success');
       }
     });
   } else {
-    // For grades 73 and above, save directly without confirmation
     localStorage.setItem(localStorageKey, Grade.value);
     selectedStudent.value.grades[gradeKey] = Grade.value;
     Swal.fire('Success', 'Grade saved to local storage!', 'success');
@@ -286,7 +312,29 @@ const selectedStudents = computed(() => {
   return studentsInSubject.value.filter(student => student.selected);
 });
 
+// Add a new computed property to check if submission is allowed
+const canSubmitGrades = computed(() => {
+  const selectedStudents = studentsInSubject.value.filter(student => student.selected);
+  if (selectedStudents.length === 0) return false;
+
+  // Check if all selected students have grades in sequence
+  return selectedStudents.every(student => {
+    const checkResult = checkPreviousQuarters(student, selectedQuarter.value);
+    return checkResult.canGrade;
+  });
+});
+
 async function submitGrades() {
+  if (!canSubmitGrades.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Cannot Submit',
+      text: 'Please ensure all selected students have grades in sequence before submitting.',
+      confirmButtonColor: '#3085d6'
+    });
+    return;
+  }
+
   const classId = props.class_id || route.params.class_id;
   if (!classId) {
     Swal.fire('Error', 'Class ID is missing.', 'error');
@@ -390,19 +438,21 @@ watch(currentIndex, () => {
   }
 });
 
-async function loadSubjectData() {
+// Add a new function to fetch grades from database
+async function fetchGradesFromDatabase() {
   try {
     const classId = props.class_id || route.params.class_id;
-    console.log('Loading subject data for subject_id:', props.subject_id, 'and class_id:', classId);
+    if (!classId) {
+      console.error('Class ID is missing');
+      return;
+    }
 
     const response = await classService.getClassStudents(classId);
-    console.log('Raw API response:', response);
+    console.log('Fetched grades from database:', response);
 
     if (response.status === 'success' && response.data && Array.isArray(response.data)) {
-      console.log('Processing students data:', response.data);
-      
+      // Update students with grades from database
       studentsInSubject.value = response.data.map((student) => {
-        // Initialize grades object with existing grades from the API
         const grades = {
           first: student.grades?.first || null,
           second: student.grades?.second || null,
@@ -410,37 +460,59 @@ async function loadSubjectData() {
           fourth: student.grades?.fourth || null
         };
 
-        // Load grades from localStorage for each quarter
+        // Merge with localStorage grades if they exist
         Object.keys(quarterMapping).forEach(quarter => {
           const gradeKey = quarterMapping[quarter];
           const localStorageKey = `grade_${student.student_id}_${props.subject_id}_${gradeKey}`;
           const storedGrade = localStorage.getItem(localStorageKey);
           
-          // Always use localStorage grade if available, otherwise use API grade
           if (storedGrade) {
             grades[gradeKey] = storedGrade;
           }
         });
-        
-        const processedStudent = {
+
+        return {
           ...student,
           selected: false,
           grades: grades
         };
-        
-        console.log('Processed student:', processedStudent);
-        return processedStudent;
       });
 
-      if (studentsInSubject.value.length > 0) {
-        currentIndex.value = 0;
-        selectedStudent.value = studentsInSubject.value[0];
-        loadGrade();
+      // Update selected student if exists
+      if (selectedStudent.value) {
+        const updatedStudent = studentsInSubject.value.find(
+          s => s.student_id === selectedStudent.value.student_id
+        );
+        if (updatedStudent) {
+          selectedStudent.value = updatedStudent;
+          loadGrade();
+        }
       }
-    } else {
-      console.error('Invalid response format:', response);
-      throw new Error('Invalid response format from server');
     }
+  } catch (error) {
+    console.error('Error fetching grades:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to fetch grades. Please try again.',
+      confirmButtonColor: '#dc2626'
+    });
+  }
+}
+
+// Add a watcher for route changes
+watch(
+  () => route.query,
+  () => {
+    fetchGradesFromDatabase();
+  },
+  { immediate: true }
+);
+
+// Modify the existing loadSubjectData function
+async function loadSubjectData() {
+  try {
+    await fetchGradesFromDatabase();
   } catch (error) {
     console.error('Error loading subject data:', error);
     Swal.fire({
@@ -452,6 +524,22 @@ async function loadSubjectData() {
   }
 }
 
+// Add a function to refresh data periodically
+let refreshInterval;
+
+onMounted(() => {
+  loadSubjectData();
+  // Refresh data every 30 seconds
+  refreshInterval = setInterval(fetchGradesFromDatabase, 30000);
+});
+
+onUnmounted(() => {
+  // Clear the interval when component is unmounted
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+});
+
 function setStudentInfo(index) {
   currentIndex.value = index;
   selectedStudent.value = studentsInSubject.value[index];
@@ -459,15 +547,25 @@ function setStudentInfo(index) {
 }
 
 function validateGrade(event) {
-  Grade.value = Grade.value.replace(/[^0-9]/g, '');
+  // First check if input is allowed
+  if (!canInputGrade.value) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Cannot Grade',
+      text: `Please grade Quarter ${checkPreviousQuarters(selectedStudent.value, selectedQuarter.value).missingQuarter} first before grading Quarter ${selectedQuarter.value}.`,
+      confirmButtonColor: '#3085d6'
+    });
+    Grade.value = ''; // Clear the input
+    return;
+  }
 
+  // Then proceed with normal grade validation
+  Grade.value = Grade.value.replace(/[^0-9]/g, '');
   const numValue = parseInt(Grade.value);
   if (numValue > 100) {
     Grade.value = '100';
   }
 }
-
-onMounted(loadSubjectData);
 
 const filteredStudents = computed(() => {
   return studentsInSubject.value.filter((student) => {
@@ -600,4 +698,36 @@ watch(Grade, (newValue) => {
     localStorage.setItem(localStorageKey, newValue);
   }
 }, { immediate: true });
+
+// Add a new function to check if previous quarters are graded
+function checkPreviousQuarters(student, currentQuarter) {
+  const quarterOrder = ['1st', '2nd', '3rd', '4th'];
+  const currentIndex = quarterOrder.indexOf(currentQuarter);
+  
+  // Check all previous quarters
+  for (let i = 0; i < currentIndex; i++) {
+    const prevQuarter = quarterOrder[i];
+    const gradeKey = quarterMapping[prevQuarter];
+    const localStorageKey = `grade_${student.student_id}_${props.subject_id}_${gradeKey}`;
+    const storedGrade = localStorage.getItem(localStorageKey);
+    const grade = storedGrade || student.grades[gradeKey];
+    
+    if (!grade || grade === '') {
+      return {
+        canGrade: false,
+        missingQuarter: prevQuarter
+      };
+    }
+  }
+  
+  return { canGrade: true };
+}
+
+// Add a new computed property to check if input is allowed
+const canInputGrade = computed(() => {
+  if (!selectedStudent.value) return false;
+  
+  const checkResult = checkPreviousQuarters(selectedStudent.value, selectedQuarter.value);
+  return checkResult.canGrade;
+});
 </script>
