@@ -55,7 +55,8 @@
         </div>
         <div>
           <label class="block text-sm font-semibold text-center mb-1">Final Grade</label>
-          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.FinalGrade" readonly />
+          <input type="number" class="border text-center px-2 py-1 w-24" :value="student.subject_grades.FinalGrade"
+            readonly />
         </div>
         <div>
           <label class="block text-sm font-semibold text-center mb-1">Remarks</label>
@@ -67,8 +68,9 @@
 
       <!-- COMMENT -->
       <h2 class="text-blue-800 font-semibold text-xl mb-4" style="color: #295F98;">COMMENT</h2>
-      <textarea v-model="comment" rows="4" class="w-full border rounded px-3 py-2 mb-4"
+      <textarea v-model="student.subject_grades.Comments" rows="4" class="w-full border rounded px-3 py-2 mb-4"
         placeholder="Enter comment..."></textarea>
+
 
       <!-- ACTION BUTTONS -->
       <div class="flex justify-end space-x-4"

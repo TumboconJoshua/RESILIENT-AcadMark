@@ -76,7 +76,7 @@
       </div>
 
       <div class="button">
-        <button class="red">Reject</button>
+        <!-- <button class="red">Reject</button> -->
         <button @click="acceptCheckedClasses" class="green">Accept</button>
       </div>
 

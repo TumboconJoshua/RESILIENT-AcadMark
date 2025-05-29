@@ -42,9 +42,9 @@
       <table>
         <thead>
           <tr>
-            <th>
+            <!-- <th>
               <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" />
-            </th>
+            </th> -->
             <th>LRN</th>
             <th>NAME</th>
             <th>GENDER</th>
@@ -56,9 +56,9 @@
         <tbody>
           <tr v-for="student in paginatedStudents" :key="student.lrn" @click="openGradeModal(student)"
             class="cursor-pointer hover:bg-gray-100">
-            <td>
+            <!-- <td>
               <input type="checkbox" :value="student.lrn" v-model="selectedStudents" @click.stop />
-            </td>
+            </td> -->
             <td>{{ student.lrn }}</td>
             <td>{{ student.lastName }}, {{ student.firstName }} {{ student.middleName }}</td>
             <td>{{ student.sex }}</td>
@@ -85,10 +85,10 @@
       <GradeModal v-if="showModal" :student="selectedStudent" @close="showModal = false" @accepted="handleAccepted" />
 
 
-      <div class="button mt-5">
+      <!-- <div class="button mt-5">
         <button class="red" @click="reject">Reject</button>
         <button class="green" @click="acceptAlert">Accept</button>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

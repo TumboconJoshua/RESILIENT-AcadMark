@@ -65,7 +65,7 @@
             <component :is="activeComponent" :class_id="class_id" :subject_id="subject_id" :trackStand="trackStand"
               :className="className" :subjectName="subjectName" :classType="classType" :currentPage="currentPage"
               :itemsPerPage="itemsPerPage" :gradeLevel="gradeLevel" @update:currentPage="currentPage = $event"
-              @update:totalItems="updateTotalItems" :key="activeComponent">
+              @update:totalItems="updateTotalItems" :key="activeComponent" :isAdviser="isAdviser">
             </component>
           </div>
           <div v-else>
@@ -269,7 +269,7 @@ export default {
       console.log('Class ID:', class_id.value);
       fetchClassDetails();
 
-      console.log("PROPS:", props)
+      console.log("PROPS2222:", props)
     });
 
     return {
