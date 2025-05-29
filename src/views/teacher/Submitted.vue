@@ -15,18 +15,13 @@
             <th class="p-2 w-1/12">NAME</th>
             <th class="p-2 w-1/12">GENDER</th>
             <th class="p-2 w-1/12">AGE</th>
-            <th class="p-2 w-1/12">Q1</th>
-            <th class="p-2 w-1/12">Q2</th>
-            <th class="p-2 w-1/12">Q3</th>
-            <th class="p-2 w-1/12">Q4</th>
-            <th class="p-2 w-1/12">FINAL GRADE</th>
-            <th class="p-2 w-1/12">REMARKS</th>
+            <th class="p-2 w-1/12">{{ selectedQuarter.toUpperCase() }} QUARTER GRADE</th>
             <th class="p-2 w-1/12">STATUS</th>
           </tr>
         </thead>
         <tbody class="font-medium text-[15px]">
           <tr v-if="loading">
-            <td colspan="11" class="p-2 text-center">
+            <td colspan="6" class="p-2 text-center">
               <div class="flex justify-center items-center">
                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue"></div>
                 <span class="ml-2">Loading...</span>
@@ -34,7 +29,7 @@
             </td>
           </tr>
           <tr v-else-if="paginatedStudents.length === 0">
-            <td colspan="11" class="p-2 text-center">
+            <td colspan="6" class="p-2 text-center">
               {{ error || 'No students available.' }}
             </td>
           </tr>
@@ -48,18 +43,8 @@
             </td>
             <td class="p-2 w-1/12">{{ grade.student?.sex || 'N/A' }}</td>
             <td class="p-2 w-1/12">{{ getAge(grade.student?.birthDate) }}</td>
-            <td class="p-2 w-1/12">{{ grade.Q1 ?? '-' }}</td>
-            <td class="p-2 w-1/12">{{ grade.Q2 ?? '-' }}</td>
-            <td class="p-2 w-1/12">{{ grade.Q3 ?? '-' }}</td>
-            <td class="p-2 w-1/12">{{ grade.Q4 ?? '-' }}</td>
-            <td class="p-2 w-1/12">{{ grade.Status === 'Approved' ? grade.FinalGrade ?? '-' : '-' }}</td>
             <td class="p-2 w-1/12">
-              <span :class="{
-                'text-green-500 font-bold': grade.Remarks === 'Passed',
-                'text-red-500 font-bold': grade.Remarks === 'Failed'
-              }">
-                {{ grade.Remarks || '-' }}
-              </span>
+              {{ grade.Status === 'Approved' ? getGradeForQuarter(grade, quarterMapping[selectedQuarter]) : '-' }}
             </td>
             <td class="p-2 w-1/12">
               <span :class="{
