@@ -557,8 +557,8 @@ const students = ref([])
 const formData = reactive(Object.fromEntries(addStudentFields.map(f => [f.name, ''])))
 
 const individualTrackOptions = {
-    'Junior High School': ['Academic', 'Arts and Design', 'Sports'],
-    'Senior High School': ['TVL', 'ABM', 'HUMMS', 'STEM']
+    'Junior High School': ['BEP', 'SPJ', 'SPA', 'OHSP'],
+    'Senior High School': ['ACAD', 'TECH-PRO']
 }
 
 watch(() => formData.Grade_Level, (newValue) => {

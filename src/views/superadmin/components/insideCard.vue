@@ -49,7 +49,7 @@
             <th>NAME</th>
             <th>GENDER</th>
             <th>AGE</th>
-            <th>LATEST GRADE</th>
+            <th>FINAL GRADE</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -65,10 +65,7 @@
             <td>{{ student.age }}</td>
             <td>
               {{
-                student.subject_grades?.Q4 ??
-                student.subject_grades?.Q3 ??
-                student.subject_grades?.Q2 ??
-                student.subject_grades?.Q1 ??
+                student.subject_grades?.FinalGrade ??
               'N/A'
               }}
             </td>

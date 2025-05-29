@@ -305,7 +305,7 @@ const handleSubmit = async () => {
 onMounted(async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://26.135.189.53:8000/api/subjects', {
+    const response = await axios.get('http://26.131.123.208:8000/api/subjects', {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',

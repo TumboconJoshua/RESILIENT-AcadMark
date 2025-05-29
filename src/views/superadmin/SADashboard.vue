@@ -265,7 +265,7 @@
           { label: 'Total Classes', value: 0, icon: 'fas fa-chalkboard-teacher' },
           { label: 'Total Students', value: 0, icon: 'fas fa-users' },
           { label: 'Pending Classes', value: 0, icon: 'fas fa-hourglass-half' },
-          { label: 'Pending Students', value: 50, icon: 'fas fa-user-clock' }
+          { label: 'Pending Students', value: 0, icon: 'fas fa-user-clock' }
         ],
         totalStudentsPerGrade: [
           { grade: 'Grade 7', students: 0 },
