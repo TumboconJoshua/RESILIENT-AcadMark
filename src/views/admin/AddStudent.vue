@@ -659,8 +659,8 @@ const bulkFormData = ref({
 });
 
 const bulkTrackOptions = {
-    'Junior High School': ['Academic', 'Arts and Design', 'Sports'],
-    'Senior High School': ['TVL', 'ABM', 'HUMMS', 'STEM']
+    'Junior High School': ['BEP', 'SPJ', 'SPA', 'OHSP'],
+    'Senior High School': ['ACAD', 'TECH-PRO']
 }
 
 const selectedFile = ref(null);
