@@ -253,14 +253,33 @@ function saveGradesToLocalStorage() {
   const gradeKey = quarterMapping[selectedQuarter.value];
   const localStorageKey = `grade_${selectedStudent.value.student_id}_${props.subject_id}_${gradeKey}`;
   
-  // Save the grade to localStorage
-  localStorage.setItem(localStorageKey, Grade.value);
-
-  // Update the student's grade in the local state
-  selectedStudent.value.grades[gradeKey] = Grade.value;
-
-  // Show success message
-  Swal.fire('Success', 'Grade saved to local storage!', 'success');
+  // Check if grade is below 73
+  if (parseFloat(Grade.value) < 73) {
+    Swal.fire({
+      title: 'Warning: Low Grade',
+      text: `Are you sure you want to give ${selectedStudent.value.firstName} ${selectedStudent.value.lastName} a grade of ${Grade.value}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, save grade',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Save the grade to localStorage
+        localStorage.setItem(localStorageKey, Grade.value);
+        // Update the student's grade in the local state
+        selectedStudent.value.grades[gradeKey] = Grade.value;
+        // Show success message
+        Swal.fire('Success', 'Grade saved to local storage!', 'success');
+      }
+    });
+  } else {
+    // For grades 73 and above, save directly without confirmation
+    localStorage.setItem(localStorageKey, Grade.value);
+    selectedStudent.value.grades[gradeKey] = Grade.value;
+    Swal.fire('Success', 'Grade saved to local storage!', 'success');
+  }
 }
 
 const selectedStudents = computed(() => {
