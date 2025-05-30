@@ -8,7 +8,7 @@
       <div :class="{
         'bg-blue': isAdviser,
         'bg-blue': !isAdviser // babalikan
-      }" class="flex items-center justify-between px-7 py-5 rounded-xl">
+      }" class="flex items-center max-h-max justify-between px-7 py-5 rounded-xl">
         <div class="flex flex-col justify-between h-full">
           <p class="text-white text-xl font-normal leading-none">
             {{ trackStand }}
@@ -37,11 +37,11 @@
           </div>
         </div>
 
-        <div :class="{
+        <div  iv :class="{
           'text-[#3E6FA2]': isAdviser,
-          'text-[#3E6FA2]': !isAdviser, //babalikan
+          'text-[#0d69e1]': !isAdviser, //babalikan
         }" class="flex items-center justify-center pr-15 h-[150px]">
-          <p class="font-bold text-[150px]">
+          <p class="overflow-hidden font-bold sm:text-[50px] md:text-[70px] lg:text-[100px]">
             {{ parseInt(gradeLevel) <= 10 ? (subjectName + ' ' + gradeLevel) : (trackStand + ' ' + gradeLevel) }} </p>
         </div>
       </div>
