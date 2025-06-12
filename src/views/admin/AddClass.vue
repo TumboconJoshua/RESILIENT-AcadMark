@@ -157,9 +157,9 @@
                                             <span
                                                 class="px-4 py-2 rounded inline-block w-[135px] font-semibold text-center"
                                                 :class="[
-                                                row.status === 'Pending' ? 'text-yellow-800' : '',
-                                                row.status === 'Accepted' ? 'text-green-800' : '',
-                                                row.status === 'Declined' ? 'text-red-800' : ''
+                                                    row.status === 'Pending' ? 'text-yellow-800' : '',
+                                                    row.status === 'Accepted' ? 'text-green-800' : '',
+                                                    row.status === 'Declined' ? 'text-red-800' : ''
                                                 ]">
                                                 {{ row.status }}
                                             </span>
@@ -256,142 +256,137 @@
                             </button>
                         </div>
                     </div>
-                    <div class="min-h-[200px] bg-[#f9f9f9] rounded-[8px] mt-8">
+                   <div class="min-h-[200px] bg-[#f9f9f9] rounded-[8px] mt-8">
                         <div class="flex gap-6 mb-5">
-                            <!-- Left Column -->
-                            <div
-                                class="bg-white rounded-[8px] border border-[#e0e0e0] w-[410px] min-w-[280px] flex flex-col p-3">
-                                <div class="mb-2">
-                                    <select v-model="leftSex"
-                                        class="w-[35%] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
-                                        <option value="" disabled selected>Sex</option>
-                                        <option value="All">All</option>
-                                        <option value="F">Female</option>
-                                        <option value="M">Male</option>
-                                    </select>
-                                </div>
-                                <div
-                                    class="flex flex-col overflow-y-auto max-h-[600px] mb-3 rounded-[4px] border border-[#e0e0e0] bg-[#fafbfc] p-1 cursor-pointer gap-5s">
-                                    <template v-if="leftSelectedStudents.length > 0">
-                                        <div v-for="row in filteredLeftTableData" :key="row.lrn"
-                                            class="flex items-center p-[6px_8px] border-b border-[#f0f0f0] text-sm text-[#222] gap-10 hover:bg-[#e0e0e0]">
-                                            <span class="ml-[5px] w-[90px] font-medium">{{ row.lrn }}</span>
-                                            <span class="flex-1 -ml-[5px] font-medium">{{ row.name }}</span>
-                                            <img src="/assets/img/admin/arrow.svg" alt="right-arrow"
-                                                class="w-5 h-5 cursor-pointer" @click="removeSelectedRow(row.lrn)" />
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-center text-gray-500 py-4">No students selected</div>
-                                    </template>
-                                </div>
-                                <button @click="logForm"
-                                    class="mt-2 w-[30%] bg-[#295F98] text-white border-none rounded-[6px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066] block ml-auto">
-                                    Submit
-                                </button>
-                            </div>
-                            <!-- Right Column -->
-                            <div
-                                class="flex-1 bg-white rounded-[8px] border border-[#e0e0e0] p-4 flex flex-col min-w-0">
+                            <!-- Right Column (Students list) -->
+                            <div class="flex-1 bg-white rounded-[8px] border border-[#e0e0e0] p-4 flex flex-col min-w-0">
                                 <div class="flex items-center gap-3">
-                                    <select v-model="rightGender"
-                                        class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
-                                        <option value="" disabled selected>Sex</option>
-                                        <option value="All">All</option>
-                                        <option value="F">Female</option>
-                                        <option value="M">Male</option>
+                                    <select v-model="rightGender" class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
+                                    <option value="" disabled selected>Sex</option>
+                                    <option value="All">All</option>
+                                    <option value="F">Female</option>
+                                    <option value="M">Male</option>
                                     </select>
-                                    <select v-model="rightSort"
-                                        class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
-                                        <option value="" disabled selected>Sort By</option>
-                                        <option value="latest">Latest</option>
-                                        <option value="oldest">Oldest</option>
+                                    <select v-model="rightSort" class="w-[130px] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
+                                    <option value="" disabled selected>Sort By</option>
+                                    <option value="latest">Latest</option>
+                                    <option value="oldest">Oldest</option>
                                     </select>
-                                    <div
-                                        class="w-[220px] ml-auto flex items-center bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-9">
-                                        <img src="/assets/img/search-icon.svg" alt="search"
-                                            class="w-[18px] h-[18px] mx-[5px] opacity-70" />
-                                        <input type="text" v-model="rightSearch" placeholder="Search..."
-                                            class="border-none outline-none bg-transparent w-full text-[15px] text-[#222]" />
+                                    <div class="w-[220px] ml-auto flex items-center bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-9">
+                                    <img src="/assets/img/search-icon.svg" alt="search" class="w-[18px] h-[18px] mx-[5px] opacity-70" />
+                                    <input type="text" v-model="rightSearch" placeholder="Search..." class="border-none outline-none bg-transparent w-full text-[15px] text-[#222]" />
                                     </div>
                                 </div>
                                 <div class="flex-1 overflow-y-auto mb-[10px] max-h-[600px] relative">
                                     <table class="w-full border-collapse mt-4 bg-white">
-                                        <thead>
-                                            <tr>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center"></th>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center">LRN</th>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center">FULL NAME</th>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center">GENDER</th>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center">Age</th>
-                                                <th class="bg-[#F6F6F6] font-semibold p-2 text-center">Track</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template v-if="filteredTableData.length > 0">
-                                                <tr v-for="row in paginatedFilteredTableData" :key="row.lrn"
-                                                    class="hover:bg-[#e0e0e0] cursor-pointer">
-                                                    <td class="text-center">
-                                                        <input type="checkbox" v-model="selectedRows"
-                                                            :value="row.lrn" />
-                                                    </td>
-                                                    <td class="p-2 text-center">{{ row.lrn }}</td>
-                                                    <td class="p-2 text-center">{{ row.name }}</td>
-                                                    <td class="p-2 text-center">{{ row.gender }}</td>
-                                                    <td class="p-2 text-center">{{ row.age }}</td>
-                                                    <td class="p-2 text-center">{{ row.track }}</td>
-                                                </tr>
-                                            </template>
-                                            <template v-else>
-                                                <tr>
-                                                    <td :colspan="showCheckboxes ? 7 : 6"
-                                                        class="text-center text-[#666] text-[15px] py-5 bg-white border-b border-[#e0e0e0]">
-                                                        <div class="flex items-center justify-center gap-2">
-                                                            <img src="/assets/img/search-icon.svg" alt="search"
-                                                                class="w-[18px] h-[18px] opacity-50" />
-                                                            No results found for "{{ rightSearch }}"
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
+                                    <thead>
+                                        <tr>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center"></th>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center">LRN</th>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center">FULL NAME</th>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center">GENDER</th>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center">Age</th>
+                                        <th class="bg-[#F6F6F6] font-semibold p-2 text-center">Track</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template v-if="filteredTableData.length > 0">
+                                        <tr
+                                            v-for="row in paginatedFilteredTableData"
+                                            :key="row.lrn"
+                                            class="hover:bg-[#e0e0e0] cursor-pointer"
+                                            draggable="true"
+                                            @dragstart="handleDragStart($event, row)"
+                                        >
+                                            <td class="text-center">
+                                            <input type="checkbox" v-model="selectedRows" :value="row.lrn" />
+                                            </td>
+                                            <td class="p-2 text-center">{{ row.lrn }}</td>
+                                            <td class="p-2 text-center">{{ row.name }}</td>
+                                            <td class="p-2 text-center">{{ row.gender }}</td>
+                                            <td class="p-2 text-center">{{ row.age }}</td>
+                                            <td class="p-2 text-center">{{ row.track }}</td>
+                                        </tr>
+                                        </template>
+                                        <template v-else>
+                                        <tr>
+                                            <td :colspan="showCheckboxes ? 7 : 6" class="text-center text-[#666] text-[15px] py-5 bg-white border-b border-[#e0e0e0]">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <img src="/assets/img/search-icon.svg" alt="search" class="w-[18px] h-[18px] opacity-50" />
+                                                No results found for "{{ rightSearch }}"
+                                            </div>
+                                            </td>
+                                        </tr>
+                                        </template>
+                                    </tbody>
                                     </table>
                                 </div>
-                                <!-- Pagination Controls for Student Selection -->
-                                <div class="flex justify-between items-center mt-4 px-4">
-                                    <div class="text-sm text-gray-600">
-                                        Showing {{ paginatedFilteredTableData.length }} of {{ filteredTableData.length
-                                        }} entries
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button @click="studentCurrentPage--" :disabled="studentCurrentPage === 1"
-                                            class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
-                                            Previous
-                                        </button>
-                                        <button v-for="page in studentTotalPages" :key="page"
-                                            @click="studentCurrentPage = page" :class="[
-                                                'px-3 py-1 rounded border',
-                                                studentCurrentPage === page
-                                                    ? 'bg-blue-500 text-white border-blue-500'
-                                                    : 'border-gray-300 hover:bg-gray-100'
-                                            ]">
-                                            {{ page }}
-                                        </button>
-                                        <button @click="studentCurrentPage++"
-                                            :disabled="studentCurrentPage === studentTotalPages"
-                                            class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
-                                            Next
-                                        </button>
-                                    </div>
+                            <div class="flex justify-between items-center mt-4 px-4">
+                                <div class="text-sm text-gray-600">
+                                Showing {{ paginatedFilteredTableData.length }} of {{ filteredTableData.length }} entries
                                 </div>
+                                <div class="flex gap-2">
+                                <button @click="studentCurrentPage--" :disabled="studentCurrentPage === 1" class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">Previous</button>
                                 <button
-                                    class="mt-2 self-end bg-[#295F98] text-white border-none rounded-[6px] px-[22px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]"
-                                    @click="toggleSelectAllStudents">{{ showCheckboxes ? 'Select Students'
-                                        : 'Remove Students'
-                                    }}</button>
+                                    v-for="page in studentTotalPages"
+                                    :key="page"
+                                    @click="studentCurrentPage = page"
+                                    :class="[
+                                    'px-3 py-1 rounded border',
+                                    studentCurrentPage === page ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                                <button @click="studentCurrentPage++" :disabled="studentCurrentPage === studentTotalPages" class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">Next</button>
+                                </div>
+                            </div>
+                            <button
+                                class="mt-2 self-end bg-[#295F98] text-white border-none rounded-[6px] px-[22px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066]"
+                                @click="toggleSelectAllStudents"
+                            >
+                                {{ showCheckboxes ? 'Select Students' : 'Remove Students' }}
+                            </button>
+                            </div>
+
+                            <!-- Left Column (Selected Students) -->
+                            <div class="bg-white rounded-[8px] border border-[#e0e0e0] w-[410px] min-w-[280px] flex flex-col p-3">
+                            <div class="mb-2">
+                                <select v-model="leftSex" class="w-[35%] p-[6px_10px] border border-[#e0e0e0] rounded-[6px] text-[15px] text-[#242424] bg-white">
+                                <option value="" disabled selected>Sex</option>
+                                <option value="All">All</option>
+                                <option value="F">Female</option>
+                                <option value="M">Male</option>
+                                </select>
+                            </div>
+                            <div
+                                class="flex flex-col overflow-y-auto max-h-[600px] mb-3 rounded-[4px] border border-[#e0e0e0] bg-[#fafbfc] p-1 cursor-pointer gap-5s"
+                                @dragover.prevent
+                                @drop="handleDrop"
+                            >
+                                <template v-if="leftSelectedStudents.length > 0">
+                                <div
+                                    v-for="row in filteredLeftTableData"
+                                    :key="row.lrn"
+                                    class="flex items-center p-[6px_8px] border-b border-[#f0f0f0] text-sm text-[#222] gap-10 hover:bg-[#e0e0e0]"
+                                >
+                                    <span class="ml-[5px] w-[90px] font-medium">{{ row.lrn }}</span>
+                                    <span class="flex-1 -ml-[5px] font-medium">{{ row.name }}</span>
+                                    <img src="/assets/img/admin/arrow.svg" alt="right-arrow" class="w-5 h-5 cursor-pointer" @click="removeSelectedRow(row.lrn)" />
+                                </div>
+                                </template>
+                                <template v-else>
+                                <div class="text-center text-gray-500 py-4">No students selected</div>
+                                </template>
+                            </div>
+                            <button @click="logForm" class="mt-2 w-[30%] bg-[#295F98] text-white border-none rounded-[6px] py-2 text-[15px] cursor-pointer transition-colors duration-200 hover:bg-[#1d4066] block ml-auto">
+                                Submit
+                            </button>
                             </div>
                         </div>
                     </div>
+
+
                 </div>
             </div>
         </template>
@@ -539,14 +534,17 @@ import { getAllClasses } from '@/service/adminClassService';
 import { createClass } from '@/service/adminClassService';
 import Swal from 'sweetalert2';
 import { useToast } from 'vue-toastification'
+import draggable from 'vuedraggable';
+
 
 const toast = useToast()
 
 export default {
     name: 'Dasboard',
-    components: { Dropdown },
+    components: { Dropdown, draggable },
     data() {
         return {
+            draggedStudent: null,
             subjectTeachers: [{ subject: '', teacher: '' }],
             activeTab: 'add',
             showBlank: false,
@@ -796,6 +794,29 @@ export default {
                 }
             });
         },
+
+        handleDragStart(event, student) {
+            this.draggedStudent = student;
+        },
+        handleDrop() {
+            if (
+                this.draggedStudent &&
+                !this.leftSelectedStudents.some((s) => s.student_id === this.draggedStudent.student_id)
+            ) {
+                this.leftSelectedStudents.push(this.draggedStudent);
+            }
+            this.draggedStudent = null;
+
+            // ✅ Update form.student_ids after drop
+            this.form.student_ids = this.leftSelectedStudents.map(row => row.student_id);
+        },
+
+        removeSelectedRow(lrn) {
+            this.leftSelectedStudents = this.leftSelectedStudents.filter((s) => s.lrn !== lrn);
+            // ✅ Update form.student_ids after removing
+            this.form.student_ids = this.leftSelectedStudents.map(row => row.student_id);
+        },
+
 
 
         async fetchStudentCounts() {
@@ -1188,31 +1209,30 @@ export default {
 
 <style scoped>
 .filters {
-  display: flex;
-  gap: 10px;
-} 
+    display: flex;
+    gap: 10px;
+}
 
 .filter-dropdown {
-  padding: 10px 15px;
-  width: 150px;
-  border: 1px solid #295f98;
-  border-radius: 5px;
-  font-size: 14px;
-  background: #fff;
-  font-weight: bold;
-  color: #295f98;
-  cursor: pointer;
-  appearance: none;
-  position: relative;
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px;
-  transition: all 0.3s ease-in-out;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+    padding: 10px 15px;
+    width: 150px;
+    border: 1px solid #295f98;
+    border-radius: 5px;
+    font-size: 14px;
+    background: #fff;
+    font-weight: bold;
+    color: #295f98;
+    cursor: pointer;
+    appearance: none;
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+    transition: all 0.3s ease-in-out;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
 }
 
 .filter-dropdown:focus {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
 }
-
 </style>
