@@ -74,7 +74,16 @@
 
         <div class="flex gap-4 mb-6">
           <div class="floating-label flex-1" :class="{ filled: contactNumber }">
-            <input v-model="contactNumber" type="text" placeholder=" " class="input" />
+            <input
+              v-model="contactNumber"
+              type="text"
+              placeholder=" "
+              class="input"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="11"
+              @input="contactNumber = contactNumber.replace(/\D/g, '').slice(0, 11)"
+            />
             <label>Contact Number</label>
           </div>
           <div class="floating-label flex-1" :class="{ filled: address }">
@@ -103,15 +112,20 @@
         <!-- Teacher Subjects -->
         <div v-if="selectedAccession === 'Teacher'">
           <h1 class="font-semibold text-[#295f98] mb-2">Teacher Subject</h1>
-          <div class="flex gap-4 mb-4">
-            <div v-for="(field, idx) in 5" :key="idx" class="floating-label flex-1 relative" :class="{ filled: subjectFields[idx] }" v-show="idx === 0 || showSubjects[idx]">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <div
+              v-for="(field, idx) in 5"
+              :key="idx"
+              class="floating-label relative"
+              :class="{ filled: subjectFields[idx] }"
+              v-show="idx === 0 || showSubjects[idx]"
+            >
               <select v-model="subjectFields[idx]" class="input" :required="idx === 0">
                 <option value="" disabled selected hidden>Select Subject {{ idx + 1 }}</option>
                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
               </select>
               <label>{{ subjectFields[idx] ? capitalize(subjectFields[idx]) : `Subject ${idx + 1}` }}</label>
               <span class="custom-arrow"></span>
-              <!-- Add/Remove buttons inside each field -->
               <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 <button
                   v-if="idx > 0 && showSubjects[idx]"
@@ -129,6 +143,7 @@
             </div>
           </div>
         </div>
+
 
         <!-- Accession Section -->
         <h2 class="text-xl text-[#295f98] font-semibold mb-6">Accession</h2>

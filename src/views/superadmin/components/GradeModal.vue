@@ -76,7 +76,7 @@
       <div class="flex justify-end space-x-4"
         v-if="student.subject_grades?.Status !== 'Approved' && student.subject_grades?.Status !== 'Declined'">
         <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" @click="reject">
-          Reject
+          Decline
         </button>
         <button class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded" @click="accept">
           Accept
