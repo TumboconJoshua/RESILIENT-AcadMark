@@ -6,7 +6,7 @@
 
     <div class="flex flex-col gap-10">
       <div :class="{
-        'bg-blue': isAdviser,
+        'bg-green': isAdviser,
         'bg-blue': !isAdviser // babalikan
       }" class="flex items-center max-h-max justify-between px-7 py-5 rounded-xl">
         <div class="flex flex-col justify-between h-full">
@@ -39,7 +39,7 @@
 
         <div  iv :class="{
           'text-[#3E6FA2]': isAdviser,
-          'text-[#0d69e1]': !isAdviser, //babalikan
+          'text-[#f1f1f1]': !isAdviser, //babalikan
         }" class="flex items-center justify-center pr-15 h-[150px]">
           <p class="overflow-hidden font-bold sm:text-[50px] md:text-[70px] lg:text-[100px]">
             {{ parseInt(gradeLevel) <= 10 ? (subjectName + ' ' + gradeLevel) : (trackStand + ' ' + gradeLevel) }} </p>

@@ -115,7 +115,7 @@ const isAdmin = localStorage.getItem('isAdmin') === 'true';
 const teacherLinks = ref([
   { name: "Dashboard", path: "/dashboard", icon: "fa-solid fa-chart-pie" },
   { name: "Classes", path: "/classes", icon: "fa-solid fa-chalkboard" },
-  // { name: "Forms", path: "/forms", icon: "fa-solid fa-file-alt" },
+  { name: "Forms", path: "/forms", icon: "fa-solid fa-file-alt" },
   { name: "Profile", path: "/profile", icon: "fa-solid fa-user" },
 ]);
 
