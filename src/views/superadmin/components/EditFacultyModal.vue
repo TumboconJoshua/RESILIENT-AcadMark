@@ -175,11 +175,20 @@
 
     <div v-if="selectedAccession === 'Teacher'">
       <h1 class="font-semibold text-[#295f98] mb-2">Teacher Subject</h1>
-      <div class="flex gap-4 mb-4">
-        <div v-for="(field, idx) in 5" :key="idx" class="floating-label flex-1 relative" :class="{ filled: subjectFields[idx] }" v-show="idx === 0 || showSubjects[idx]">
+      <!-- Use flex-wrap or grid layout here -->
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div
+          v-for="(field, idx) in 5"
+          :key="idx"
+          class="floating-label relative w-full sm:w-[48%] lg:w-[30%]"
+          :class="{ filled: subjectFields[idx] }"
+          v-show="idx === 0 || showSubjects[idx]"
+        >
           <select v-model="subjectFields[idx]" class="input" :required="idx === 0">
             <option value="" disabled selected hidden>Select Subject {{ idx + 1 }}</option>
-            <option v-for="subject in props.subjects" :key="subject.id" :value="String(subject.id)">{{ subject.name }}</option>
+            <option v-for="subject in props.subjects" :key="subject.id" :value="String(subject.id)">
+              {{ subject.name }}
+            </option>
           </select>
           <label>{{ subjectFields[idx] ? capitalize(subjectFields[idx]) : `Subject ${idx + 1}` }}</label>
           <span class="custom-arrow"></span>
@@ -200,6 +209,7 @@
         </div>
       </div>
     </div>
+
 
         <!-- Accession Section -->
         <h2 class="text-xl text-[#295f98] font-semibold mb-6">Accession</h2>

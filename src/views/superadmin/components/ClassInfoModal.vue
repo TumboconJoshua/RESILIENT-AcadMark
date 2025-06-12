@@ -16,9 +16,9 @@
               <h1 class="font-semibold text-[#295f98]">Curriculum</h1>
               <p class="text-[1.5rem] text-black-700">
                 {{
-                props.classInfo.curriculum === 'JHS' ? 'Junior High School' :
-                props.classInfo.curriculum === 'SHS' ? 'Senior High School' :
-                props.classInfo.curriculum
+                  props.classInfo.curriculum === 'JHS' ? 'Junior High School' :
+                    props.classInfo.curriculum === 'SHS' ? 'Senior High School' :
+                      props.classInfo.curriculum
                 }}
               </p>
             </div>
@@ -83,8 +83,8 @@ const props = defineProps({
 })
 
 
-  const emit = defineEmits(['update:modelValue', 'submit']);
-  const comment = ref('');
+const emit = defineEmits(['update:modelValue', 'submit']);
+const comment = ref('');
 
 async function confirmReject() {
   if (!props.classInfo.comments || !props.classInfo.comments.trim()) {
@@ -163,101 +163,103 @@ async function confirmAccept() {
         Swal.fire('Error', 'An unexpected error occurred.', 'error');
       }
     }
-    
+
   });
-  
+
 }
 
 
 </script>
 
 <style scoped>
-  .floating-label {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
+.floating-label {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
 
-  .floating-label .input {
-    padding: 0.75rem 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-    background: white;
-    appearance: none;
-  }
+.floating-label .input {
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background: white;
+  appearance: none;
+}
 
-  .floating-label label {
-    position: absolute;
-    left: 0.5rem;
-    top: 0.75rem;
-    background: white;
-    color: #888;
-    padding: 0 0.25rem;
-    transition: all 0.2s ease;
-    pointer-events: none;
-  }
+.floating-label label {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.75rem;
+  background: white;
+  color: #888;
+  padding: 0 0.25rem;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
 
-  .floating-label input:focus + label,
-  .floating-label select:focus + label,
-  .floating-label.filled label {
-    transform: translateY(-1.5rem);
-    font-size: 0.75rem;
-    color: #2563eb;
-  }
+.floating-label input:focus+label,
+.floating-label select:focus+label,
+.floating-label.filled label {
+  transform: translateY(-1.5rem);
+  font-size: 0.75rem;
+  color: #2563eb;
+}
 
-  .custom-arrow {
-    position: absolute;
-    top: 50%;
-    right: 0.75rem;
-    pointer-events: none;
-    width: 1rem;
-    height: 1rem;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23888888" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    transform: translateY(-50%);
-    transition: background-image 0.2s ease;
-  }
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  pointer-events: none;
+  width: 1rem;
+  height: 1rem;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23888888" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transform: translateY(-50%);
+  transition: background-image 0.2s ease;
+}
 
-  .floating-label select:focus + label + .custom-arrow {
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%232563eb" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  }
+.floating-label select:focus+label+.custom-arrow {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%232563eb" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+}
 
-  .button {
-    width: 100%;
-    display: flex;
-    justify-content: end;
-    gap: 15px;
-  }
+.button {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  gap: 15px;
+}
 
-  .red,
-  .green {
-    padding: 5px 30px;
-    align-items: center;
-    color: #ffffff;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-    font-weight: 600;
-    font-size: 1rem;
-    display: inline-flex;
-    justify-content: center;
-    user-select: none;
-    transition: background-color 0.3s ease;
-  }
+.red,
+.green {
+  padding: 5px 30px;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-flex;
+  justify-content: center;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
 
-  .red {
-    background-color: #d30000;
-  }
-  .red:hover {
-    background-color: #d95353;
-  }
+.red {
+  background-color: #d30000;
+}
 
-  .green {
-    background-color: #0c5a48;
-  }
-  .green:hover {
-    background-color: #0a4b3b;
-  }
+.red:hover {
+  background-color: #d95353;
+}
+
+.green {
+  background-color: #0c5a48;
+}
+
+.green:hover {
+  background-color: #0a4b3b;
+}
 </style>
