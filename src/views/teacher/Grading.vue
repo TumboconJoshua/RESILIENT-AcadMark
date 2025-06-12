@@ -229,15 +229,31 @@
                   class="px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
                 {{ header }}
               </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white">
             <tr v-for="(row, index) in excelData" :key="index" 
-                :class="{'bg-red-50': hasRowError(index), 'hover:bg-gray-50': !hasRowError(index)}"
+                :class="{
+                  'bg-red-50': hasRowError(index),
+                  'hover:bg-gray-50': !hasRowError(index)
+                }"
                 class="border-b border-gray-200">
               <td v-for="header in excelHeaders" :key="header" 
                   class="px-4 py-3 text-sm text-gray-700">
                 {{ row[header] }}
+              </td>
+              <td class="px-4 py-3 text-sm">
+                <div v-if="hasRowError(index)" class="text-red-600">
+                  <ul class="list-disc pl-5">
+                    <li v-for="error in getRowErrors(index)" :key="error" class="text-xs">
+                      {{ error }}
+                    </li>
+                  </ul>
+                </div>
+                <span v-else class="text-green-600">Valid</span>
               </td>
             </tr>
           </tbody>
@@ -250,10 +266,9 @@
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
           Cancel
         </button>
-        <button @click="saveExcelData"
-          :disabled="validationErrors.length > 0"
-          class="px-4 py-2 bg-[#30612E] text-white rounded-md hover:bg-[#245020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          Save
+        <button @click="saveValidRows"
+          class="px-4 py-2 bg-[#30612E] text-white rounded-md hover:bg-[#245020] transition-colors">
+          Save Valid Rows
         </button>
       </div>
     </div>
@@ -991,43 +1006,30 @@ const hasRowError = (index) => {
   return validationErrors.value.some(error => error.includes(`Row ${index + 1}`));
 };
 
-const saveExcelData = async () => {
-  if (validationErrors.value.length > 0) {
-    const result = await Swal.fire({
-      title: 'Validation Warnings',
-      html: `
-        <div class="text-left">
-          <p>There are ${validationErrors.value.length} validation warnings.</p>
-          <p>Would you like to:</p>
-          <ul class="list-disc pl-5">
-            <li>Save only the valid rows</li>
-            <li>Cancel and fix the issues</li>
-          </ul>
-        </div>
-      `,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, save valid rows',
-      cancelButtonText: 'No, cancel',
-      confirmButtonColor: '#30612E',
-      cancelButtonColor: '#d33'
+const getRowErrors = (index) => {
+  return validationErrors.value
+    .filter(error => error.includes(`Row ${index + 1}`))
+    .map(error => error.replace(/^Row \d+: /, ''));
+};
+
+const saveValidRows = async () => {
+  try {
+    // Get all rows with their validation status
+    const processedRows = excelData.value.map((row, index) => {
+      const rowErrors = validationErrors.value.filter(error => 
+        error.startsWith(`Row ${index + 1}:`)
+      );
+      return {
+        row,
+        isValid: rowErrors.length === 0,
+        errors: rowErrors
+      };
     });
 
-    if (!result.isConfirmed) {
-      return;
-    }
-  }
-
-  try {
-    // Filter out rows with validation errors
-    const validGradesData = excelData.value
-      .filter((row, index) => {
-        const rowErrors = validationErrors.value.filter(error => 
-          error.startsWith(`Row ${index + 1}:`)
-        );
-        return rowErrors.length === 0;
-      })
-      .map(row => {
+    // Filter valid rows for submission
+    const validGradesData = processedRows
+      .filter(({ isValid }) => isValid)
+      .map(({ row }) => {
         const student = studentsInSubject.value.find(s => 
           String(s.lrn).trim().replace(/^0+/, '') === String(row.LRN).trim().replace(/^0+/, '')
         );
@@ -1048,7 +1050,7 @@ const saveExcelData = async () => {
         return {
           Student_ID: student?.student_id,
           Subject_ID: props.subject_id,
-          Teacher_ID: localStorage.getItem('teacher_ID'),
+          Teacher_ID: JSON.parse(localStorage.getItem('user')).teacher_ID,
           Class_ID: props.class_id,
           Q1: row.Q1 ? parseFloat(row.Q1) : null,
           Q2: row.Q2 ? parseFloat(row.Q2) : null,
@@ -1065,20 +1067,69 @@ const saveExcelData = async () => {
       return;
     }
 
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Save Valid Rows',
+      html: `
+        <div class="text-left">
+          <p>You have ${validGradesData.length} valid rows and ${excelData.value.length - validGradesData.length} invalid rows.</p>
+          <p>Do you want to save only the valid rows?</p>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, save valid rows',
+      cancelButtonText: 'No, cancel',
+      confirmButtonColor: '#30612E',
+      cancelButtonColor: '#d33'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
     const response = await submitGradesToAPI(validGradesData, props.class_id);
     
     if (response.status === 'success') {
+      // Get invalid rows details
+      const invalidRows = processedRows.filter(({ isValid }) => !isValid);
+      const invalidRowsDetails = invalidRows.map(({ row, errors }) => ({
+        lrn: row.LRN,
+        name: row.Name,
+        errors: errors.map(e => e.replace(/^Row \d+: /, ''))
+      }));
+
+      // Show success message with detailed information about skipped rows
+      const skippedRows = excelData.value.length - validGradesData.length;
+      const skippedRowsInfo = skippedRows > 0 
+        ? `<div class="text-left mt-4">
+            <p class="text-yellow-600 font-semibold">${skippedRows} row(s) were skipped:</p>
+            <ul class="list-disc pl-5 mt-2">
+              ${invalidRowsDetails.map(detail => `
+                <li class="text-sm">
+                  <span class="font-medium">${detail.name} (LRN: ${detail.lrn})</span>
+                  <ul class="list-disc pl-5">
+                    ${detail.errors.map(error => `<li class="text-red-600">${error}</li>`).join('')}
+                  </ul>
+                </li>
+              `).join('')}
+            </ul>
+          </div>` 
+        : '';
+
       Swal.fire({
         title: 'Success',
         html: `
           <div class="text-left">
-            <p>Grades imported successfully!</p>
+            <p class="text-green-600 font-semibold">Grades imported successfully!</p>
             <p>Saved ${validGradesData.length} out of ${excelData.value.length} rows.</p>
-            ${response.errors ? `<p class="text-red-600">${response.errors}</p>` : ''}
+            ${skippedRowsInfo}
+            ${response.errors ? `<p class="text-red-600 mt-4">${response.errors}</p>` : ''}
           </div>
         `,
         icon: 'success',
-        confirmButtonColor: '#30612E'
+        confirmButtonColor: '#30612E',
+        width: '600px'
       });
       showExcelPreview.value = false;
       await fetchGradesFromDatabase();
@@ -1086,7 +1137,7 @@ const saveExcelData = async () => {
       throw new Error(response.message || 'Failed to import grades');
     }
   } catch (error) {
-    console.error('Error saving Excel data:', error);
+    console.error('Error saving valid rows:', error);
     Swal.fire('Error', error.message || 'Failed to save grades', 'error');
   }
 };
