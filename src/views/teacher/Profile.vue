@@ -13,8 +13,9 @@
                     </div>
 
                     <div class="text-center">
-                        <h2 class="text-4xl font-semibold text-gray-800">{{ teacherData.firstName }} {{teacherData.middleName }} {{
-                            teacherData.lastName }}</h2>
+                        <h2 class="text-4xl font-semibold text-gray-800">{{ teacherData.firstName }}
+                            {{ teacherData.middleName }} {{
+                                teacherData.lastName }}</h2>
                         <p class="text-2xl font-semibold">{{ teacherData.position }}</p>
                     </div>
                 </div>
@@ -62,40 +63,38 @@
                 <div class="border-b border-[#E0E0E0] p-5 flex justify-between items-center">
                     <h3 class="text-xl px-3 font-medium text-gray-800">Lesson Plan</h3>
                     <div class="flex gap-2">
-                        <img class="bg-blue p-1 cursor-pointer" src="/assets/img/profile/add.svg" alt="Add Lesson Plan" 
-                             @click="showAddLessonPlanModal = true">
-                        <img class="bg-red p-1 cursor-pointer" src="/assets/img/profile/remove.svg" alt="Remove Lesson Plan"
-                             @click="removeSelectedLessonPlan">
+                        <img class="bg-blue p-1 cursor-pointer" src="/assets/img/profile/add.svg" alt="Add Lesson Plan"
+                            @click="showAddLessonPlanModal = true">
+                        <img class="bg-red p-1 cursor-pointer" src="/assets/img/profile/remove.svg"
+                            alt="Remove Lesson Plan" @click="removeSelectedLessonPlan">
                     </div>
                 </div>
 
-                <div v-for="(plan, index) in lessonPlans" :key="index" 
-                     class="p-5 border-b border-[#E0E0E0] cursor-pointer"
-                     @click="openEditModal(plan)">
+                <div v-for="(plan, index) in lessonPlans" :key="index"
+                    class="p-5 border-b border-[#E0E0E0] cursor-pointer" @click="openEditModal(plan)">
                     <div class="flex items-start gap-4">
                         <div class="flex items-center gap-4 w-1/3">
-                            <input type="checkbox" 
-                                   :checked="selectedLessonPlan.includes(index)"
-                                   @click.stop="toggleLessonPlanSelection(index)"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <input type="checkbox" :checked="selectedLessonPlan.includes(index)"
+                                @click.stop="toggleLessonPlanSelection(index)"
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <div class="pt-2">
                                 <p class="font-semibold">Lesson Plan {{ plan.lessonPlanNo }}</p>
                                 <p class="text-sm text-gray-500">{{ plan.gradeLevel }} - {{ plan.section }}</p>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="w-1/3">
                             <p class="font-semibold mt-1">{{ plan.category }}</p>
                         </div>
                         <div class="w-1/3 flex justify-items-center ">
                             <div class="pt-1">
-                            <span :class="{
-                                'text-orange': plan.status === 'Pending',
-                                'text-red-500': plan.status === 'Declined',
-                                'text-green-500': plan.status === 'Approved'
-                            }">
-                                {{ plan.status }}
-                            </span>
-                        </div>
+                                <span :class="{
+                                    'text-orange': plan.status === 'Pending',
+                                    'text-red-500': plan.status === 'Declined',
+                                    'text-green-500': plan.status === 'Approved'
+                                }">
+                                    {{ plan.status }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <a :href="plan.link" target="_blank" class="text-blue-600 hover:underline mt-2 block ml-8">
@@ -121,15 +120,17 @@
                                 <div class="bg-gray-50 p-6 rounded-lg">
                                     <div class="flex justify-between items-center">
                                         <h4 class="text-xl font-semibold text-gray-800 mb-4">{{ research.Title }}</h4>
-                                        <button @click.stop="deleteResearch(research.Research_ID)" 
-                                                class="text-red-500 hover:text-red-700 cursor-pointer transition-colors duration-200 p-1 rounded hover:bg-red-50">
+                                        <button @click.stop="deleteResearch(research.Research_ID)"
+                                            class="text-red-500 hover:text-red-700 cursor-pointer transition-colors duration-200 p-1 rounded hover:bg-red-50">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
                                     </div>
                                     <p class="text-gray-600 leading-relaxed">{{ research.Abstract }}</p>
-                                    <p class="text-sm text-gray-500 mt-2">Submitted: {{ formatDate(research.created_at) }}</p>
+                                    <p class="text-sm text-gray-500 mt-2">Submitted: {{ formatDate(research.created_at)
+                                        }}</p>
                                 </div>
                             </div>
                         </div>
@@ -274,15 +275,8 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="lessonPlanNo">
                             Lesson Plan No.
                         </label>
-                        <input 
-                            v-model="newLessonPlan.lessonPlanNo" 
-                            type="text" 
-                            id="lessonPlanNo" 
-                            required
-                            pattern="[0-9]*"
-                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        >
+                        <input v-model="newLessonPlan.lessonPlanNo" type="text" id="lessonPlanNo" required readonly
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline cursor-not-allowed">
                     </div>
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="category">
@@ -304,7 +298,8 @@
                                 <option v-for="grade in gradeLevels" :key="grade" :value="grade">{{ grade }}</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
@@ -349,14 +344,9 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Lesson Plan No.</label>
-                        <input 
-                            v-model="editingLessonPlan.lessonPlanNo" 
-                            type="text" 
-                            required
-                            pattern="[0-9]*"
+                        <input v-model="editingLessonPlan.lessonPlanNo" type="text" required pattern="[0-9]*"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        >
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
@@ -368,14 +358,9 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Grade Level</label>
-                        <select 
-                            v-model="editingLessonPlan.gradeLevel" 
-                            required
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8"
-                        >
-                            <option v-for="grade in gradeLevels" 
-                                    :key="grade" 
-                                    :value="grade">
+                        <select v-model="editingLessonPlan.gradeLevel" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-8">
+                            <option v-for="grade in gradeLevels" :key="grade" :value="grade">
                                 {{ grade }}
                             </option>
                         </select>
@@ -408,17 +393,17 @@
     </div>
 
     <div v-if="showDeleteConfirmation" class="fixed inset-0 flex items-center justify-center z-50"
-         style="background-color: rgba(0, 0, 0, 0.8);">
+        style="background-color: rgba(0, 0, 0, 0.8);">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 class="text-2xl font-semibold mb-4">Confirm Delete</h3>
             <p class="mb-6">Are you sure you want to delete this research?</p>
             <div class="flex justify-end gap-3">
                 <button @click="showDeleteConfirmation = false"
-                        class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer">
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer">
                     Cancel
                 </button>
                 <button @click="confirmDelete"
-                        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 cursor-pointer">
+                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 cursor-pointer">
                     Delete
                 </button>
             </div>
@@ -426,17 +411,17 @@
     </div>
 
     <div v-if="showDeleteLessonPlanConfirmation" class="fixed inset-0 flex items-center justify-center z-50"
-         style="background-color: rgba(0, 0, 0, 0.8);">
+        style="background-color: rgba(0, 0, 0, 0.8);">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 class="text-2xl font-semibold mb-4">Confirm Delete</h3>
             <p class="mb-6">Are you sure you want to delete this lesson plan?</p>
             <div class="flex justify-end gap-3">
                 <button @click="showDeleteLessonPlanConfirmation = false"
-                        class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer">
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer">
                     Cancel
                 </button>
                 <button @click="confirmDeleteLessonPlan"
-                        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 cursor-pointer">
+                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 cursor-pointer">
                     Delete
                 </button>
             </div>
@@ -452,12 +437,12 @@
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Lesson Plan No.</label>
                         <input v-model="approvedLessonPlan.lessonPlanNo" type="text" readonly
-                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Category</label>
                         <input v-model="approvedLessonPlan.category" type="text" readonly
-                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                 </div>
 
@@ -465,30 +450,30 @@
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Grade Level</label>
                         <input v-model="approvedLessonPlan.gradeLevel" type="text" readonly
-                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Section</label>
                         <input v-model="approvedLessonPlan.section" type="text" readonly
-                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
                     </div>
                 </div>
 
                 <div class="relative mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Lesson Plan Link</label>
                     <input v-model="approvedLessonPlan.link" type="url" readonly
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
 
                 <div class="relative mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">Comments</label>
                     <textarea v-model="approvedLessonPlan.comments" rows="4" readonly
-                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-100 leading-tight focus:outline-none focus:shadow-outline"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-2">
                     <button type="button" @click="showApprovedLessonPlanModal = false"
-                            class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
+                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-[#cecece] transition-colors duration-200 cursor-pointer">
                         Close
                     </button>
                 </div>
@@ -500,16 +485,16 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { 
-  getProfile, 
-  updateProfile, 
-  updateAvatar, 
-  addResearch, 
-  deleteResearchById,
-  getLessonPlans,
-  addLessonPlan,
-  updateLessonPlan,
-  deleteLessonPlan
+import {
+    getProfile,
+    updateProfile,
+    updateAvatar,
+    addResearch,
+    deleteResearchById,
+    getLessonPlans,
+    addLessonPlan,
+    updateLessonPlan,
+    deleteLessonPlan
 } from '@/service/profileService';
 
 const emit = defineEmits(['logged-in']);
@@ -569,11 +554,11 @@ const prevSlide = () => {
 const saveNewResearch = async () => {
     try {
         const response = await addResearch(newResearch.value);
-        
+
         // Replace the manual unshift with proper refresh
         const profileResponse = await getProfile();
         teacherData.value.research = profileResponse.teacher.research || [];
-        
+
         showAddResearchModal.value = false;
         newResearch.value = { Title: '', Abstract: '' };
         currentSlide.value = 0;
@@ -643,14 +628,14 @@ const saveNewLessonPlan = async () => {
             gradeLevel: lp.grade_level,
             section: lp.section
         }));
-        
-        newLessonPlan.value = { 
-            lessonPlanNo: '', 
-            category: '', 
-            gradeLevel: '', 
+
+        newLessonPlan.value = {
+            lessonPlanNo: '',
+            category: '',
+            gradeLevel: '',
             section: '',
-            link: '', 
-            status: 'Pending' 
+            link: '',
+            status: 'Pending'
         };
         showAddLessonPlanModal.value = false;
     } catch (error) {
@@ -669,11 +654,11 @@ const removeSelectedLessonPlan = () => {
 
 const confirmDeleteLessonPlan = async () => {
     try {
-        await Promise.all(selectedLessonPlan.value.map(index => 
+        await Promise.all(selectedLessonPlan.value.map(index =>
             deleteLessonPlan(lessonPlans.value[index].LessonPlan_ID)
         ));
-        
-        lessonPlans.value = lessonPlans.value.filter((_, index) => 
+
+        lessonPlans.value = lessonPlans.value.filter((_, index) =>
             !selectedLessonPlan.value.includes(index)
         );
         selectedLessonPlan.value = [];
@@ -697,7 +682,7 @@ const openEditModal = (plan) => {
 const saveEditedLessonPlan = async () => {
     try {
         console.log('Editing ID:', editingLessonPlan.value.LessonPlan_ID);
-        
+
         // Always include all fields
         const payload = {
             lesson_plan_no: editingLessonPlan.value.lessonPlanNo.toString(), // Ensure string
@@ -708,17 +693,17 @@ const saveEditedLessonPlan = async () => {
         };
 
         console.log('Update Payload:', payload);
-        
+
         const updated = await updateLessonPlan(
             editingLessonPlan.value.LessonPlan_ID,
             payload
         );
-        
+
         // Update the lessonPlans array reactively
         const index = lessonPlans.value.findIndex(
             p => p.LessonPlan_ID === updated.LessonPlan_ID
         );
-        
+
         if (index !== -1) {
             lessonPlans.value[index] = {
                 ...updated,
@@ -727,7 +712,7 @@ const saveEditedLessonPlan = async () => {
                 section: updated.section
             };
         }
-        
+
         showEditLessonPlanModal.value = false;
     } catch (error) {
         console.error('Full Error:', error);
@@ -744,7 +729,7 @@ const confirmDelete = async () => {
         await deleteResearchById(researchToDelete.value);
         const profileResponse = await getProfile();
         teacherData.value.research = profileResponse.teacher.research || [];
-        
+
         if (currentSlide.value >= teacherData.value.research.length) {
             currentSlide.value = Math.max(0, teacherData.value.research.length - 1);
         }
@@ -775,13 +760,13 @@ onMounted(async () => {
             getProfile(),
             getLessonPlans()
         ]);
-        
+
         teacherData.value = {
             ...profileRes.teacher,
             research: profileRes.teacher.research || [],
             avatar: savedAvatar || profileRes.teacher.avatar || '/assets/img/profile/avatar.png'
         };
-        
+
         lessonPlans.value = lessonRes.map(lp => ({
             ...lp,
             lessonPlanNo: lp.lesson_plan_no,
@@ -828,6 +813,26 @@ const saveApprovedLessonPlan = () => {
 };
 
 watch(() => localStorage.getItem('teacherAvatar'), () => {
-  updateImageFromStorage(); // This should update the avatar in the sidebar
+    updateImageFromStorage(); // This should update the avatar in the sidebar
+});
+
+const generateLessonPlanNumber = () => {
+    // If there are no lesson plans, start with 1
+    if (lessonPlans.value.length === 0) {
+        return '1';
+    }
+
+    // Find the highest lesson plan number and increment it
+    const highestNumber = Math.max(...lessonPlans.value.map(plan =>
+        parseInt(plan.lessonPlanNo) || 0
+    ));
+
+    return (highestNumber + 1).toString();
+};
+
+watch(showAddLessonPlanModal, (newValue) => {
+    if (newValue) {
+        newLessonPlan.value.lessonPlanNo = generateLessonPlanNumber();
+    }
 });
 </script>
