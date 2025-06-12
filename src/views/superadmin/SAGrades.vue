@@ -105,7 +105,7 @@ function goToInsideCard(card) {
   router.push({
     name: 'subjectcards',
     params: {
-      grade: card.grade,
+      Grade: card.grade,
       section: card.section
     }
   });

@@ -1035,6 +1035,12 @@ export default {
         filteredTableData() {
             let filteredData = this.dummyTableData[this.enteredIdx] || [];
 
+            // 🔹 Filter by Track
+            if (this.selectedClass?.Track) {
+                filteredData = filteredData.filter(row => row.track === this.selectedClass.Track);
+            }
+
+            // 🔹 Filter by Gender
             if (this.rightGender && this.rightGender !== "All") {
                 filteredData = filteredData.filter(row => {
                     const rowGender = row.gender.toLowerCase();
@@ -1043,6 +1049,7 @@ export default {
                 });
             }
 
+            // 🔹 Filter by Search
             if (this.rightSearch) {
                 const searchTerm = this.rightSearch.toLowerCase();
                 filteredData = filteredData.filter(row =>
@@ -1051,7 +1058,7 @@ export default {
                 );
             }
 
-            // Sort by created_at if rightSort is set
+            // 🔹 Sort by created_at
             if (this.rightSort) {
                 filteredData.sort((a, b) => {
                     const dateA = new Date(a.created_at);
