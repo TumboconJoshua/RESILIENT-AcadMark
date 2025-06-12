@@ -38,7 +38,7 @@
         <div class="flex flex-col gap-2">
           <label class="text-blue font-semibold text-2xl" for="comment">REASON FOR DROP-OUT</label>
           <textarea rows="5" class="border border-gray-300 rounded-lg p-2" placeholder="Comment the reason here"
-            v-model="dropOutFormData.drop_out_comments" required></textarea>
+            v-model="dropOutFormData.drop_out_comments" required disabled></textarea>
         </div>
 
         <!-- Buttons -->
@@ -53,7 +53,7 @@
 
 <script setup>
 import { defineProps, defineEmits, computed } from 'vue'
-import { acceptDropStudent } from '@/service/studentService'
+import { acceptDropStudent, rejectDropStudent } from '@/service/studentService'
 import Swal from 'sweetalert2';
 
 const props = defineProps({
@@ -93,6 +93,35 @@ const dropOutStudent = async () => {
       icon: 'error',
       title: 'Error!',
       text: error.message || 'Failed to mark student as Drop-Out.',
+    });
+  }
+};
+
+const rejectAlert = async () => {
+  try {
+    const studentId = props.dropOutFormData.Student_ID;
+    const response = await rejectDropStudent(studentId);
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: response.message || 'Student status updated to Pending.',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    emit('submit', props.dropOutFormData); // notify parent of submission
+    emit('close'); // notify parent to close modal
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  } catch (error) {
+    console.error('Failed to reject drop out:', error);
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: error.message || 'Failed to update student status.',
     });
   }
 };

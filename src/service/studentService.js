@@ -90,13 +90,26 @@ export const dropStudent = async (studentId, dropOutComments = '') => {
     }
 };
 
-export const acceptDropStudent = async (studentId) => {
+    export const acceptDropStudent = async (studentId) => {
+        try {
+            const payload = { student_id: studentId };
+
+            const response = await API.post('/students/approve-mark-dropout', payload);
+            return response.data;
+        } catch (error) {
+            throw error.response ? error.response.data : error;
+        }
+    };
+
+
+export const rejectDropStudent = async (studentId) => {
     try {
         const payload = { student_id: studentId };
 
-        const response = await API.post('/students/approve-mark-dropout', payload);
+        const response = await API.post('/students/reject-mark-dropout', payload);
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : error;
     }
-  };
+};
+    

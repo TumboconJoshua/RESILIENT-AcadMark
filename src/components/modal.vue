@@ -81,7 +81,7 @@
                     <div class="p-6 border-b border-gray-200">
                         <h2 class="text-2xl font-semibold text-gray-800">Student Information</h2>
                     </div>
-                    <div class="p-10 flex flex-col gap-5">
+                        <div class="p-10 flex flex-col gap-5">
                         <div class="flex flex-col gap-3">
                             <div class="flex gap-10">
                                 <div class="flex flex-col gap-1">

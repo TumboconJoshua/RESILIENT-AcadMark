@@ -24,8 +24,17 @@
             <label>Last Name</label>
           </div>
           <div class="floating-label flex-1" :class="{ filled: suffix }">
-            <input v-model="suffix" type="text" placeholder=" " class="input" />
+            <select v-model="suffix" class="input">
+              <option value="" disabled selected hidden>Suffix</option>
+              <option value="Sr.">Sr.</option>
+              <option value="Jr.">Jr.</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+            </select>
             <label>Suffix</label>
+            <span class="custom-arrow"></span>
           </div>
         </div>
 
@@ -95,32 +104,29 @@
         <div v-if="selectedAccession === 'Teacher'">
           <h1 class="font-semibold text-[#295f98] mb-2">Teacher Subject</h1>
           <div class="flex gap-4 mb-4">
-            <div class="floating-label flex-1" :class="{ filled: subject1 }">
-              <select v-model="subject1" class="input" required>
-                <option value="" disabled selected hidden></option>
+            <div v-for="(field, idx) in 5" :key="idx" class="floating-label flex-1 relative" :class="{ filled: subjectFields[idx] }" v-show="idx === 0 || showSubjects[idx]">
+              <select v-model="subjectFields[idx]" class="input" :required="idx === 0">
+                <option value="" disabled selected hidden>Select Subject {{ idx + 1 }}</option>
                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
               </select>
-              <label>{{ subject1 ? capitalize(subject1) : 'Subject 1' }}</label>
+              <label>{{ subjectFields[idx] ? capitalize(subjectFields[idx]) : `Subject ${idx + 1}` }}</label>
               <span class="custom-arrow"></span>
+              <!-- Add/Remove buttons inside each field -->
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                <button
+                  v-if="idx > 0 && showSubjects[idx]"
+                  type="button"
+                  @click="toggleSubjectField(idx, 'remove')"
+                  class="px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700 text-sm"
+                >-</button>
+                <button
+                  v-if="idx === lastVisibleSubjectIdx && idx < 4"
+                  type="button"
+                  @click="toggleSubjectField(idx + 1, 'add')"
+                  class="px-2 py-1 text-white rounded bg-blue-600 hover:bg-blue-700 text-sm"
+                >+</button>
+              </div>
             </div>
-
-            <div v-if="showSubject2" class="floating-label flex-1" :class="{ filled: subject2 }">
-              <select v-model="subject2" class="input">
-                <option value="" disabled selected hidden></option>
-                <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
-              </select>
-              <label>{{ subject2 ? capitalize(subject2) : 'Subject 2' }}</label>
-              <span class="custom-arrow"></span>
-            </div>
-
-            <button
-              type="button"
-              @click="toggleSubject2"
-              class="px-5 py-3.5 text-white rounded cursor-pointer"
-              :class="showSubject2 ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'"
-            >
-              {{ showSubject2 ? '-' : '+' }}
-            </button>
           </div>
         </div>
 
@@ -163,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import personnelService from '@/service/personnelService';
@@ -179,8 +185,6 @@ const suffix = ref('');
 const employeeNumber = ref('');
 const educationalAttainment = ref('');
 const teachingPosition = ref('');
-const subject1 = ref('');
-const subject2 = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
@@ -189,8 +193,18 @@ const birthDate = ref('');
 const sex = ref('');
 const contactNumber = ref('');
 const address = ref('');
-const showSubject2 = ref(false);
+const showSubjects = ref([true, false, false, false, false]);
+const subjectFields = ref(['', '', '', '', '']);
 const subjects = ref([]);
+
+// Helper to find the last visible subject field index
+const lastVisibleSubjectIdx = computed(() => {
+  let idx = 0;
+  for (let i = 0; i < showSubjects.value.length; i++) {
+    if (showSubjects.value[i]) idx = i;
+  }
+  return idx;
+});
 
 // Validation helpers
 const isTextOnly = value => /^[A-Za-z\s]+$/.test(value || '');
@@ -203,12 +217,22 @@ const is18OrOlder = date => {
   return age > 18 || (age === 18 && m >= 0 && today.getDate() >= birth.getDate());
 };
 
-const toggleSubject2 = () => {
-  showSubject2.value = !showSubject2.value;
-  if (!showSubject2.value) subject2.value = '';
+const toggleSubjectField = (idx, action) => {
+  if (action === 'add') {
+    // Find the next hidden field after the last visible one
+    for (let i = 0; i < showSubjects.value.length; i++) {
+      if (!showSubjects.value[i]) {
+        showSubjects.value[i] = true;
+        break;
+      }
+    }
+  } else if (action === 'remove') {
+    showSubjects.value[idx] = false;
+    subjectFields.value[idx] = '';
+  }
 };
 
-const getSelectedSubjects = () => [subject1.value, subject2.value].filter(Boolean);
+const getSelectedSubjects = () => subjectFields.value.filter(Boolean);
 
 const capitalize = str => (typeof str === 'string' && str.length ? str.charAt(0).toUpperCase() + str.slice(1) : '');
 
@@ -225,7 +249,7 @@ const getMissingFields = () => {
   if (!password.value) missing.push('Password');
   if (!confirmPassword.value) missing.push('Confirm Password');
   if (!selectedAccession.value) missing.push('Accession');
-  if (selectedAccession.value === 'Teacher' && !subject1.value) missing.push('Subject 1');
+  if (selectedAccession.value === 'Teacher' && !subjectFields.value[0]) missing.push('Subject 1');
 
   if (contactNumber.value && !isValidContact(contactNumber.value)) missing.push('Valid 11-digit Contact Number');
   if (birthDate.value && !is18OrOlder(birthDate.value)) missing.push('Birthdate must be 18 or older');
@@ -286,11 +310,12 @@ const handleSubmit = async () => {
       // Reset all fields
       [
         firstName, middleName, lastName, suffix, employeeNumber,
-        educationalAttainment, teachingPosition, subject1, subject2,
+        educationalAttainment, teachingPosition,
         email, password, confirmPassword, selectedAccession,
         birthDate, sex, contactNumber, address,
       ].forEach(field => (field.value = ''));
-      showSubject2.value = false;
+      subjectFields.value = ['', '', '', '', ''];
+      showSubjects.value = [true, false, false, false, false];
 
       emit('update:modelValue', false);
       Swal.fire({ icon: 'success', title: 'Saved!', text: 'Faculty member has been saved successfully.', timer: 1500, showConfirmButton: false });
@@ -305,7 +330,7 @@ const handleSubmit = async () => {
 onMounted(async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://26.131.123.208:8000/api/subjects', {
+    const response = await axios.get('http://127.0.0.1:8000/api/subject/getSubjects', {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
@@ -316,6 +341,13 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to fetch subjects:', error);
+  }
+});
+
+watch(selectedAccession, (val) => {
+  if (val !== 'Teacher') {
+    subjectFields.value = ['', '', '', '', ''];
+    showSubjects.value = [true, false, false, false, false];
   }
 });
 </script>

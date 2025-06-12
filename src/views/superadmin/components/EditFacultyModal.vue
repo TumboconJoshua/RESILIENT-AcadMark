@@ -41,8 +41,17 @@
             <label>Last Name</label>
           </div>
           <div class="floating-label flex-1" :class="{ filled: suffix }">
-            <input v-model="suffix" type="text" placeholder=" " class="input" />
+            <select v-model="suffix" class="input">
+              <option value="" disabled selected hidden>Select Suffix</option>
+              <option value="Sr.">Sr.</option>
+              <option value="Jr.">Jr.</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+            </select>
             <label>Suffix</label>
+            <span class="custom-arrow"></span>
           </div>
         </div>
 
@@ -167,36 +176,28 @@
     <div v-if="selectedAccession === 'Teacher'">
       <h1 class="font-semibold text-[#295f98] mb-2">Teacher Subject</h1>
       <div class="flex gap-4 mb-4">
-       <div class="floating-label flex-1" :class="{ filled: subject1 }">
-  <select v-model="subject1" class="input" required>
-    <option value="" disabled selected hidden>Select Subject 1</option>
-    <option v-for="subject in subjects" :key="subject.id" :value="String(subject.id)">
-      {{ subject.name }}
-    </option>
-  </select>
-  <label>{{ subject1 ? capitalize(subject1) : 'Subject 1' }}</label>
-  <span class="custom-arrow"></span>
-</div>
-
-<div v-if="showSubject2" class="floating-label flex-1" :class="{ filled: subject2 }">
-  <select v-model="subject2" class="input">
-    <option value="" disabled selected hidden>Select Subject 2</option>
-    <option v-for="subject in subjects" :key="subject.id" :value="String(subject.id)">
-      {{ subject.name }}
-    </option>
-  </select>
-  <label>{{ subject2 ? capitalize(subject2) : 'Subject 2' }}</label>
-  <span class="custom-arrow"></span>
-</div>
-
-        <button
-          type="button"
-          @click="toggleSubject2"
-          class="px-5 py-3.5 text-white rounded cursor-pointer"
-          :class="showSubject2 ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'"
-        >
-          {{ showSubject2 ? '-' : '+' }}
-        </button>
+        <div v-for="(field, idx) in 5" :key="idx" class="floating-label flex-1 relative" :class="{ filled: subjectFields[idx] }" v-show="idx === 0 || showSubjects[idx]">
+          <select v-model="subjectFields[idx]" class="input" :required="idx === 0">
+            <option value="" disabled selected hidden>Select Subject {{ idx + 1 }}</option>
+            <option v-for="subject in props.subjects" :key="subject.id" :value="String(subject.id)">{{ subject.name }}</option>
+          </select>
+          <label>{{ subjectFields[idx] ? capitalize(subjectFields[idx]) : `Subject ${idx + 1}` }}</label>
+          <span class="custom-arrow"></span>
+          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+            <button
+              v-if="idx > 0 && showSubjects[idx]"
+              type="button"
+              @click="toggleSubjectField(idx, 'remove')"
+              class="px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700 text-sm"
+            >-</button>
+            <button
+              v-if="idx === lastVisibleSubjectIdx && idx < 4"
+              type="button"
+              @click="toggleSubjectField(idx + 1, 'add')"
+              class="px-2 py-1 text-white rounded bg-blue-600 hover:bg-blue-700 text-sm"
+            >+</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -251,7 +252,7 @@
 
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import Swal from 'sweetalert2';
 import personnelService from '@/service/personnelService';
 
@@ -276,28 +277,44 @@ const birthDate = ref('');
 const sex = ref('');
 const contactNumber = ref('');
 const address = ref('');
-const subject1 = ref('');
-const subject2 = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const selectedAccession = ref('');
 
+// --- SUBJECT FIELDS (UP TO 5) ---
+const showSubjects = ref([true, false, false, false, false]);
+const subjectFields = ref(['', '', '', '', '']);
+
+// Helper to find the last visible subject field index
+const lastVisibleSubjectIdx = computed(() => {
+  let idx = 0;
+  for (let i = 0; i < showSubjects.value.length; i++) {
+    if (showSubjects.value[i]) idx = i;
+  }
+  return idx;
+});
+
+const toggleSubjectField = (idx, action) => {
+  if (action === 'add') {
+    for (let i = 0; i < showSubjects.value.length; i++) {
+      if (!showSubjects.value[i]) {
+        showSubjects.value[i] = true;
+        break;
+      }
+    }
+  } else if (action === 'remove') {
+    showSubjects.value[idx] = false;
+    subjectFields.value[idx] = '';
+  }
+};
 
 watch(selectedAccession, (val) => {
   if (val !== 'Teacher') {
-    subject1.value = '';
-    subject2.value = '';
-    showSubject2.value = false;
+    subjectFields.value = ['', '', '', '', ''];
+    showSubjects.value = [true, false, false, false, false];
   }
 });
-
-const showSubject2 = ref(false);
-
-function capitalize(subjectId) {
-  const subject = props.subjects?.find(s => String(s.id) === String(subjectId));
-  return subject ? subject.name : '';
-}
 
 // Load initial values into the form
 watch(
@@ -316,46 +333,25 @@ watch(
       sex.value = d.Sex || '';
       contactNumber.value = d.ContactNumber || '';
       address.value = d.Address || '';
-      // Try all possible subject sources for best compatibility
+      // --- SUBJECT POPULATION LOGIC ---
       let subjArr = [];
       if (Array.isArray(d.assigned_subjects) && d.assigned_subjects.length > 0) {
         subjArr = d.assigned_subjects;
       } else if (Array.isArray(d.subjects) && d.subjects.length > 0) {
-        // fallback for 'subjects' array
         subjArr = d.subjects;
-      }
-      if (subjArr.length > 0) {
-        // Support both {Subject_ID} and {id}
-        subject1.value = subjArr[0]?.Subject_ID ? String(subjArr[0].Subject_ID) : (subjArr[0]?.id ? String(subjArr[0].id) : '');
-        if (subjArr[1]) {
-          subject2.value = subjArr[1]?.Subject_ID ? String(subjArr[1].Subject_ID) : (subjArr[1]?.id ? String(subjArr[1].id) : '');
-          showSubject2.value = true;
-        } else {
-          subject2.value = '';
-          showSubject2.value = false;
-        }
       } else if (Array.isArray(d.Subject_IDs)) {
-        subject1.value = d.Subject_IDs[0] !== undefined && d.Subject_IDs[0] !== null ? String(d.Subject_IDs[0]) : '';
-        if (d.Subject_IDs[1] !== undefined && d.Subject_IDs[1] !== null) {
-          subject2.value = String(d.Subject_IDs[1]);
-          showSubject2.value = true;
-        } else {
-          subject2.value = '';
-          showSubject2.value = false;
-        }
+        subjArr = d.Subject_IDs.map(id => ({ id }));
       } else {
-        subject1.value = d.Subject1 !== undefined && d.Subject1 !== null ? String(d.Subject1) : '';
-        if (d.Subject2 !== undefined && d.Subject2 !== null) {
-          subject2.value = String(d.Subject2);
-          showSubject2.value = true;
-        } else {
-          subject2.value = '';
-          showSubject2.value = false;
-        }
+        subjArr = [d.Subject1, d.Subject2, d.Subject3, d.Subject4, d.Subject5].filter(Boolean).map(id => ({ id }));
+      }
+      subjectFields.value = ['', '', '', '', ''];
+      showSubjects.value = [true, false, false, false, false];
+      for (let i = 0; i < Math.min(subjArr.length, 5); i++) {
+        subjectFields.value[i] = subjArr[i]?.Subject_ID ? String(subjArr[i].Subject_ID) : (subjArr[i]?.id ? String(subjArr[i].id) : '');
+        showSubjects.value[i] = true;
       }
       email.value = d.Email || '';
       selectedAccession.value = d.Accession || d.Position || '';
-      // Fix: If value is 'Book-keeping', ensure it matches the radio value exactly
       if (selectedAccession.value && selectedAccession.value.toLowerCase().replace(/[-_ ]/g, '') === 'bookkeeping') {
         selectedAccession.value = 'Book-keeping';
       }
@@ -373,7 +369,7 @@ const toggleSubject2 = () => {
 
 // Handle form submission
 const handleSubmit = async () => {
-  if (selectedAccession.value === 'Teacher' && !subject1.value) {
+  if (selectedAccession.value === 'Teacher' && !subjectFields.value[0]) {
     Swal.fire({
       icon: 'error',
       title: 'Validation Error',
@@ -389,7 +385,6 @@ const handleSubmit = async () => {
     });
     return;
   }
-
   const teacherId = props.facultyData?.id;
   const payload = {
     FirstName: firstName.value,
@@ -407,10 +402,7 @@ const handleSubmit = async () => {
     Email: email.value,
     Accession: selectedAccession.value,
     ...(selectedAccession.value === 'Teacher' && {
-      Subject_IDs: [
-        subject1.value ? Number(subject1.value) : null,
-        showSubject2.value && subject2.value ? Number(subject2.value) : null
-      ].filter(v => v),
+      Subject_IDs: subjectFields.value.filter(Boolean).map(Number),
     }),
     ...(password.value && { Password: password.value }),
   };
@@ -423,8 +415,8 @@ const handleSubmit = async () => {
       timer: 1500,
       showConfirmButton: false,
     });
-    emit('updated', payload); // Pass the updated data to the parent
-    emit('update:modelValue', false); // Close the modal
+    emit('updated', payload);
+    emit('update:modelValue', false);
   } catch (error) {
     Swal.fire({
       icon: 'error',
@@ -432,6 +424,11 @@ const handleSubmit = async () => {
       text: error.response?.data?.message || error.message,
     });
   }
+};
+
+const capitalize = (subjectId) => {
+  const subject = props.subjects?.find(s => String(s.id) === String(subjectId));
+  return subject ? subject.name : '';
 };
 </script>
 
