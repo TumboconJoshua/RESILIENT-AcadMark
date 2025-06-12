@@ -19,20 +19,18 @@
       <!-- Select All Checkbox -->
       <div class="mt-4 flex items-center justify-end gap-2">
         <label for="select-all" class="ml-2 text-xs">Select All</label>
-        <input type="checkbox" class="checkbox mr-[35px]" id="select-all" v-model="selectAll"
-          @change="toggleSelectAll" :disabled="isLoading" />
+        <input type="checkbox" class="checkbox mr-[35px]" id="select-all" v-model="selectAll" @change="toggleSelectAll"
+          :disabled="isLoading" />
       </div>
 
       <!-- Displaying Student Names Dynamically -->
       <div class="mt-4 overflow-y-auto overflow-x-auto scrollbar-hide max-h-[230px]">
         <ul v-if="filteredStudents.length > 0">
           <li v-for="(student, index) in filteredStudents" :key="index"
-            class="flex justify-between py-2 mr-3 rounded-md transition-colors duration-200 px-2 cursor-pointer"
-            :class="{ 
+            class="flex justify-between py-2 mr-3 rounded-md transition-colors duration-200 px-2 cursor-pointer" :class="{
               'bg-blue-100 border-blue': isSelectedStudent(student),
-              'opacity-50': isLoading 
-            }"
-            @click="handleStudentClick(student)">
+              'opacity-50': isLoading
+            }" @click="handleStudentClick(student)">
             <div class="flex items-center gap-5">
               <!-- Conditional background color based on grade presence for the current quarter -->
               <div :class="{
@@ -59,11 +57,9 @@
       </div>
 
       <div class="flex justify-end mt-2 mr-5">
-        <button 
-          class="bg-blue px-3 py-2 text-xs font-semibold text-white rounded-sm cursor-pointer"
+        <button class="bg-blue px-3 py-2 text-xs font-semibold text-white rounded-sm cursor-pointer"
           :class="{ 'opacity-50 cursor-not-allowed': !canSubmitGrades, 'hover:bg-[#cecece]': canSubmitGrades }"
-          @click="submitGrades"
-          :disabled="!canSubmitGrades">
+          @click="submitGrades" :disabled="!canSubmitGrades">
           Submit Grades
         </button>
       </div>
@@ -79,7 +75,7 @@
               <p class="text-blue text-xs font-bold">Student Name</p>
               <div class="relative">
                 <p class="text-2xl font-medium">
-                  {{ selectedStudent ? selectedStudent.firstName + " " + 
+                  {{ selectedStudent ? selectedStudent.firstName + " " +
                     selectedStudent.middleName + " " + selectedStudent.lastName : '(Select a Student)' }}
                 </p>
               </div>
@@ -138,15 +134,8 @@
           <div>
             <p class="text-blue text-xs font-bold">Quarter Grade</p>
             <div class="relative">
-              <input 
-                type="text" 
-                class="border-[1px] w-35 h-9 text-center" 
-                v-model="Grade" 
-                @input="validateGrade"
-                maxlength="3" 
-                pattern="[0-9]*" 
-                inputmode="numeric" 
-                :disabled="!canInputGrade || isLoading" />
+              <input type="text" class="border-[1px] w-35 h-9 text-center" v-model="Grade" @input="validateGrade"
+                maxlength="5" pattern="[0-9]*\.?[0-9]*" inputmode="decimal" :disabled="!canInputGrade || isLoading" />
               <!-- Loading overlay -->
               <div v-if="isLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center">
                 <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue"></div>
@@ -164,10 +153,8 @@
         <p class="italic text-xs">You are grading for <span class="font-bold mt-5">{{ selectedQuarter }}</span></p>
       </div>
 
-      <button 
-        class="max-w-28 h-8 rounded-md text-white font-semibold text-md hover:bg-[#cecece] cursor-pointer"
-        :class="isEditMode ? 'bg-yellow-500' : 'bg-blue'"
-        @click="toggleEditMode">
+      <button class="max-w-28 h-8 rounded-md text-white font-semibold text-md hover:bg-[#cecece] cursor-pointer"
+        :class="isEditMode ? 'bg-yellow-500' : 'bg-blue'" @click="toggleEditMode">
         {{ isEditMode ? 'Edit' : 'Save' }}
       </button>
 
@@ -259,7 +246,7 @@ const loadGrade = async () => {
         const studentGrade = response.data.find(
           grade => grade.Student_ID === selectedStudent.value.student_id
         );
-        
+
         if (studentGrade) {
           const gradeKey = quarterMapping[selectedQuarter.value];
           Grade.value = studentGrade.grades[gradeKey] || '';
@@ -296,7 +283,7 @@ const remarks = computed(() => {
   if (!Grade.value) {
     return '';
   }
-  return parseFloat(Grade.value) <= 75 ? 'Failed' : 'Passed';
+  return parseFloat(Grade.value) <= 74.4 ? 'Failed' : 'Passed';
 });
 
 function nextStudent() {
@@ -331,7 +318,7 @@ async function saveGradesToLocalStorage() {
   try {
     // Get existing grades for the student
     const existingGrades = selectedStudent.value.grades;
-    
+
     const gradeData = {
       Student_ID: selectedStudent.value.student_id,
       Subject_ID: props.subject_id,
@@ -362,7 +349,7 @@ async function saveGradesToLocalStorage() {
     }
 
     const response = await submitGradesToAPI([gradeData], props.class_id);
-    
+
     if (response.status === 'success') {
       Swal.fire('Success', 'Grade saved successfully!', 'success');
       // Refresh the grades after saving
@@ -373,7 +360,7 @@ async function saveGradesToLocalStorage() {
   } catch (error) {
     console.error('Error saving grade:', error);
     let errorMessage = 'Failed to save grade. Please try again.';
-    
+
     if (error.response?.data?.message) {
       errorMessage = error.response.data.message;
     } else if (error.message) {
@@ -424,7 +411,7 @@ async function submitGrades() {
 
   // Get selected students
   const selectedStudents = studentsInSubject.value.filter(student => student.selected);
-  
+
   // Check if any selected students have null grades
   const studentsWithNullGrades = selectedStudents.filter(student => {
     const gradeKey = quarterMapping[selectedQuarter.value];
@@ -436,7 +423,7 @@ async function submitGrades() {
     Swal.fire({
       icon: 'error',
       title: 'Cannot Submit',
-      text: `The following students have no grades: ${studentsWithNullGrades.map(student => 
+      text: `The following students have no grades: ${studentsWithNullGrades.map(student =>
         `${student.firstName} ${student.lastName}`
       ).join(', ')}`,
       confirmButtonColor: '#dc2626'
@@ -470,7 +457,7 @@ async function submitGrades() {
 
     if (result.isConfirmed) {
       const response = await submitGradesToAPI(gradesData, classId);
-      
+
       if (response.status === 'success') {
         Swal.fire('Success', 'Grades submitted successfully!', 'success');
         // Refresh the grades after submission
@@ -482,7 +469,7 @@ async function submitGrades() {
   } catch (error) {
     console.error('Error:', error);
     let errorMessage = 'Failed to submit grades. Please try again.';
-    
+
     if (error.response?.data?.message) {
       errorMessage = error.response.data.message;
     } else if (error.message) {
@@ -513,7 +500,7 @@ function calculateFinalGrade(grades) {
 
 function calculateRemarks(grades) {
   const finalGrade = calculateFinalGrade(grades);
-  return finalGrade ? (finalGrade >= 75 ? 'Passed' : 'Failed') : null;
+  return finalGrade ? (finalGrade >= 75.5 ? 'Passed' : 'Failed') : null;
 }
 
 function prevStudent() {
@@ -526,7 +513,7 @@ const remarksClass = computed(() => {
   if (!Grade.value) {
     return '';
   }
-  return parseFloat(Grade.value) <= 75 ? 'text-red-500' : 'text-green-500';
+  return parseFloat(Grade.value) <= 74.4 ? 'text-red-500' : 'text-green-500';
 });
 
 watch(selectedQuarter, loadGrade);
@@ -549,7 +536,7 @@ async function fetchGradesFromDatabase() {
 
     // Get students
     const studentsResponse = await classService.getClassStudents(classId);
-    
+
     // Get grades
     const gradesResponse = await getSubjectGrades(props.subject_id, classId);
 
@@ -656,8 +643,21 @@ function validateGrade(event) {
   }
 
   // Then proceed with normal grade validation
-  Grade.value = Grade.value.replace(/[^0-9]/g, '');
-  const numValue = parseInt(Grade.value);
+  // Allow only numbers and one decimal point
+  Grade.value = Grade.value.replace(/[^0-9.]/g, '');
+
+  // Ensure only one decimal point
+  const parts = Grade.value.split('.');
+  if (parts.length > 2) {
+    Grade.value = parts[0] + '.' + parts.slice(1).join('');
+  }
+
+  // Limit to 2 decimal places
+  if (parts.length > 1 && parts[1].length > 2) {
+    Grade.value = parts[0] + '.' + parts[1].slice(0, 2);
+  }
+
+  const numValue = parseFloat(Grade.value);
   if (numValue > 100) {
     Grade.value = '100';
   }
@@ -699,7 +699,7 @@ async function refreshGrades() {
 
 function validateGradeData(gradeData) {
   const errors = [];
-  
+
   if (!gradeData.Student_ID) {
     errors.push('Student ID is required');
   }
@@ -709,7 +709,7 @@ function validateGradeData(gradeData) {
   if (!gradeData.Teacher_ID) {
     errors.push('Teacher ID is required');
   }
-  
+
   // Validate quarter grades
   ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
     if (gradeData[quarter] !== null) {
@@ -763,7 +763,7 @@ function handleStudentClick(student) {
   // Toggle student selection
   student.selected = !student.selected;
   setStudentInfo(studentsInSubject.value.findIndex(s => s.student_id === student.student_id));
-  
+
   // Enable edit mode when selecting a student
   isEditMode.value = false; // This will enable the input since we inverted the disabled logic
 }
@@ -780,13 +780,13 @@ const hasGrade = computed(() => {
 function checkPreviousQuarters(student, currentQuarter) {
   const quarterOrder = ['1st', '2nd', '3rd', '4th'];
   const currentIndex = quarterOrder.indexOf(currentQuarter);
-  
+
   // Check all previous quarters
   for (let i = 0; i < currentIndex; i++) {
     const prevQuarter = quarterOrder[i];
     const gradeKey = quarterMapping[prevQuarter];
     const grade = student.grades[gradeKey];
-    
+
     if (!grade || grade === '') {
       return {
         canGrade: false,
@@ -794,14 +794,14 @@ function checkPreviousQuarters(student, currentQuarter) {
       };
     }
   }
-  
+
   return { canGrade: true };
 }
 
 // Add a new computed property to check if input is allowed
 const canInputGrade = computed(() => {
   if (!selectedStudent.value) return false;
-  
+
   const checkResult = checkPreviousQuarters(selectedStudent.value, selectedQuarter.value);
   return checkResult.canGrade;
 });

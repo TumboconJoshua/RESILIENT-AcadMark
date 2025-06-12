@@ -113,7 +113,7 @@ const error = ref(null);
 const loadSubjectData = async () => {
   loading.value = true;
   error.value = '';
-  
+
   try {
     const response = await getSubjectGrades(props.subject_id, props.class_id);
     console.log('API Response:', response);
@@ -151,7 +151,7 @@ const getGradeForQuarter = (student, quarter) => {
   if (!student.status || student.status.toLowerCase() !== 'approved') {
     return '-';
   }
-  
+
   const grade = student.grades?.[quarter];
   if (!grade || grade === null || grade === undefined || grade === '' || grade === '-' || grade === 'No grade') {
     return '-';
@@ -191,7 +191,7 @@ const getRemarks = (student) => {
 
   const finalGrade = getFinalGrade(student);
   if (finalGrade === '-') return '-';
-  return parseFloat(finalGrade) >= 75 ? 'Passed' : 'Failed';
+  return parseFloat(finalGrade) >= 74.5 ? 'Passed' : 'Failed';
 };
 
 const gradeToNumeric = (grade) => {
