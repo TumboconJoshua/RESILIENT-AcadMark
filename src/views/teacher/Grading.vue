@@ -16,6 +16,25 @@
         <p class="font-semibold text-lg">{{ formattedDate }}</p>
       </div>
 
+      <!-- Add Excel Import/Export buttons -->
+      <div class="flex gap-2 mt-4">
+        <button @click="downloadTemplate"
+          class="bg-[#30612E] text-white px-5 py-1 rounded-md hover:bg-[#cecece] transition-colors cursor-pointer duration-200">
+          <p class="w-full">Download Template</p>
+        </button>
+        <input
+          type="file"
+          ref="fileInput"
+          accept=".xlsx,.xls"
+          class="hidden"
+          @change="handleFileUpload"
+        />
+        <button @click="$refs.fileInput.click()"
+          class="bg-[#30612E] text-white px-5 py-1 rounded-md hover:bg-[#cecece] transition-colors cursor-pointer duration-200">
+          <p class="w-full">Import Excel</p>
+        </button>
+      </div>
+
       <!-- Select All Checkbox -->
       <div class="mt-4 flex items-center justify-end gap-2">
         <label for="select-all" class="ml-2 text-xs">Select All</label>
@@ -180,6 +199,66 @@
     </div>
   </div>
 
+  <!-- Add Excel Preview Modal -->
+  <div v-if="showExcelPreview" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: transparent;">
+    <div class="bg-white p-6 rounded-lg w-[90%] max-h-[80vh] overflow-hidden flex flex-col shadow-xl">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Excel Preview</h2>
+        <button @click="showExcelPreview = false" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Validation Errors -->
+      <div v-if="validationErrors.length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h3 class="font-bold text-red-700 mb-2">Validation Errors:</h3>
+        <ul class="list-disc pl-5 text-red-600">
+          <li v-for="(error, index) in validationErrors" :key="index" class="text-sm">{{ error }}</li>
+        </ul>
+      </div>
+
+      <!-- Table Container -->
+      <div class="flex-1 overflow-auto">
+        <table class="w-full border-collapse">
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
+              <th v-for="header in excelHeaders" :key="header" 
+                  class="px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">
+                {{ header }}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr v-for="(row, index) in excelData" :key="index" 
+                :class="{'bg-red-50': hasRowError(index), 'hover:bg-gray-50': !hasRowError(index)}"
+                class="border-b border-gray-200">
+              <td v-for="header in excelHeaders" :key="header" 
+                  class="px-4 py-3 text-sm text-gray-700">
+                {{ row[header] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-4 pt-4 border-t border-gray-200 flex justify-end gap-3">
+        <button @click="showExcelPreview = false"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+          Cancel
+        </button>
+        <button @click="saveExcelData"
+          :disabled="validationErrors.length > 0"
+          class="px-4 py-2 bg-[#30612E] text-white rounded-md hover:bg-[#245020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Move the modal outside the main container -->
   <div v-if="showSubmitSuccess" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
     <div class="bg-white rounded-xl p-8 text-center shadow-xl max-w-sm w-full">
@@ -201,6 +280,7 @@ import { classService } from '@/service/classService';
 import { submitGrades as submitGradesToAPI, getSubjectGrades } from '@/service/gradeService';
 import Swal from 'sweetalert2';
 import { useRoute } from 'vue-router';
+import * as XLSX from 'xlsx';
 
 const props = defineProps({
   trackStand: String,
@@ -229,6 +309,11 @@ const showSubmitSuccess = ref(false);
 const isEditMode = ref(false);
 const route = useRoute();
 const isLoading = ref(false);
+const fileInput = ref(null);
+const showExcelPreview = ref(false);
+const excelData = ref([]);
+const excelHeaders = ref(['LRN', 'Name', 'Gender', 'Q1', 'Q2', 'Q3', 'Q4']);
+const validationErrors = ref([]);
 
 const quarterMapping = {
   '1st': 'first',
@@ -805,4 +890,204 @@ const canInputGrade = computed(() => {
   const checkResult = checkPreviousQuarters(selectedStudent.value, selectedQuarter.value);
   return checkResult.canGrade;
 });
+
+const downloadTemplate = () => {
+  const template = [
+    {
+      LRN: '123456789012',
+      Q1: 85,
+      Q2: 88,
+      Q3: 90,
+      Q4: 87
+    }
+  ];
+
+  const ws = XLSX.utils.json_to_sheet(template);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, "grades_template.xlsx");
+};
+
+const validateExcelData = (data) => {
+  const errors = [];
+  // Format LRNs to ensure consistent comparison
+  const validLRNs = new Set(studentsInSubject.value.map(s => String(s.lrn).trim().replace(/^0+/, '')));
+
+  data.forEach((row, index) => {
+    if (!row.LRN) {
+      errors.push(`Row ${index + 1}: LRN is required`);
+    } else {
+      // Format the input LRN the same way
+      const formattedLRN = String(row.LRN).trim().replace(/^0+/, '');
+      if (!validLRNs.has(formattedLRN)) {
+        errors.push(`Row ${index + 1}: Invalid LRN ${row.LRN} - Student not found in this class`);
+      }
+    }
+
+    // Validate quarter grades
+    ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+      if (row[quarter] !== '') {
+        const grade = parseFloat(row[quarter]);
+        if (isNaN(grade)) {
+          errors.push(`Row ${index + 1}: ${quarter} must be a number`);
+        } else if (grade < 0 || grade > 100) {
+          errors.push(`Row ${index + 1}: ${quarter} must be between 0 and 100`);
+        }
+      }
+    });
+  });
+
+  return errors;
+};
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+      if (jsonData.length === 0) {
+        Swal.fire('Error', 'Excel file is empty', 'error');
+        return;
+      }
+
+      // Map the data to include Name, Gender, and quarter grades
+      const mappedData = jsonData.map(row => {
+        // Format LRN to ensure consistent comparison
+        const formattedLRN = String(row.LRN).trim().replace(/^0+/, '');
+        const student = studentsInSubject.value.find(s => 
+          String(s.lrn).trim().replace(/^0+/, '') === formattedLRN
+        );
+        
+        return {
+          LRN: row.LRN,
+          Name: student ? `${student.lastName}, ${student.firstName} ${student.middleName}`.trim() : '',
+          Gender: student ? student.sex : '',
+          Q1: row.Q1 || '',
+          Q2: row.Q2 || '',
+          Q3: row.Q3 || '',
+          Q4: row.Q4 || ''
+        };
+      });
+
+      validationErrors.value = validateExcelData(mappedData);
+      excelData.value = mappedData;
+      showExcelPreview.value = true;
+    } catch (error) {
+      console.error('Error reading Excel file:', error);
+      Swal.fire('Error', 'Failed to read Excel file', 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+const hasRowError = (index) => {
+  return validationErrors.value.some(error => error.includes(`Row ${index + 1}`));
+};
+
+const saveExcelData = async () => {
+  if (validationErrors.value.length > 0) {
+    const result = await Swal.fire({
+      title: 'Validation Warnings',
+      html: `
+        <div class="text-left">
+          <p>There are ${validationErrors.value.length} validation warnings.</p>
+          <p>Would you like to:</p>
+          <ul class="list-disc pl-5">
+            <li>Save only the valid rows</li>
+            <li>Cancel and fix the issues</li>
+          </ul>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, save valid rows',
+      cancelButtonText: 'No, cancel',
+      confirmButtonColor: '#30612E',
+      cancelButtonColor: '#d33'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+  }
+
+  try {
+    // Filter out rows with validation errors
+    const validGradesData = excelData.value
+      .filter((row, index) => {
+        const rowErrors = validationErrors.value.filter(error => 
+          error.startsWith(`Row ${index + 1}:`)
+        );
+        return rowErrors.length === 0;
+      })
+      .map(row => {
+        const student = studentsInSubject.value.find(s => 
+          String(s.lrn).trim().replace(/^0+/, '') === String(row.LRN).trim().replace(/^0+/, '')
+        );
+        
+        // Calculate final grade if all quarters are present
+        let finalGrade = null;
+        if (row.Q1 && row.Q2 && row.Q3 && row.Q4) {
+          finalGrade = (parseFloat(row.Q1) + parseFloat(row.Q2) + 
+                       parseFloat(row.Q3) + parseFloat(row.Q4)) / 4;
+        }
+
+        // Determine remarks based on final grade
+        let remarks = null;
+        if (finalGrade !== null) {
+          remarks = finalGrade >= 75 ? 'Passed' : 'Failed';
+        }
+
+        return {
+          Student_ID: student?.student_id,
+          Subject_ID: props.subject_id,
+          Teacher_ID: localStorage.getItem('teacher_ID'),
+          Class_ID: props.class_id,
+          Q1: row.Q1 ? parseFloat(row.Q1) : null,
+          Q2: row.Q2 ? parseFloat(row.Q2) : null,
+          Q3: row.Q3 ? parseFloat(row.Q3) : null,
+          Q4: row.Q4 ? parseFloat(row.Q4) : null,
+          FinalGrade: finalGrade,
+          Remarks: remarks,
+          Status: 'Pending'
+        };
+      });
+
+    if (validGradesData.length === 0) {
+      Swal.fire('Error', 'No valid rows to save', 'error');
+      return;
+    }
+
+    const response = await submitGradesToAPI(validGradesData, props.class_id);
+    
+    if (response.status === 'success') {
+      Swal.fire({
+        title: 'Success',
+        html: `
+          <div class="text-left">
+            <p>Grades imported successfully!</p>
+            <p>Saved ${validGradesData.length} out of ${excelData.value.length} rows.</p>
+            ${response.errors ? `<p class="text-red-600">${response.errors}</p>` : ''}
+          </div>
+        `,
+        icon: 'success',
+        confirmButtonColor: '#30612E'
+      });
+      showExcelPreview.value = false;
+      await fetchGradesFromDatabase();
+    } else {
+      throw new Error(response.message || 'Failed to import grades');
+    }
+  } catch (error) {
+    console.error('Error saving Excel data:', error);
+    Swal.fire('Error', error.message || 'Failed to save grades', 'error');
+  }
+};
 </script>
