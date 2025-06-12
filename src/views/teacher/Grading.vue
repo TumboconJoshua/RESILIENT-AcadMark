@@ -262,7 +262,7 @@
 
       <!-- Footer -->
       <div class="mt-4 pt-4 border-t border-gray-200 flex justify-end gap-3">
-        <button @click="showExcelPreview = false"
+        <button @click="handleCancel"
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
           Cancel
         </button>
@@ -695,7 +695,25 @@ watch(
 // Modify the existing loadSubjectData function
 async function loadSubjectData() {
   try {
+    isLoading.value = true;
     await fetchGradesFromDatabase();
+    
+    // Force a re-render of the student list
+    studentsInSubject.value = [...studentsInSubject.value];
+    
+    // Update filtered students
+    filteredStudents.value = [...filteredStudents.value];
+    
+    // If there's a selected student, update their data
+    if (selectedStudent.value) {
+      const updatedStudent = studentsInSubject.value.find(
+        s => s.student_id === selectedStudent.value.student_id
+      );
+      if (updatedStudent) {
+        selectedStudent.value = updatedStudent;
+        await loadGrade();
+      }
+    }
   } catch (error) {
     console.error('Error loading subject data:', error);
     Swal.fire({
@@ -704,6 +722,8 @@ async function loadSubjectData() {
       text: 'Failed to load student data. Please try again.',
       confirmButtonColor: '#dc2626'
     });
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -720,6 +740,16 @@ onUnmounted(() => {
   // Clear the interval when component is unmounted
   if (refreshInterval) {
     clearInterval(refreshInterval);
+  }
+  
+  // Clean up any remaining data
+  excelData.value = [];
+  validationErrors.value = [];
+  showExcelPreview.value = false;
+  
+  // Reset file input
+  if (fileInput.value) {
+    fileInput.value.value = '';
   }
 });
 
@@ -1091,48 +1121,52 @@ const saveValidRows = async () => {
     const response = await submitGradesToAPI(validGradesData, props.class_id);
     
     if (response.status === 'success') {
-      // Get invalid rows details
-      const invalidRows = processedRows.filter(({ isValid }) => !isValid);
-      const invalidRowsDetails = invalidRows.map(({ row, errors }) => ({
-        lrn: row.LRN,
-        name: row.Name,
-        errors: errors.map(e => e.replace(/^Row \d+: /, ''))
-      }));
-
-      // Show success message with detailed information about skipped rows
-      const skippedRows = excelData.value.length - validGradesData.length;
-      const skippedRowsInfo = skippedRows > 0 
-        ? `<div class="text-left mt-4">
-            <p class="text-yellow-600 font-semibold">${skippedRows} row(s) were skipped:</p>
-            <ul class="list-disc pl-5 mt-2">
-              ${invalidRowsDetails.map(detail => `
-                <li class="text-sm">
-                  <span class="font-medium">${detail.name} (LRN: ${detail.lrn})</span>
-                  <ul class="list-disc pl-5">
-                    ${detail.errors.map(error => `<li class="text-red-600">${error}</li>`).join('')}
-                  </ul>
-                </li>
-              `).join('')}
-            </ul>
-          </div>` 
-        : '';
-
-      Swal.fire({
-        title: 'Success',
-        html: `
-          <div class="text-left">
-            <p class="text-green-600 font-semibold">Grades imported successfully!</p>
-            <p>Saved ${validGradesData.length} out of ${excelData.value.length} rows.</p>
-            ${skippedRowsInfo}
-            ${response.errors ? `<p class="text-red-600 mt-4">${response.errors}</p>` : ''}
-          </div>
-        `,
-        icon: 'success',
-        confirmButtonColor: '#30612E',
-        width: '600px'
-      });
+      // Close the preview modal
       showExcelPreview.value = false;
-      await fetchGradesFromDatabase();
+      
+      // Reset the file input
+      if (fileInput.value) {
+        fileInput.value.value = '';
+      }
+      
+      // Clear the excel data
+      excelData.value = [];
+      validationErrors.value = [];
+
+      // Force a complete refresh of all data
+      await loadSubjectData();
+      
+      // Add a small delay to ensure data is loaded
+      setTimeout(async () => {
+        // Update the selected student's grade if one is selected
+        if (selectedStudent.value) {
+          const updatedStudent = studentsInSubject.value.find(
+            s => s.student_id === selectedStudent.value.student_id
+          );
+          if (updatedStudent) {
+            selectedStudent.value = updatedStudent;
+            await loadGrade();
+          }
+        }
+
+        // Force a re-render of the student list
+        studentsInSubject.value = [...studentsInSubject.value];
+
+        // Show success message after data is refreshed
+        Swal.fire({
+          title: 'Success',
+          html: `
+            <div class="text-left">
+              <p class="text-green-600 font-semibold">Grades imported successfully!</p>
+              <p>Saved ${validGradesData.length} out of ${excelData.value.length} rows.</p>
+              ${response.errors ? `<p class="text-red-600 mt-4">${response.errors}</p>` : ''}
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#30612E',
+          width: '600px'
+        });
+      }, 500); // 500ms delay to ensure data is loaded
     } else {
       throw new Error(response.message || 'Failed to import grades');
     }
@@ -1140,5 +1174,23 @@ const saveValidRows = async () => {
     console.error('Error saving valid rows:', error);
     Swal.fire('Error', error.message || 'Failed to save grades', 'error');
   }
+};
+
+// Add a new function to handle cancel
+const handleCancel = async () => {
+  // Close the preview modal
+  showExcelPreview.value = false;
+  
+  // Reset the file input
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+  
+  // Clear the excel data
+  excelData.value = [];
+  validationErrors.value = [];
+
+  // Force a refresh of the data
+  await loadSubjectData();
 };
 </script>
