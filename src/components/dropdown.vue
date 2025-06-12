@@ -2,13 +2,21 @@
   <div class="flex gap-5 flex-wrap">
     <div v-if="showCurriculum" class="flex gap-2 border border-[#E3E9EC] rounded-md">
       <div class="flex justify-between items-center">
-        <label for="curriculum" class="mr-2.5 p-1.5 text-[#858585]">Curriculum</label>
-        <select v-model="selectedCurriculum" id="curriculum"
-          class="text-base border-none bg-transparent p-1.5 font-bold text-center max-w-max focus:outline-none">
+        <select v-model="selectedCurriculum" id="curriculum" class="filter-dropdown">
+          <option :value="''">All Curriculum</option>
           <option v-for="option in curriculumOptions" :key="option" :value="option">{{ option }}</option>
         </select>
       </div>
     </div>
+
+    <!-- <div v-if="showCurriculum" class="flex gap-2 border border-[#E3E9EC] rounded-md">
+      <div class="flex justify-between items-center">
+        <label for="curriculum" class="mr-2.5 p-1.5 text-[#858585]">Curriculum</label>
+        <select v-model="selectedCurriculum" id="curriculum" class="filter-dropdown">
+          <option v-for="option in curriculumOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </div>
+    </div> -->
 
     <div v-if="showYear" class="flex gap-2 border border-[#E3E9EC] rounded-md">
       <div class="flex justify-between items-center">
