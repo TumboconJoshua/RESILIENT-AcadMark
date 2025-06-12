@@ -39,12 +39,14 @@
               {{ grade.student?.LRN || 'N/A' }}
             </td>
             <td class="p-2 w-1/12 whitespace-nowrap">
-              {{ `${grade.student?.LastName || 'N/A'}, ${grade.student?.FirstName || 'N/A'} ${grade.student?.MiddleName || ''}` }}
+              {{ `${grade.student?.LastName || 'N/A'}, ${grade.student?.FirstName || 'N/A'} ${grade.student?.MiddleName
+                || ''}` }}
             </td>
             <td class="p-2 w-1/12">{{ grade.student?.sex || 'N/A' }}</td>
             <td class="p-2 w-1/12">{{ getAge(grade.student?.birthDate) }}</td>
             <td class="p-2 w-1/12">
-              {{ (grade.Status === 'Approved' || grade.Status === 'Declined') ? getGradeForQuarter(grade, quarterMapping[selectedQuarter]) : '-' }}
+              {{ (grade.Status === 'Approved' || grade.Status === 'Declined') ? getGradeForQuarter(grade,
+                quarterMapping[selectedQuarter]) : '-' }}
             </td>
             <td class="p-2 w-1/12">
               <span :class="{
@@ -60,19 +62,9 @@
       </table>
     </div>
 
-    <Modal 
-      v-if="showMessage" 
-      :showMessage="showMessage" 
-      :showLis="false"
-      @close="closeModal"
-      :trackStand="trackStand"
-      :selectedStudent="selectedStudent"
-      :selectedQuarter="selectedQuarter"
-      :students="students"
-      :subjectName="subjectName"
-      :subject_id="subject_id"
-      :class_id="class_id"
-    />
+    <Modal v-if="showMessage" :showMessage="showMessage" :showLis="false" @close="closeModal" :trackStand="trackStand"
+      :selectedStudent="selectedStudent" :selectedQuarter="selectedQuarter" :students="students"
+      :subjectName="subjectName" :subject_id="subject_id" :class_id="class_id" :gradeLevel="gradeLevel" />
   </div>
 </template>
 
@@ -109,6 +101,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  gradeLevel: {
+    type: [String, Number],
+    required: true
+  }
 });
 
 const emit = defineEmits(['update:currentPage', 'update:totalItems', 'close']);
@@ -140,7 +136,7 @@ defineExpose({
 const loadSubjectData = async () => {
   loading.value = true;
   error.value = '';
-  
+
   try {
     console.log('Loading subject data for subject_id:', props.subject_id, 'and class_id:', props.class_id);
     const response = await getSubjectGrades(props.subject_id, props.class_id);
@@ -148,10 +144,10 @@ const loadSubjectData = async () => {
 
     if (response.status === 'success' && response.data && Array.isArray(response.data)) {
       console.log('Processing students data:', response.data);
-      
+
       students.value = response.data.map((student) => {
         console.log('Processing student:', student);
-        
+
         return {
           ...student,
           grades: {
@@ -176,7 +172,7 @@ const loadSubjectData = async () => {
     error.value = error.message || 'Failed to load student data. Please try again.';
     emit('update:currentPage', 1);
     emit('update:totalItems', 0);
-    
+
     Swal.fire({
       icon: 'error',
       title: 'Error',
@@ -260,13 +256,13 @@ const fetchStudents = async () => {
   try {
     loading.value = true;
     error.value = null;
-    
+
     if (!props.subject_id) {
       console.warn('No subject_id provided to modal');
       students.value = [];
       return;
     }
-    
+
     const response = await getSubjectGrades(props.subject_id, props.class_id);
     if (response.status === 'success' && response.data) {
       students.value = response.data;
