@@ -937,17 +937,50 @@ const canInputGrade = computed(() => {
 });
 
 const downloadTemplate = () => {
+  // Create a template with instructions and example data
   const template = [
     {
-      LRN: '123456789012',
-      Q1: 85,
-      Q2: 88,
-      Q3: 90,
-      Q4: 87
+      'Instructions': 'Please fill in the grades for each quarter (Q1-Q4)',
+      'Note': 'Grades must be between 0 and 100',
+      'LRN Note': 'LRN must exist in the class roster'
+    },
+    {
+      'Instructions': 'LRN Requirements:',
+      'Note': '- Must be a valid student LRN',
+      'LRN Note': '- Must match an existing student in this class'
+    },
+    {
+      'LRN': '123456789012',
+      'Q1': 85,
+      'Q2': 88,
+      'Q3': 90,
+      'Q4': 87
     }
   ];
 
   const ws = XLSX.utils.json_to_sheet(template);
+  
+  // Add column widths for better readability
+  const colWidths = [
+    { wch: 20 }, // Instructions
+    { wch: 20 }, // Note
+    { wch: 20 }, // LRN Note
+    { wch: 15 }, // LRN
+    { wch: 10 }, // Q1
+    { wch: 10 }, // Q2
+    { wch: 10 }, // Q3
+    { wch: 10 }  // Q4
+  ];
+  ws['!cols'] = colWidths;
+
+  // Add styling to make it more readable
+  ws['A1'].s = { font: { bold: true, color: { rgb: "0000FF" } } };
+  ws['B1'].s = { font: { bold: true, color: { rgb: "0000FF" } } };
+  ws['C1'].s = { font: { bold: true, color: { rgb: "0000FF" } } };
+  ws['A2'].s = { font: { bold: true, color: { rgb: "FF0000" } } };
+  ws['B2'].s = { font: { bold: true, color: { rgb: "FF0000" } } };
+  ws['C2'].s = { font: { bold: true, color: { rgb: "FF0000" } } };
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Template");
   XLSX.writeFile(wb, "grades_template.xlsx");
