@@ -966,6 +966,15 @@ export default {
         backFromDetail() {
             this.showGrade7Detail = false;
             this.showBlank = false;
+
+            // Reset dropdown selection
+            this.leftSex = '';
+
+            // Clear selected students
+            this.leftSelectedStudents = [];
+
+            // Clear selected rows (checkboxes)
+            this.selectedRows = [];
         },
         openAddTeacherModal() {
             this.showAddTeacherModal = true;

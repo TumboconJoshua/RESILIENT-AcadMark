@@ -75,10 +75,10 @@ onMounted(async () => {
 
       // Map the data into the structure expected by the UI
       cards.value = response.data.map(item => {
-        const [grade, section] = item.className.split(' - ');
         return {
-          grade: Number(grade.replace('Grade ', '').trim()), // Convert "Grade 7" to 7
-          section: section?.trim(),
+          grade: Number(item.grade_level),             // e.g., 7
+          gradeLabel: `Grade ${item.grade_level}`,     // e.g., "Grade 7"
+          section: item.section?.trim(),               // directly use section
           curriculum: item.curriculum,
           track: item.track,
           class_id: item.class_id
@@ -91,6 +91,7 @@ onMounted(async () => {
     console.error('Failed to fetch data:', err);
   }
 });
+
 
 function goToInsideCard(card) {
   const selected = allClasses.value.find(c => c.class_id === card.class_id);
