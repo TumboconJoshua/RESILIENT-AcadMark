@@ -19,7 +19,7 @@
             <!-- Content -->
             <div v-else>
                 <!-- Filters -->
-                <div class="filters flex flex-wrap gap-4 mb-6">
+                <div class="filters flex flex-wrap gap-10 mb-6">
                     <select v-model="selectedGrade" class="filter-dropdown border border-gray-300 rounded-lg p-3">
                         <option value="">Grade Level</option>
                         <option v-for="grade in grades" :key="grade" :value="grade">
@@ -43,36 +43,44 @@
                 </div>
                 
                 <!-- Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                    <div v-for="(card, index) in filteredCards" :key="index"
-                        class="rounded-xl shadow-lg border border-gray-300 overflow-hidden cursor-pointer transition-transform hover:scale-105"
-                        @click="handleCardClick(card)">
+               <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div
+                        v-for="(card, index) in filteredCards"
+                        :key="index"
+                        class="rounded-xl shadow-lg border border-gray-300 overflow-hidden cursor-pointer transition-transform hover:scale-105 w-full"
+                        @click="handleCardClick(card)"
+                    >
                         <!-- Curriculum Background Color -->
                         <div
-                            :class="['py-3 px-4 text-center font-semibold', getStatusBgClass(card.Status), 'text-white']">
-                            {{ getSchoolLevel(card.Curriculum) }}
+                        :class="['py-3 px-4 text-center font-semibold', getStatusBgClass(card.Status), 'text-white']"
+                        >
+                        {{ getSchoolLevel(card.Curriculum) }}
                         </div>
 
                         <div class="bg-white p-6 relative pb-20">
-                            <div class="relative z-10 mt-[-17px]">
-                                <!-- Grade Level Color -->
-                                <h2 :class="['text-5xl font-bold mb-2', getStatusTextClass(card.Status)]">
-                                    Grade {{ card.Grade_Level }}
-                                </h2>
+                        <div class="relative z-10 mt-[-17px]">
+                            <!-- Grade Level Color -->
+                            <h2 :class="['text-5xl font-bold mb-2', getStatusTextClass(card.Status)]">
+                            Grade {{ card.Grade_Level }}
+                            </h2>
 
-                                <!-- Track & Section Color -->
-                                <p :class="['text-lg font-semibold', getStatusTextClass(card.Status)]">
-                                    {{ card.Track }} – {{ card.Section }}
-                                </p>
-                            </div>
+                            <!-- Track & Section Color -->
+                            <p :class="['text-lg font-semibold', getStatusTextClass(card.Status)]">
+                            {{ card.Track }} – {{ card.Section }}
+                            </p>
+                        </div>
 
-                            <div class="absolute top-0 right-0 w-full h-full overflow-hidden">
-                                <img src="/assets/img/logo.png" alt="School Logo"
-                                    class="opacity-40 h-40 absolute top-10 right-[-40px]" />
-                            </div>
+                        <div class="absolute top-0 right-0 w-full h-full overflow-hidden">
+                            <img
+                            src="/assets/img/logo.png"
+                            alt="School Logo"
+                            class="opacity-40 h-40 absolute top-10 right-[-40px]"
+                            />
+                        </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Cards Grid -->
 
 

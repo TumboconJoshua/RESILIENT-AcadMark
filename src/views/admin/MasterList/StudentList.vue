@@ -17,27 +17,41 @@
             <div class="student-list-container mt-6 mb-6 shadow-xl border border-gray-300">
                 <div class="flex items-center justify-between flex-wrap gap-4">
     <!-- Left: Filters (Selects directly side by side) -->
-    <div class="flex gap-2">
-        <select v-model="genderFilter" class="filter-dropdown w-40 h-10 px-3 border border-gray-300 rounded-md">
-            <option value="All">All</option>
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
-        </select>
-
-        <select v-model="sortOrder" class="filter-dropdown w-40 h-10 px-3 border border-gray-300 rounded-md">
-            <option value="Latest">Latest</option>
-            <option value="Oldest">Oldest</option>
-        </select>
-    </div>
+     <div class="flex gap-4">
+                        <div class="relative w-30">
+                             <select v-model="genderFilter" class="filter-dropdown">
+<option value="">Select Sex</option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                            </select>   
+                        </div>
+                        <div class="relative w-30">
+                            <select v-model="sortOrder"
+                                class="filter-dropdown">
+                                <option value="Latest">Latest</option>
+                                <option value="Oldest">Oldest</option>
+                            </select>
+                           
+                        </div>
+                    </div>
+    
 
     <!-- Right: Search Bar + Buttons -->
-    <div class="flex items-center gap-4 ml-auto">
-        <!-- Search Bar -->
-        <div class="relative w-80">
-            <input v-model="searchTerm" type="text" placeholder="Search..."
-                class="border border-[#295f98] rounded-md py-2 px-3 pl-10 w-full h-10" />
-            <i class="fas fa-search text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
-        </div>
+        <div class="flex items-center gap-4 ml-auto">
+            <!-- Search Bar -->
+
+            <div
+                class="w-[350px] border border-[#295f98] flex items-center rounded-[8px] mr-5 shadow-[rgba(0,0,0,0.05)_0px_6px_24px_0px,rgba(0,0,0,0.08)_0px_0px_0px_1px,rgba(0,0,0,0.1)_0px_0px_5px_0px,rgba(0,0,0,0.1)_0px_0px_1px_0px]">
+                <i class="fas fa-search text-[#6C6C6C] text-lg mx-3"></i>
+                <input
+                    type="text"
+                    class="border-none outline-none p-2 placeholder-[#6C6C6C] w-full text-sm font-semibold h-10"
+                    placeholder="Search..."
+                    v-model="searchTerm"
+                />
+            </div>
+
+       
 
         <!-- Buttons -->
         <div class="flex gap-2">
@@ -98,31 +112,19 @@
                     <!-- Left: Filters -->
                     <div class="flex gap-4">
                         <div class="relative w-30">
-                            <select v-model="modalGenderFilter"
-                                class="appearance-none border border-gray-300 rounded-md px-5 py-2 w-full">
+                             <select v-model="modalGenderFilter" class="filter-dropdown">
+                                <option value="">Select Sex</option>
                                 <option value="Female">Female</option>
                                 <option value="Male">Male</option>
-                                <option value="All">All</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+                            </select>   
                         </div>
                         <div class="relative w-30">
                             <select v-model="modalSortOrder"
-                                class="appearance-none border border-gray-300 rounded-md px-5 py-2 w-full">
+                                class="filter-dropdown">
                                 <option value="Latest">Latest</option>
                                 <option value="Oldest">Oldest</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+                           
                         </div>
                     </div>
 
@@ -133,17 +135,17 @@
                     </label>
                 </div>
 
-                <!-- Right: Search #295f98 -->
-                <div class="relative flex-1 mx-4 w-full">
-                    <input v-model="modalSearchTerm" type="text" placeholder="Search..."
-                        class="border border-gray-300 rounded-md py-2 px-3 pl-10 w-full" />
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                <div
+                    class="w-full border border-[#295f98] flex items-center rounded-[8px] mr-5 shadow-[rgba(0,0,0,0.05)_0px_6px_24px_0px,rgba(0,0,0,0.08)_0px_0px_0px_1px,rgba(0,0,0,0.1)_0px_0px_5px_0px,rgba(0,0,0,0.1)_0px_0px_1px_0px]">
+                    <i class="fas fa-search text-[#6C6C6C] text-lg mx-3"></i>
+                    <input
+                        type="text"
+                        class="border-none outline-none p-2 placeholder-[#6C6C6C] w-full text-sm font-semibold h-10"
+                        placeholder="Search..."
+                        v-model="modalSearchTerm"
+                    />
                 </div>
+                
             </div>
             <!-- Table with checkboxes -->
             <div class="mt-6 max-h-[60vh] overflow-auto">
@@ -176,7 +178,7 @@
                 </table>
             </div>
             <div class="flex justify-end gap-2 mt-6">
-                <button class="px-6 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+                <button class="px-6 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 cursor-pointer"
                     @click="showAddModal = false">Cancel</button>
                 <button class="px-6 py-2 rounded bg-blue hover:bg-blue-700 text-white cursor-pointer"
                     @click="handleAddStudents(selectedCard)">Add Students</button>
@@ -186,25 +188,17 @@
 
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg p-8 w-[90vw] max-w-5xl relative">
-            <button @click="showEditModal = false"
-                class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl">&times;</button>
+            
             <div class="flex justify-between items-start gap-8">
                 <div>
                     <!-- Left: Filters -->
                     <div class="flex gap-4">
                         <div class="relative w-30">
-                            <select v-model="editModalGenderFilter"
-                                class="appearance-none border border-gray-300 rounded-md px-5 py-2 w-full">
+                            <select v-model="editModalGenderFilter" class="filter-dropdown w-full">
+                                <option value="">Select Sex</option>
                                 <option value="Female">Female</option>
                                 <option value="Male">Male</option>
-                                <option value="All">All</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+                            </select>   
                         </div>
                     </div>
                     <!-- Select All Checkbox -->
@@ -213,17 +207,17 @@
                         <span class="ml-2">Select All</span>
                     </label>
                 </div>
-                <!-- Right: Search -->
-                <div class="relative flex-1 mx-4 w-full">
-                    <input v-model="editModalSearchTerm" type="text" placeholder="Search..."
-                        class="border border-gray-300 rounded-md py-2 px-3 pl-10 w-full" />
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                <div
+                    class="w-full border border-[#295f98] flex items-center rounded-[8px] mr-5 shadow-[rgba(0,0,0,0.05)_0px_6px_24px_0px,rgba(0,0,0,0.08)_0px_0px_0px_1px,rgba(0,0,0,0.1)_0px_0px_5px_0px,rgba(0,0,0,0.1)_0px_0px_1px_0px]">
+                    <i class="fas fa-search text-[#6C6C6C] text-lg mx-3"></i>
+                    <input
+                        type="text"
+                        class="border-none outline-none p-2 placeholder-[#6C6C6C] w-full text-sm font-semibold h-10"
+                        placeholder="Search..."
+                        v-model="editModalSearchTerm"
+                    />
                 </div>
+               
             </div>
             <!-- Table with checkboxes -->
             <div class="mt-6 max-h-[60vh] overflow-auto">
@@ -256,7 +250,7 @@
                 </table>
             </div>
             <div class="flex justify-end gap-2 mt-6">
-                <button class="px-6 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+                <button class="px-6 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 cursor-pointer"
                     @click="showEditModal = false">Cancel</button>
                 <button class="px-6 py-2 rounded bg-green hover:bg-green-700 text-white cursor-pointer"
                     @click="handleUpdateClass(selectedCard)">Update Class</button>
@@ -286,7 +280,7 @@ const props = defineProps({
 const loading = ref(true);
 const error = ref(null);
 
-const genderFilter = ref('All');
+const genderFilter = ref('');
 const sortOrder = ref('Latest');
 const searchTerm = ref('');
 const selectAll = ref(false);
@@ -294,14 +288,14 @@ const selectedStudents = ref([]);
 const showAddModal = ref(false);
 
 // Modal-specific filter/search/sort state
-const modalGenderFilter = ref('All');
+const modalGenderFilter = ref('');
 const modalSortOrder = ref('Latest');
 const modalSearchTerm = ref('');
 const modalSelectAll = ref(false);
 const modalSelectedStudents = ref([]);
 
 const showEditModal = ref(false);
-const editModalGenderFilter = ref('All');
+const editModalGenderFilter = ref('');
 const editModalSearchTerm = ref('');
 const editModalSelectAll = ref(false);
 const editModalSelectedStudents = ref([]);

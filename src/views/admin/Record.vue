@@ -4,89 +4,90 @@
             <h1 class="text-5xl font-bold text-[#295f98]">Record</h1>
         </div>
 
-       <div class="bg-white border border-gray-200 shadow-lg rounded-lg p-6 flex flex-col mb-6" style="height: 875px;">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-4 space-x-4">
-                <div class="flex flex-wrap gap-5">
-                    <Dropdown :showGrade="true" v-model="selectedGrade" />
-                    <Dropdown :showAcademicTrack="true" v-model="selectedAcademicTrack" />
-                </div>
-
-                <div class="w-[30%]">
-                    <Searchbar v-model="searchQuery" />
-                </div>
-            </div>
-
-            <!-- Table Area (should grow to fill space) -->
-            <div class="flex-1 overflow-auto">
-                <table class="w-full border-collapse text-center text-sm">
-                    <thead class="bg-gray-100 text-[#464F60] text-[15px] font-semibold">
-                        <tr>
-                            <th class="p-2">Grade Level</th>
-                            <th class="p-2">LRN</th>
-                            <th class="p-2">Name</th>
-                            <th class="p-2">Curriculum</th>
-                            <th class="p-2">Track</th>
-                            <th class="p-2">Section</th>
-                            <th class="p-2">Gender</th>
-                            <th class="p-2">Birthdate</th>
-                            <th class="p-2">Age</th>
-                        </tr>
-                    </thead>
-                    <tbody class="font-medium text-[15px]">
-                        <tr v-if="filteredStudents.length === 0">
-                            <td colspan="9" class="p-2 text-center">No students available.</td>
-                        </tr>
-                        <tr v-for="student in paginatedStudents" :key="student.lrn" class="hover:bg-gray-200">
-                            <td class="p-2">{{ student.gradeLevel }}</td>
-                            <td class="p-2">{{ student.lrn }}</td>
-                            <td class="p-2">{{ student.fullName }}</td>
-                            <td class="p-2">{{ student.curriculum }}</td>
-                            <td class="p-2">{{ student.track }}</td>
-                            <td class="p-2">{{ student.section || '-' }}</td>
-                            <td class="p-2">{{ student.sex }}</td>
-                            <td class="p-2">{{ student.birthdate }}</td>
-                            <td class="p-2">{{ student.age }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination (pushed to bottom via flex layout) -->
-            <div class="flex justify-center items-center mt-auto pt-4 border-t border-gray-300 space-x-1">
-                <button
-                    class="w-28 px-3 border border-[#295F98] text-[#295F98] py-1 rounded disabled:opacity-50 flex items-center justify-center gap-1"
-                    :disabled="currentPage === 1"
-                    @click="currentPage--"
-                >
-                    <span>←</span>
-                    <span>Previous</span>
-                </button>
-                <button
-                    v-for="page in pageNumbers"
-                    :key="page"
-                    class="py-1 border border-[#295F98] rounded w-10 text-center"
-                    :class="{
-                        'bg-[#295F98] text-white': page === currentPage,
-                        'text-gray-600': page !== currentPage,
-                        'cursor-default': page === '...',
-                        'cursor-pointer': page !== '...'
-                    }"
-                    @click="page !== '...' && (currentPage = page)"
-                    :disabled="page === '...'"
-                >
-                    {{ page }}
-                </button>
-                <button
-                    class="w-28 px-3 border border-[#295F98] text-[#295F98] py-1 rounded disabled:opacity-50 flex items-center justify-center gap-1"
-                    :disabled="currentPage === totalPages"
-                    @click="currentPage++"
-                >
-                    <span>Next</span>
-                    <span>→</span>
-                </button>
-            </div>
+       <div class="bg-white border border-gray-200 shadow-lg rounded-lg p-6 flex flex-col mb-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4 space-x-4">
+        <div class="flex flex-wrap gap-5">
+            <Dropdown :showGrade="true" v-model="selectedGrade" />
+            <Dropdown :showAcademicTrack="true" v-model="selectedAcademicTrack" />
         </div>
+
+        <div class="w-[30%]">
+            <Searchbar v-model="searchQuery" />
+        </div>
+    </div>
+
+    <!-- Table Area -->
+    <div class="flex-1 overflow-auto">
+        <table class="w-full border-collapse text-center text-sm">
+            <thead class="bg-gray-100 text-[#464F60] text-[15px] font-semibold">
+                <tr>
+                    <th class="p-2">Grade Level</th>
+                    <th class="p-2">LRN</th>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Curriculum</th>
+                    <th class="p-2">Track</th>
+                    <th class="p-2">Section</th>
+                    <th class="p-2">Gender</th>
+                    <th class="p-2">Birthdate</th>
+                    <th class="p-2">Age</th>
+                </tr>
+            </thead>
+            <tbody class="font-medium text-[15px]">
+                <tr v-if="filteredStudents.length === 0">
+                    <td colspan="9" class="p-2 text-center">No students available.</td>
+                </tr>
+                <tr v-for="student in paginatedStudents" :key="student.lrn" class="hover:bg-gray-200">
+                    <td class="p-2">{{ student.gradeLevel }}</td>
+                    <td class="p-2">{{ student.lrn }}</td>
+                    <td class="p-2">{{ student.fullName }}</td>
+                    <td class="p-2">{{ student.curriculum }}</td>
+                    <td class="p-2">{{ student.track }}</td>
+                    <td class="p-2">{{ student.section || '-' }}</td>
+                    <td class="p-2">{{ student.sex }}</td>
+                    <td class="p-2">{{ student.birthdate }}</td>
+                    <td class="p-2">{{ student.age }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination (now follows table naturally) -->
+    <div class="flex justify-center items-center pt-4 border-t border-gray-300 space-x-1">
+        <button
+            class="w-28 px-3 border border-[#295F98] text-[#295F98] py-1 rounded disabled:opacity-50 flex items-center justify-center gap-1"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+        >
+            <span>←</span>
+            <span>Previous</span>
+        </button>
+        <button
+            v-for="page in pageNumbers"
+            :key="page"
+            class="py-1 border border-[#295F98] rounded w-10 text-center"
+            :class="{
+                'bg-[#295F98] text-white': page === currentPage,
+                'text-gray-600': page !== currentPage,
+                'cursor-default': page === '...',
+                'cursor-pointer': page !== '...'
+            }"
+            @click="page !== '...' && (currentPage = page)"
+            :disabled="page === '...'"
+        >
+            {{ page }}
+        </button>
+        <button
+            class="w-28 px-3 border border-[#295F98] text-[#295F98] py-1 rounded disabled:opacity-50 flex items-center justify-center gap-1"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+        >
+            <span>Next</span>
+            <span>→</span>
+        </button>
+    </div>
+</div>
+
 
     </div>
 </template>
