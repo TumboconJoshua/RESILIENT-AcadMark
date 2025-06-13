@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col overflow-hidden">
         <template v-if="!showBlank && !showGrade7Detail">
-            <h1 class="text-5xl font-bold text-[#242424]">Manage Class</h1>
+            <h1 class="text-5xl font-bold text-[#242424] mb-6">Manage Class</h1>
 
             <!-- Loading State -->
             <div v-if="loading" class="flex justify-center items-center h-64">
@@ -14,7 +14,7 @@
             <!-- Content -->
             <div v-else>
                 <!-- ===================== Tab Navigation ===================== -->
-                <div class="flex justify-between p-8 rounded-t-xl" style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+                <div class="flex justify-between p-8 rounded-t-xl mb-6" style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
                     <div v-for="tab in [
                         { label: 'Add Classes', value: 'add' },
                         { label: 'Submitted', value: 'submitted' }
@@ -27,174 +27,157 @@
                     </div>
                 </div>
 
-                <div v-if="activeTab === 'add'" class="grid md:grid-cols-4  sm:grid-cols-3 gap-8 my-8">
-                    <div v-for="(grade, idx) in grades" :key="grade.mainTitle"
-                        class="bg-white rounded-[12px] shadow-[0_4px_24px_rgba(0,0,0,0.1)] border border-[#e0e0e0] flex flex-col min-w-[300px] max-w-[360px] min-h-[180px] relative overflow-hidden">
+                <div v-if="activeTab === 'add'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px] my-8">
+                    <div
+                        v-for="(grade, idx) in grades"
+                        :key="grade.mainTitle"
+                        class="bg-white rounded-[12px] border border-[#e0e0e0] flex flex-col min-h-[180px] relative overflow-hidden shadow transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer"
+                    >
                         <div class="flex flex-row justify-between items-start px-5 pt-6">
-                            <div class="flex-1">
-                                <div class="text-[35.2px] font-bold text-[#295F98] mb-1">
-                                    {{ grade.mainTitle }}
-                                </div>
-                                <div class="text-[17.6px] text-[#295F98] mb-0.5">
-                                    {{ grade.subTitle }}
-                                </div>
-                                <div class="text-base text-[#295F98] font-normal italic">
-                                    {{ grade.studentCount }}
-                                </div>
+                        <div class="flex-1">
+                            <div class="text-[35.2px] font-bold text-[#295F98] mb-1">
+                            {{ grade.mainTitle }}
                             </div>
-                            <div
-                                class="absolute top-[15px] right-[-55px] flex items-start justify-end pointer-events-none z-0">
-                                <img src="/assets/img/logo.png" alt="School Logo"
-                                    class="w-[190px] h-[190px] object-contain opacity-50 pointer-events-none" />
+                            <div class="text-[17.6px] text-[#295F98] mb-0.5">
+                            {{ grade.subTitle }}
+                            </div>
+                            <div class="text-base text-[#295F98] font-normal italic">
+                            {{ grade.studentCount }}
                             </div>
                         </div>
+                        <div class="absolute top-[15px] right-[-55px] flex items-start justify-end pointer-events-none z-0">
+                            <img src="/assets/img/logo.png" alt="School Logo"
+                            class="w-[190px] h-[190px] object-contain opacity-50 pointer-events-none" />
+                        </div>
+                        </div>
 
-                        <div
-                            class="bg-[#295F98] rounded-b-[12px] flex justify-between items-center px-5 py-3 mt-[18px] z-10">
-                            <span class="text-white font-semibold text-base">Manage Class</span>
-                            <button
-                                class="bg-[#295F98] text-white border border-white rounded-lg px-6 py-1.5 text-base font-medium cursor-pointer transition-colors duration-200 hover:bg-white hover:text-[#295F98] hover:border-white"
-                                @click="handleEnter(idx)">
-                                Enter
-                            </button>
+                        <div class="bg-[#295F98] rounded-b-[12px] flex justify-between items-center px-5 py-3 mt-[18px] z-10">
+                        <span class="text-white font-semibold text-base">Manage Class</span>
+                        <button
+                            class="bg-[#295F98] text-white border border-white rounded-lg px-6 py-1.5 text-base font-medium cursor-pointer transition-colors duration-200 hover:bg-white hover:text-[#295F98] hover:border-white"
+                            @click="handleEnter(idx)">
+                            Enter
+                        </button>
                         </div>
                     </div>
                 </div>
 
-                <div v-else class="submitted-section">
-                    <!-- Filter Bar -->
-                    <div
-                        class="flex flex-row gap-4 items-center bg-white p-6 border border-[#EEEEEE] rounded-[5px] shadow mb-6">
-                        <select v-model="selectedSubmittedGrade"
-                            class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
-                            <option value="" disabled>Select Grade</option>
-                            <option v-for="option in gradeOptions" :key="option.value || option"
-                                :value="option.value || option">
-                                {{ option.label || option }}
-                            </option>
-                        </select>
-                        <select v-model="selectedSubmittedCurriculum"
-                            class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
-                            <option value="" disabled>Select Curriculum</option>
-                            <option v-for="option in curriculumOptions" :key="option.value || option"
-                                :value="option.value || option">
-                                {{ option.label || option }}
-                            </option>
-                        </select>
-                        <select v-model="selectedSubmittedTrack"
-                            class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
-                            <option value="" disabled>Select Track</option>
-                            <option v-for="option in trackOptions" :key="option.value || option"
-                                :value="option.value || option">
-                                {{ option.label || option }}
-                            </option>
-                        </select>
-                        <select v-model="selectedSubmittedStatus"
-                            class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
-                            <option value="" disabled>Select Status</option>
-                            <option v-for="option in statusOptions" :key="option.value || option"
-                                :value="option.value || option">
-                                {{ option.label || option }}
-                            </option>
-                        </select>
-                        <div
-                            class="flex items-center bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-10 w-1/4">
-                            <img src="/assets/img/search-icon.svg" alt="search" class="w-5 h-5 mx-1 opacity-70" />
-                            <input type="text" v-model="rightSearch" placeholder="Search..."
-                                class="bg-transparent border-none outline-none w-full text-[15px] text-gray-700" />
-                        </div>
-                    </div>
 
-                    <!-- Table -->
-                    <div class="bg-white rounded-lg shadow border border-gray-200 overflow-x-auto mb-4">
-                        <table class="min-w-[900px] w-full border-collapse table-fixed">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Grade Level</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Curriculum</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Track</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Class Section</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Class Adviser</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Student Added</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        Date Added</th>
-                                    <th
-                                        class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">
-                                        STATUS</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="max-h-[400px] overflow-y-auto w-full">
-                            <table class="min-w-[900px] w-full border-collapse table-fixed">
-                                <tbody>
-                                    <tr v-for="(row, idx) in paginatedSuperClasses" :key="idx"
-                                        class="border-b border-[#e0e0e0] cursor-pointer"
-                                        @click="openClassInfoModal(row)">
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.grade }}</td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.curriculum }}
-                                        </td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.track }}</td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.section }}</td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.adviser }}</td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">
-                                            {{ row.students }}
-                                        </td>
-                                        <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.date }}</td>
-                                        <td class="text-[14px] text-center px-3 py-2">
-                                            <span
-                                                class="px-4 py-2 rounded inline-block w-[135px] font-semibold text-center"
-                                                :class="[
-                                                    row.status === 'Pending' ? 'text-yellow-800' : '',
-                                                    row.status === 'Accepted' ? 'text-green-800' : '',
-                                                    row.status === 'Declined' ? 'text-red-800' : ''
-                                                ]">
-                                                {{ row.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- Pagination Controls for Submitted Classes -->
-                    <div class="flex justify-between items-center mt-4 px-4">
-                        <div class="text-sm text-gray-600">
-                            Showing {{ paginatedSuperClasses.length }} of {{ superClasses.length }} entries
-                        </div>
-                        <div class="flex gap-2">
-                            <button @click="submittedCurrentPage--" :disabled="submittedCurrentPage === 1"
-                                class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
-                                Previous
-                            </button>
-                            <button v-for="page in submittedTotalPages" :key="page" @click="submittedCurrentPage = page"
-                                :class="[
-                                    'px-3 py-1 rounded border',
-                                    submittedCurrentPage === page
-                                        ? 'bg-blue-500 text-white border-blue-500'
-                                        : 'border-gray-300 hover:bg-gray-100'
-                                ]">
-                                {{ page }}
-                            </button>
-                            <button @click="submittedCurrentPage++"
-                                :disabled="submittedCurrentPage === submittedTotalPages"
-                                class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
-                                Next
-                            </button>
-                        </div>
-                    </div>
+
+                <div v-else class="submitted-section">
+                    <!-- Outer Container that wraps filters, table, and pagination -->
+<div class="bg-white p-6 border border-[#EEEEEE] rounded-[5px] shadow mb-6">
+
+  <!-- Filters -->
+  <div class="flex flex-row gap-4 items-center mb-6">
+    <select v-model="selectedSubmittedGrade"
+      class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
+      <option value="" disabled>Select Grade</option>
+      <option v-for="option in gradeOptions" :key="option.value || option" :value="option.value || option">
+        {{ option.label || option }}
+      </option>
+    </select>
+    <select v-model="selectedSubmittedCurriculum"
+      class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
+      <option value="" disabled>Select Curriculum</option>
+      <option v-for="option in curriculumOptions" :key="option.value || option" :value="option.value || option">
+        {{ option.label || option }}
+      </option>
+    </select>
+    <select v-model="selectedSubmittedTrack"
+      class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
+      <option value="" disabled>Select Track</option>
+      <option v-for="option in trackOptions" :key="option.value || option" :value="option.value || option">
+        {{ option.label || option }}
+      </option>
+    </select>
+    <select v-model="selectedSubmittedStatus"
+      class="w-[180px] p-2 border border-[#E3E9EC] rounded-[6px] bg-white text-base text-[#242424] font-medium">
+      <option value="" disabled>Select Status</option>
+      <option v-for="option in statusOptions" :key="option.value || option" :value="option.value || option">
+        {{ option.label || option }}
+      </option>
+    </select>
+    <div class="flex items-center bg-[#fafbfc] border border-[#e0e0e0] rounded-[6px] px-2 h-10 w-1/4">
+      <img src="/assets/img/search-icon.svg" alt="search" class="w-5 h-5 mx-1 opacity-70" />
+      <input type="text" v-model="rightSearch" placeholder="Search..."
+        class="bg-transparent border-none outline-none w-full text-[15px] text-gray-700" />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="rounded-lg border border-gray-200 overflow-x-auto mb-4">
+    <table class="min-w-[900px] w-full border-collapse table-fixed">
+      <thead>
+        <tr>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Grade Level</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Curriculum</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Track</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Class Section</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Class Adviser</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Student Added</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">Date Added</th>
+          <th class="bg-[#f6f6f6] font-semibold text-[#222] text-[16px] text-center px-3 py-2">STATUS</th>
+        </tr>
+      </thead>
+    </table>
+    <div class="max-h-[400px] overflow-y-auto w-full">
+      <table class="min-w-[900px] w-full border-collapse table-fixed">
+        <tbody>
+          <tr v-for="(row, idx) in paginatedSuperClasses" :key="idx"
+            class="border-b border-[#e0e0e0] cursor-pointer" @click="openClassInfoModal(row)">
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.grade }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.curriculum }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.track }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.section }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.adviser }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.students }}</td>
+            <td class="text-[14px] text-center px-3 py-2 text-[#222]">{{ row.date }}</td>
+            <td class="text-[14px] text-center px-3 py-2">
+              <span class="px-4 py-2 rounded inline-block w-[135px] font-semibold text-center"
+                :class="[
+                  row.status === 'Pending' ? 'text-yellow-800' : '',
+                  row.status === 'Accepted' ? 'text-green-800' : '',
+                  row.status === 'Declined' ? 'text-red-800' : ''
+                ]">
+                {{ row.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-between items-center mt-4 px-2">
+    <div class="text-sm text-gray-600">
+      Showing {{ paginatedSuperClasses.length }} of {{ superClasses.length }} entries
+    </div>
+    <div class="flex gap-2">
+      <button @click="submittedCurrentPage--" :disabled="submittedCurrentPage === 1"
+        class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
+        Previous
+      </button>
+      <button v-for="page in submittedTotalPages" :key="page" @click="submittedCurrentPage = page"
+        :class="[
+          'px-3 py-1 rounded border',
+          submittedCurrentPage === page
+            ? 'bg-blue-500 text-white border-blue-500'
+            : 'border-gray-300 hover:bg-gray-100'
+        ]">
+        {{ page }}
+      </button>
+      <button @click="submittedCurrentPage++" :disabled="submittedCurrentPage === submittedTotalPages"
+        class="px-3 py-1 rounded border border-gray-300 disabled:opacity-50">
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+
+                    
+                    
                 </div>
             </div>
         </template>
@@ -816,8 +799,6 @@ export default {
             // ✅ Update form.student_ids after removing
             this.form.student_ids = this.leftSelectedStudents.map(row => row.student_id);
         },
-
-
 
         async fetchStudentCounts() {
             try {

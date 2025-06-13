@@ -3,7 +3,7 @@
     <div
       class="bg-white w-full max-w-md rounded-2xl shadow-lg px-6 py-5 transition-transform transform scale-100"
     >
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Reject Student(s)</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Decline Student(s)</h2>
 
       <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">
         Reason for rejection:

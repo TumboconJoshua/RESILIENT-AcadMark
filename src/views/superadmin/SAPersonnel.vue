@@ -60,8 +60,8 @@
                   <th class="px-6 py-3 text-left font-medium text-gray-700 border-b border-gray-300">Action</th>
                 </tr>
             </thead>
-             <tbody>
-              <tr v-for="(employee, index) in paginatedEmployees" :key="index" class="hover:bg-gray-50">
+            <tbody>
+              <tr v-for="(employee, index) in [...paginatedEmployees].reverse()" :key="index" class="hover:bg-gray-50">
                 <td class="px-6 py-4 border-b border-gray-300">{{ employee.empNo }}</td>
                 <td class="px-6 py-4 border-b border-gray-300">{{ employee.name }}</td>
                 <td class="px-6 py-4 border-b border-gray-300">{{ employee.qualification }}</td>

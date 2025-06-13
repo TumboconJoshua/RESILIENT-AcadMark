@@ -32,8 +32,10 @@
       <div class="card-grid mt-9">
         <div class="card cursor-pointer hover:shadow-lg transition" v-for="(card, index) in filteredCards" :key="index"
           @click="goToInsideCard(card)">
-          <div class="header">
-            <p>Junior High School</p>
+          <div class="header" v-if="card.curriculum">
+            <p>
+              {{ card.curriculum === 'JHS' ? 'Junior High School' : card.curriculum === 'SHS' ? 'Senior High School' : card.curriculum }}
+            </p>
           </div>
           <div class="grade">Grade {{ card.grade }}</div>
           <div class="section" v-if="card.section && card.curriculum">
@@ -168,33 +170,40 @@ const filteredCards = computed(() => {
   background-position: right 10px center;
   padding-right: 30px;
   transition: all 0.3s ease-in-out;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M14 7l-5 5 5 5V7z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
 }
 
 .filter-dropdown:focus {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
 }
 
 .card-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 50px;
+  gap: 20px;
   margin-left: 5px;
   margin-right: -5px;
 }
 
 .card {
-  width: 208px;
-  height: 180px;
+  width: 350px;
+  height: 200px;
   background: white;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
-  margin-top: -20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 10px;
 }
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
 
 .header {
   font-weight: bold;

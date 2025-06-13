@@ -21,7 +21,8 @@
             <img src="/assets/img/logo.png" alt="" />
           </div>
         </div>
-      </div>
+      </div>  
+
     </div>
   </div>
 </template>
@@ -143,22 +144,28 @@ const tracks = ["STEM", "ABM", "TVL", "HUMSS"];
 .card-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 50px;
+  gap: 20px;
   margin-left: 5px;
   margin-right: -5px;
 }
 
 .card {
-  width: 250px;
-  height: 180px;
+  width: 400px;
+  height: 200px;
   background: white;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
-  margin-top: -20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: -10px;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .header {
@@ -181,7 +188,7 @@ const tracks = ["STEM", "ABM", "TVL", "HUMSS"];
 }
 
 .grade {
-  font-size: 40px;
+  font-size: 37px;
   margin-top: 5px;
   font-weight: 500;
 }

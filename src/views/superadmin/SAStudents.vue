@@ -224,7 +224,7 @@
         <button class="red" @click="reject">Decline</button>
         <button class="green" @click="acceptAlert">Accept</button>
       </div>
-    </div>
+    </div>  
   </div>
 </template>
 
@@ -364,11 +364,20 @@ result.sort((a, b) => {
 
 
 
-// Pagination: Slice filteredStudents according to currentPage and pageSize
 const paginatedStudents = computed(() => {
+  const reversed = [...filteredStudents.value].reverse(); // latest first
   const start = (currentPage.value - 1) * pageSize;
-  return filteredStudents.value.slice(start, start + pageSize);
+  return reversed.slice(start, start + pageSize);
 });
+
+const pageNumbers = computed(() => {
+  const pages = [];
+  for (let i = 1; i <= totalPages.value; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
 
 // Calculate total pages
 const totalPages = computed(() => {
@@ -460,8 +469,8 @@ const handleReject = async ({ comment }) => {
     await refreshStudents();
     selectedStudents.value = [];
     Swal.fire(
-      'Rejected!',
-      'Selected students have been rejected.',
+      'Declined!',
+      'Selected students have been declined.',
       'success'
     );
   } catch (err) {
@@ -535,12 +544,13 @@ const acceptAlert = async () => {
     background-position: right 10px center;
     padding-right: 30px;
     transition: all 0.3s ease-in-out;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M14 7l-5 5 5 5V7z'/></svg>");
-  }
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+}
+
 
   .filter-dropdown:focus {
     outline: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 14l5-5 5 5H7z'/></svg>");
   }
 
   .filtering-section {
