@@ -162,6 +162,7 @@ export default {
             date: new Date(item.created_at).toLocaleDateString(),
             status: item.Status,
             comments: item.comments,
+            subject_teachers: item.subject_teachers ?? [],
           };
         })
         .filter((item) => {

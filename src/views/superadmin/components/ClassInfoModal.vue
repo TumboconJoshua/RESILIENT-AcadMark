@@ -49,6 +49,20 @@
           </div>
         </div>
 
+<div v-if="props.classInfo.subject_teachers && props.classInfo.subject_teachers.length" class="mt-6">
+  <h2 class="text-xl text-[#295f98] font-semibold mb-2">Subject Teachers</h2>
+  <ul class="list-disc pl-6 space-y-1">
+    <li v-for="(teacher, index) in props.classInfo.subject_teachers" :key="index">
+      <span class="font-medium text-gray-800">{{ teacher.subject_name }}</span> —
+      <span class="text-gray-700">{{ teacher.teacher_name }}</span>
+      <span class="text-gray-500">({{ teacher.subject_code }})</span>
+    </li>
+  </ul>
+</div>
+
+
+
+
         <!-- Section Separator -->
         <h2 class="text-xl text-[#295f98] font-semibold mt-4">Comments</h2>
         <textarea v-model="props.classInfo.comments" rows="5" placeholder="Enter comments or additional notes here..."

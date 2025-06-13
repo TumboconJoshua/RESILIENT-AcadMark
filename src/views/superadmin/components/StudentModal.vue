@@ -125,7 +125,7 @@
 
           <!-- Action Buttons -->
           <div class="form-actions">
-            <button type="button" class="cancel-btn" @click="rejectAlert">Reject</button>
+            <button type="button" class="cancel-btn" @click="rejectAlert">Decline</button>
             <button type="submit" class="submit-btn">Accept</button>
           </div>
         </form>

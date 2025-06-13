@@ -80,6 +80,15 @@
               {{ track }}
             </option>
           </select>
+
+          <!-- Sort by -->
+          <select v-model="sortOrder" class="filter-dropdown" style="width: 100px;">
+            <option value="latest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+
+
+
         </div>
 
         <!-- Search -->
@@ -185,21 +194,21 @@
           <span>←</span> Previous
         </button>
 
-<button
-  v-for="page in pageNumbers"
-  :key="page"
-  class="py-1 border border-[#295F98] rounded w-10 text-center"
-  :class="{
-    'bg-[#295F98] text-white': page === currentPage,
-    'text-gray-600': page !== currentPage,
-    'cursor-default': page === '...',
-    'cursor-pointer': page !== '...',
-  }"
-  @click="page !== '...' && goToPage(page)"
-  :disabled="page === '...'"
->
-  {{ page }}
-</button>
+        <button
+          v-for="page in pageNumbers"
+          :key="page"
+          class="py-1 border border-[#295F98] rounded w-10 text-center"
+          :class="{
+            'bg-[#295F98] text-white': page === currentPage,
+            'text-gray-600': page !== currentPage,
+            'cursor-default': page === '...',
+            'cursor-pointer': page !== '...',
+          }"
+          @click="page !== '...' && goToPage(page)"
+          :disabled="page === '...'"
+        >
+          {{ page }}
+        </button>
 
         <button
           class="px-3 border border-[#295F98] text-[#295F98] py-1 rounded w-28 disabled:opacity-50 whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer"
@@ -212,7 +221,7 @@
 
       <!-- Accept/Reject Buttons -->
       <div class="button">
-        <button class="red" @click="reject">Reject</button>
+        <button class="red" @click="reject">Decline</button>
         <button class="green" @click="acceptAlert">Accept</button>
       </div>
     </div>
@@ -291,6 +300,7 @@ const refreshStudents = async () => {
       birthdate: student.BirthDate,
       age: student.Age,
       status: student.Status,
+      created_at: student.created_at,
     }));
   } catch (error) {
     console.error('Failed to load students:', error);
@@ -309,6 +319,7 @@ const genders = [
 ];
 const tracks = ['STEM', 'ABM', 'TVL', 'HUMSS'];
 const selectedStatus = ref('');
+const sortOrder = ref('latest');
 const selectedGrade = ref('');
 const selectedCurriculum = ref('');
 const selectedGender = ref('');
@@ -321,23 +332,15 @@ const showCurriculum = ref(true);
 const showGender = ref(true);
 const showTrack = ref(true);
 
-const filteredStudents = computed(() =>
-  students.value.filter((student) => {
-    const matchesSearch = student.name
-      .toLowerCase()
-      .includes(searchQuery.value.toLowerCase());
-    const matchesStatus =
-      !selectedStatus.value || student.status === selectedStatus.value;
-    const matchesGrade =
-      !selectedGrade.value ||
-      parseInt(student.grade) === parseInt(selectedGrade.value);
-    const matchesCurriculum =
-      !selectedCurriculum.value ||
-      student.curriculum === selectedCurriculum.value;
-    const matchesGender =
-      !selectedGender.value || student.gender === selectedGender.value;
-    const matchesTrack =
-      !selectedTrack.value || student.track === selectedTrack.value;
+const filteredStudents = computed(() => {
+  let result = students.value.filter((student) => {
+    const matchesSearch = student.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchesStatus = !selectedStatus.value || student.status === selectedStatus.value;
+    const matchesGrade = !selectedGrade.value || parseInt(student.grade) === parseInt(selectedGrade.value);
+    const matchesCurriculum = !selectedCurriculum.value || student.curriculum === selectedCurriculum.value;
+    const matchesGender = !selectedGender.value || student.gender === selectedGender.value;
+    const matchesTrack = !selectedTrack.value || student.track === selectedTrack.value;
+
     return (
       matchesSearch &&
       matchesStatus &&
@@ -346,8 +349,20 @@ const filteredStudents = computed(() =>
       matchesGender &&
       matchesTrack
     );
-  })
-);
+  });
+
+  // ✅ Sort by created_at
+result.sort((a, b) => {
+  const dateA = new Date(a.created_at);
+  const dateB = new Date(b.created_at);
+  return sortOrder.value === 'oldest' ? dateA - dateB : dateB - dateA;
+});
+
+
+  return result;
+});
+
+
 
 // Pagination: Slice filteredStudents according to currentPage and pageSize
 const paginatedStudents = computed(() => {
@@ -388,6 +403,7 @@ watch(
     selectedGender,
     selectedTrack,
     searchQuery,
+    sortOrder,
   ],
   () => {
     currentPage.value = 1;
