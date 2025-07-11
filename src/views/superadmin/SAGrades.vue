@@ -37,7 +37,7 @@
               {{ card.curriculum === 'JHS' ? 'Junior High School' : card.curriculum === 'SHS' ? 'Senior High School' : card.curriculum }}
             </p>
           </div>
-          <div class="grade">Grade {{ card.grade }}</div>
+          <div class="grade">{{ card.gradeLabel }}</div>
           <div class="section" v-if="card.section && card.curriculum">
             {{ card.section }} - {{ card.curriculum }}
           </div>
@@ -76,14 +76,15 @@ onMounted(async () => {
       // Map the data into the structure expected by the UI
       cards.value = response.data.map(item => {
         return {
-          grade: Number(item.grade_level),             // e.g., 7
-          gradeLabel: `Grade ${item.grade_level}`,     // e.g., "Grade 7"
-          section: item.section?.trim(),               // directly use section
+          grade: parseInt(item.gradeLevel),                // Parse to number
+          gradeLabel: `Grade ${item.gradeLevel}`,          // e.g., "Grade 7"
+          section: item.className.split('-')[1]?.trim() || '', // Get section if exists
           curriculum: item.curriculum,
           track: item.track,
           class_id: item.class_id
         };
       });
+
 
       console.log("Mapped Cards:", cards.value);
     }
